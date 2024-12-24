@@ -76,7 +76,7 @@
             <div class="card mb-6">
                 <div class="card-body">
                     <div class="row">
-                       
+
                         <div class="col-sm-4 text-right">
                             <img src="{{ asset('images/assets/logo.png') }}" class="rounded-circle" width="150"
                                 alt="{{ $workerEntry->name }}">
@@ -284,11 +284,11 @@
             </table>
 
         </section>
-        {{-- <hr> --}}
+        <!-- hr section -->
         <section class="content pt-2">
             <table class="table table-borderless">
 
-                <tr>
+                {{-- <tr>
                     <th>Necessity of Helper</th>
                     <td>
                         <div class="custom-control custom-checkbox">
@@ -298,7 +298,7 @@
 
                         </div>
                     </td>
-                </tr>
+                </tr> --}}
                 <tr>
                     <th>Perception About Size</th>
                     <td>
@@ -371,66 +371,71 @@
 
                 </div>
             </div>
+            <hr>
             <section class="content">
-                <h6 class="text-bold pb-2">HR</h6>
+                <h6 class="text-bold pb-2 text-center">HR</h6>
                 <table class="table table-borderless">
+                    @php
+                        $disciplinary_problems = DB::table('disciplinary_problems')
+                            ->where('worker_entry_id', $workerEntry->id)
+                            ->where('examination_date', $workerEntry->examination_date)
+                            ->get();
+                    @endphp
+                    <tr>
+                        <th>Disciplinary Problems</th>
+                        <td>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="sizeCheckbox" checked disabled>
+                                @if ($disciplinary_problems->count() > 0)
+                                    <label class="custom-control-label" for="sizeCheckbox">Yes</label> <br>
+                                    {{ $disciplinary_problems[0]->disciplinary_problem_description }}
+                                @else
+                                    <label class="custom-control-label" for="sizeCheckbox">No</label>
+                                @endif
+
+                            </div>
+                        </td>
+                    </tr>
+                </table>
                 @php
-                    $disciplinary_problems = DB::table('disciplinary_problems')
-                        ->where('worker_entry_id', $workerEntry->id)
+                    $i = 0;
+                    $trainingDevelopmentEntries = DB::table('training_developments')
+                        ->where('id_card_no', $workerEntry->id_card_no)
                         ->where('examination_date', $workerEntry->examination_date)
                         ->get();
                 @endphp
-                <tr>
-                    <th>Disciplinary Problems</th>
-                    <td>
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="sizeCheckbox" checked disabled>
-                            @if ($disciplinary_problems->count() > 0)
-                            <label class="custom-control-label"
-                                for="sizeCheckbox">Yes</label> <br>
-                                {{ $disciplinary_problems[0]->disciplinary_problem_description }}
-                            @else
-                                <label class="custom-control-label"
-                                for="sizeCheckbox">No</label>
-                            @endif
+                @if ($trainingDevelopmentEntries->count() > 0)
 
-                        </div>
-                    </td>
-                </tr>
-                </table>
-                <table class="table table-bordered table-hover text-center">
-                    <thead>
-                        <tr>
-                            <th>SL No</th>
-                            <th>Training Date</th>
-                            <th>Trining Title</th>
-                            <th>Trining Duration</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @php
-                            $i = 0;
-                            $trainingDevelopmentEntries = DB::table('training_developments')
-                                ->where('id_card_no', $workerEntry->id_card_no)
-                                ->where('examination_date', $workerEntry->examination_date)
-                                ->get();
-                        @endphp
-                        @forelse ($trainingDevelopmentEntries as $trainingDevelopmentEntry)
-                            <tr>
-                                <td>{{ ++$i }}</td>
-                                <td>{{ Carbon\Carbon::parse($trainingDevelopmentEntry->training_date)->format('d-M-Y') }}
-                                </td>
-                                <td>{{ $trainingDevelopmentEntry->training_name }}</td>
-                                <td>{{ $trainingDevelopmentEntry->training_duration }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="text-center">No Training Data Found</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
 
-                </table>
+
+                    <table class="table table-bordered table-hover text-center">
+                        <thead>
+                            <tr>
+                                <th>SL No</th>
+                                <th>Training Date</th>
+                                <th>Trining Title</th>
+                                <th>Trining Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @forelse ($trainingDevelopmentEntries as $trainingDevelopmentEntry)
+                                <tr>
+                                    <td>{{ ++$i }}</td>
+                                    <td>{{ Carbon\Carbon::parse($trainingDevelopmentEntry->training_date)->format('d-M-Y') }}
+                                    </td>
+                                    <td>{{ $trainingDevelopmentEntry->training_name }}</td>
+                                    <td>{{ $trainingDevelopmentEntry->training_duration }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center">No Training Data Found</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+
+                    </table>
+                @endif
             </section>
 
             <div class="row pb-2 pt-1">

@@ -23,6 +23,7 @@
                 <select name="process_type" id="process_type" class="form-control" required>
                     <option value="">Select Process Type</option>
                     <option value="normal">Normal Process</option>
+                    <option value="semi-critical">Semi-Critical Process</option>
                     <option value="critical">Critical Process</option>
                 </select>
             </div>
@@ -31,10 +32,17 @@
                 <label for="machine_type">Machine Type</label>
                 <select name="machine_type" id="machine_type" class="form-control" required>
                     <option value="">Select Machine Type</option>
+                    <option value="OL">OVER LOCK MACHINE</option>
+                    <option value="F/L">FLAT LOCK MACHINE</option>
+                    <option value="SND">Single Needle Lock Stitch</option>
+                    <option value="DNL">Double Needle Lock Stitch Machine</option>
+                    <option value="KNS">Kanchai Machine</option>
                     <option value="LSM">LOCK STITCH MACHINE</option>
-                    <option value="FLM">FLAT LOCK MACHINE</option>
-                    <option value="OLM">OVER LOCK MACHINE</option>
-                    <option value="NM">NORMAL MACHINES</option>
+                    <option value="BS">Button Stitch Machine</option>
+                    <option value="BH">Button Hole Machine</option>
+                    <option value="BTK">Bartack Machine</option>
+                    
+                    <option value="F/L/KNS">Multi Needle Chain Stitch Machine/ Kanchai Machine</option>
                     <option value="SM">SPECIAL MACHINES</option>
                 </select>
             </div>
@@ -45,20 +53,18 @@
                 <div id="process-inputs">
                     <div class="process-input p-1" style="display: flex;">
                         <input type="text" name="process_name[]" class="form-control mr-2" style="flex-grow: 1;"
-                            required placeholder="Process Name">
+                            required placeholder="Process Name" required>
+                        <input type="number" name="smv[]" class="form-control mr-2" style="flex-grow: 1;"
+                            placeholder="SMV" step="0.01" min="0" required>
                         <input type="number" name="standard_capacity[]" class="form-control mr-2" style="flex-grow: 1;"
-                            placeholder="Standard Capacity">
+                            placeholder="Standard Capacity" required>
                         <input type="number" name="standard_time_sec[]" class="form-control mr-2" style="flex-grow: 1;"
-                            placeholder="Standard Time (sec)">
+                            placeholder="Standard Time (sec)" required>
                         <a type="button" class="btn btn-outline-danger remove-process-input">Remove</a>
                     </div>
                 </div>
                 <a type="button" id="add-process-input" class="btn btn-outline-success">Add Processes</a>
             </div>
-
-
-
-
             <br>
             <a type="button" class="btn btn-lg btn-outline-info" href="{{ route('sewingProcessList.index') }}">Cancel</a>
             <x-backend.form.saveButton>Save</x-backend.form.saveButton>
@@ -70,7 +76,7 @@
             // Add Process input field
             $('#add-process-input').click(function() {
                 $('#process-inputs').append(
-                    '<div class="process-input p-1" style="display: flex;"><input type="text" name="process_name[]" class="form-control mr-2" style="flex-grow: 1;" required placeholder="Process Name"><input type="number" name="standard_capacity[]" class="form-control mr-2" style="flex-grow: 1;" placeholder="standard capacity"><input type="number" name="standard_time_sec[]" class="form-control mr-2" style="flex-grow: 1;" placeholder="standard time (sec)"><a type="button" class="btn btn-outline-danger remove-process-input">Remove</a></div>'
+                    '<div class="process-input p-1" style="display: flex;"><input type="text" name="process_name[]" class="form-control mr-2" style="flex-grow: 1;" required placeholder="Process Name"> <input type="number" name="smv[]" class="form-control mr-2" style="flex-grow: 1;" placeholder="SMV" step="0.01" min="0" required> <input type="number" name="standard_capacity[]" class="form-control mr-2" style="flex-grow: 1;" placeholder="standard capacity" required><input type="number" name="standard_time_sec[]" class="form-control mr-2" style="flex-grow: 1;" placeholder="standard time (sec)" required><a type="button" class="btn btn-outline-danger remove-process-input">Remove</a></div>'
                 );
             });
 

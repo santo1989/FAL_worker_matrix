@@ -29,6 +29,9 @@ class SewingProcessListController extends Controller
             'process_name' => 'array|required|min:1|max:191',
             'process_type' => 'required',
             'machine_type' => 'required',
+            'smv' => 'required',
+            'standard_capacity' => 'required',
+            'standard_time_sec' => 'required',
 
         ]);
 
@@ -51,7 +54,7 @@ class SewingProcessListController extends Controller
                 $sewingProcessList->standard_time_sec = $request->standard_time_sec[$key];
                 $sewingProcessList->dataEntryBy = Auth::user()->name;
                 $sewingProcessList->dataEntryDate = date("Y-m-d H:i:s");
-
+        
                 $sewingProcessList->save();
             }
             return redirect()->route('sewingProcessList.index')->withMessage('SewingProcessList is created successfully!');

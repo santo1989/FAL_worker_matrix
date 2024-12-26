@@ -25,6 +25,7 @@
                 <select name="process_type" id="process_type" class="form-control" required>
                     <option value="">Select Process Type</option>
                     <option value="normal" {{ $sewingProcessList->process_type == 'normal' ? 'selected' : '' }}>Normal Process</option>
+                    <option value="semi-critical" {{ $sewingProcessList->process_type == 'semi-critical' ? 'selected' : '' }}>Semi-Critical Process</option>
                     <option value="critical" {{ $sewingProcessList->process_type == 'critical' ? 'selected' : '' }}>Critical Process</option>
                 </select>
             </div>
@@ -33,11 +34,18 @@
                 <label for="machine_type">Machine Type</label>
                 <select name="machine_type" id="machine_type" class="form-control" required>
                     <option value="">Select Machine Type</option>
+                    <option value="OL" {{ $sewingProcessList->machine_type == 'OL' ? 'selected' : '' }}>OVER LOCK MACHINE</option>
+                    <option value="F/L" {{ $sewingProcessList->machine_type == 'F/L' ? 'selected' : '' }}>FLAT LOCK MACHINE</option>
+                    <option value="SND" {{ $sewingProcessList->machine_type == 'SND' ? 'selected' : '' }}>Single Needle Lock Stitch</option>
+                    <option value="DNL" {{ $sewingProcessList->machine_type == 'DNL' ? 'selected' : '' }}>Double Needle Lock Stitch Machine</option>
+                    <option value="KNS" {{ $sewingProcessList->machine_type == 'KNS' ? 'selected' : '' }}>Kanchai Machine</option>
                     <option value="LSM" {{ $sewingProcessList->machine_type == 'LSM' ? 'selected' : '' }}>LOCK STITCH MACHINE</option>
-                    <option value="FLM" {{ $sewingProcessList->machine_type == 'FLM' ? 'selected' : '' }}>FLAT LOCK MACHINE</option>
-                    <option value="OLM" {{ $sewingProcessList->machine_type == 'OLM' ? 'selected' : '' }}>OVER LOCK MACHINE</option>
-                    <option value="NM" {{ $sewingProcessList->machine_type == 'NM' ? 'selected' : '' }}>NORMAL MACHINES</option>
+                    <option value="BS" {{ $sewingProcessList->machine_type == 'BS' ? 'selected' : '' }}>Button Stitch Machine</option>
+                    <option value="BH" {{ $sewingProcessList->machine_type == 'BH' ? 'selected' : '' }}>Button Hole Machine</option>
+                    <option value="BTK" {{ $sewingProcessList->machine_type == 'BTK' ? 'selected' : '' }}>Bartack Machine</option>
+                    <option value="F/L/KNS" {{ $sewingProcessList->machine_type == 'F/L/KNS' ? 'selected' : '' }}>Multi Needle Chain Stitch Machine/ Kanchai Machine</option>
                     <option value="SM" {{ $sewingProcessList->machine_type == 'SM' ? 'selected' : '' }}>SPECIAL MACHINES</option>
+                    
                 </select>
             </div>
             <br>

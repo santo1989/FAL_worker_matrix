@@ -143,7 +143,7 @@
                         <th scope="col">Target</th>
                         <th scope="col">Capacity</th>
                         <th scope="col">Production</th>
-                        <th scope="col">Achieve Production</th>
+                        <th scope="col">Line Output</th>
                         <th scope="col">Cycle Log History</th>
                         <th scope="col">Efficiency</th>
                     </tr>
@@ -258,19 +258,32 @@
         <section class="content">
             <table class="table table-borderless">
                 @php
-                    $rating = $sewingProcessEntries[0]['rating'];
+                    $team_rating = $sewingProcessEntries[0]['rating'];
                     // dd($rating);
                 @endphp
                 <tr>
                     <th>Team Work</th>
                     <td>
 
-                        @for ($i = 0; $i < $rating; $i++)
+                        @for ($i = 0; $i < $team_rating; $i++)
                             <i class="bi bi-star-fill text-warning" style="font-size: 1.5rem;"></i>
                         @endfor
                     </td>
                 </tr>
+                 @php
+                    $Disciplinary = $sewingProcessEntries[0]['perception_about_size'];
+                    // dd($Disciplinary);
+                @endphp
                 <tr>
+                    <th>Disciplinary Approach/Behavior</th>
+                    <td>
+
+                        @for ($i = 0; $i < $Disciplinary; $i++)
+                            <i class="bi bi-star-fill text-warning" style="font-size: 1.5rem;"></i>
+                        @endfor
+                    </td>
+                </tr>
+                {{-- <tr>
                     <th>Necessity of Helper</th>
                     <td>
                         <div class="custom-control custom-checkbox">
@@ -291,13 +304,13 @@
 
                         </div>
                     </td>
-                </tr>
-                 @php
+                </tr> --}}
+                @php
                     $disciplinary_problems = DB::table('disciplinary_problems')
                         ->where('worker_entry_id', $workerEntry->id)
                         ->where('examination_date', $workerEntry->examination_date)
                         ->get();
-                        // dd($disciplinary_problems);
+                    // dd($disciplinary_problems);
                 @endphp
                 <tr>
                     <th>Disciplinary Problems</th>
@@ -305,12 +318,10 @@
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="sizeCheckbox" checked disabled>
                             @if ($disciplinary_problems->count() > 0)
-                            <label class="custom-control-label"
-                                for="sizeCheckbox">Yes</label> <br>
+                                <label class="custom-control-label" for="sizeCheckbox">Yes</label> <br>
                                 {{ $disciplinary_problems[0]->disciplinary_problem_description }}
                             @else
-                                <label class="custom-control-label"
-                                for="sizeCheckbox">No</label>
+                                <label class="custom-control-label" for="sizeCheckbox">No</label>
                             @endif
 
                         </div>
@@ -319,7 +330,7 @@
             </table>
         </section>
         <section class="content">
-         
+
             <table class="table table-info table-striped table-hover table-bordered border-info text-center">
                 <thead>
                     <tr>

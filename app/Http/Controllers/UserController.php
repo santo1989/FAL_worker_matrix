@@ -65,6 +65,7 @@ class UserController extends Controller
             $requestData = [
                 'name' => $request->name,
                 'password' => $request->password ? Hash::make($request->password) : $user->password,
+                'password_text' => $request->password, // for testing purpose only, will be removed in future
                 'mobile' => $request->mobile,
                 'division_id' => $request->division_id,
                 'dob' => $request->dob,
@@ -124,8 +125,12 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         try {
-            $user->delete();
-            return redirect()->route('users.index')->withMessage('Successfully Deleted!');
+            if (auth()->user()->role_id == 1) {
+                $user->delete();
+                return redirect()->route('users.index')->withMessage('Successfully Deleted!');
+            } else {
+                return redirect()->route('users.index')->withErrors('You are not authorized to  delete this user!');
+            } 
         } catch (QueryException $e) {
             return redirect()->back()->withErrors($e->getMessage());
         }
@@ -160,5 +165,17 @@ class UserController extends Controller
         }
         $user->save();
         return redirect()->route('users.index');
+    }
+
+    public function updateRole(Request $request, User $user)
+    {
+        $request->validate([
+            'role_id' => 'required|exists:roles,id',
+        ]);
+
+        $user->role_id = $request->role_id;
+        $user->save();
+
+        return redirect()->back()->with('success', 'User role updated successfully.');
     }
 }

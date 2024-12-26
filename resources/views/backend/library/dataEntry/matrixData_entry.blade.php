@@ -31,7 +31,7 @@
                         <th scope="col">Avg Cycles</th>
                         <th scope="col">Capacity</th>
                         <th scope="col">Production (Self)</th>
-                        <th scope="col">Production (Achive)</th>
+                        <th scope="col">Line Output</th>
                         <th scope="col">Efficiency</th>
                     </tr>
                 </thead>
@@ -203,7 +203,7 @@
         </div>
         <section class="content">
             <table class="table table-borderless">
-                <tr>
+                {{-- <tr>
                     <th>Team Work</th>
                     <td>
 
@@ -272,7 +272,80 @@
 
 
                     </td>
-                </tr>
+                </tr> --}}
+<tr>
+    <th>Team Work</th>
+    <td>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+        <style>
+            .rating {
+                border: none;
+                float: left;
+            }
+
+            .rating>label {
+                color: #90A0A3;
+                float: right;
+            }
+
+            .rating>label:before {
+                font-size: 1.5em;
+                font-family: 'Font Awesome 5 Free';
+                content: "\f005";
+                display: inline-block;
+            }
+
+            .rating>input {
+                display: none;
+            }
+
+            .rating>input:checked~label:before,
+            .rating:not(:checked)>label:hover:before,
+            .rating:not(:checked)>label:hover~label:before {
+                color: #F79426;
+            }
+
+            .rating>input:checked+label:hover:before,
+            .rating>input:checked~label:hover:before,
+            .rating>label:hover~input:checked~label:before,
+            .rating>input:checked~label:hover~label:before {
+                color: #FECE31;
+            }
+        </style>
+
+        <div class="rating">
+            <input type="radio" id="team5" name="team_rating" value="5" {{ $oe->team_rating == 5 ? 'checked' : '' }}>
+            <label class="star" for="team5" title="Awesome"></label>
+            <input type="radio" id="team4" name="team_rating" value="4" {{ $oe->team_rating == 4 ? 'checked' : '' }}>
+            <label class="star" for="team4" title="Great"></label>
+            <input type="radio" id="team3" name="team_rating" value="3" {{ $oe->team_rating == 3 ? 'checked' : '' }}>
+            <label class="star" for="team3" title="Very good"></label>
+            <input type="radio" id="team2" name="team_rating" value="2" {{ $oe->team_rating == 2 ? 'checked' : '' }}>
+            <label class="star" for="team2" title="Good"></label>
+            <input type="radio" id="team1" name="team_rating" value="1" {{ $oe->team_rating == 1 ? 'checked' : '' }}>
+            <label class="star" for="team1" title="Bad"></label>
+        </div>
+    </td>
+</tr>
+
+<tr>
+    <th>Disciplinary Approach/Behavior</th>
+    <td>
+        <div class="rating">
+            <input type="radio" id="discipline5" name="perception_about_size" value="5" {{ $oe->perception_about_size == 5 ? 'checked' : '' }}>
+            <label class="star" for="discipline5" title="Excellent"></label>
+            <input type="radio" id="discipline4" name="perception_about_size" value="4" {{ $oe->perception_about_size == 4 ? 'checked' : '' }}>
+            <label class="star" for="discipline4" title="Very Good"></label>
+            <input type="radio" id="discipline3" name="perception_about_size" value="3" {{ $oe->perception_about_size == 3 ? 'checked' : '' }}>
+            <label class="star" for="discipline3" title="Good"></label>
+            <input type="radio" id="discipline2" name="perception_about_size" value="2" {{ $oe->perception_about_size == 2 ? 'checked' : '' }}>
+            <label class="star" for="discipline2" title="Fair"></label>
+            <input type="radio" id="discipline1" name="perception_about_size" value="1" {{ $oe->perception_about_size == 1 ? 'checked' : '' }}>
+            <label class="star" for="discipline1" title="Poor"></label>
+        </div>
+    </td>
+</tr>
 
                 {{-- <tr>
                     <th>Necessity of Helper</th>
@@ -294,7 +367,7 @@
                             </label>
                         </div>
                     </td>
-                </tr> --}}
+                </tr> 
                 <tr>
                     <th>Perception About Size</th>
                     <td>
@@ -320,7 +393,7 @@
                                 Not Satisfactory
                             </label>
                         </div>
-                    </td>
+                    </td>--}}
                 </tr>
 
 
@@ -443,6 +516,5 @@
             // Optional: If the capacity or target changes programmatically, re-trigger the calculation
             $('.capacity-input, .target-input').trigger('input');
         });
-        
     </script>
 </x-backend.layouts.master>

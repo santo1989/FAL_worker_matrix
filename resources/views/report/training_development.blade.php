@@ -43,11 +43,11 @@
                                                 'examination_date',
                                                 'like',
                                                 $current_year . '%',
-                                            )->get();
+                                            )->distinct()->get(['id_card_no', 'employee_name_english']);
                                         @endphp
                                         @foreach ($workerEntries as $workerEntry)
                                             <option value="{{ $workerEntry->id_card_no }}">
-                                                {{ $workerEntry->id_card_no }}</option>
+                                                {{ $workerEntry->id_card_no }} : {{ $workerEntry->employee_name_english }}</option>
                                         @endforeach
                                     </select>
 
@@ -55,12 +55,69 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer">
+                    <div class="card-footer text-right">
                         <a href="{{ route('home') }}" class="btn btn-outline-danger"><i
                                 class="fas fa-times"></i> Cancel</a>
                         <button type="submit" class="btn btn-outline-success"><i class="fas fa-save"></i> Save</button>
                     </div>
                 </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container pt-1">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        Training & Development List
+                    </div>
+                    @php
+                    $current_year = date('Y');
+                        $trainingDevelopments = \App\Models\TrainingDevelopment::where(
+                            'training_date',
+                            'like',
+                            $current_year . '%',
+                        )->get();
+
+                    // dd($trainingDevelopments);
+                    @endphp
+                  
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>SL</th>
+                                    <th>Training Date</th>
+                                    <th>Training Title</th>
+                                    <th>Training Duration</th>
+                                    <th>Training Perticipent ID Card No</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($trainingDevelopments as $trainingDevelopment)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $trainingDevelopment->training_date }}</td>
+                                        <td>{{ $trainingDevelopment->training_name }}</td>
+                                        <td>{{ $trainingDevelopment->training_duration }}</td>
+                                        <td>
+                                            {{  $trainingDevelopment->id_card_no }}
+                                        </td>
+                                        <td>
+                                            {{-- <a href="{{ route('training_development_edit', $trainingDevelopment->id) }}"
+                                                class="btn btn-outline-primary"><i class="fas fa-edit"></i> Edit</a>
+                                            <a href="{{ route('training_development_delete', $trainingDevelopment->id) }}"
+                                                class="btn btn-outline-danger"><i class="fas fa-trash"></i> Delete</a> --}}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                         
+                    </div> 
                 </div>
             </div>
         </div>

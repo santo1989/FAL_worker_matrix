@@ -22,287 +22,288 @@ use Illuminate\Support\Facades\DB;
 class WorkerEntryController extends Controller
 {
 
-    public function index()
-    {
-        // //last 1 month data entry worker list order by id desc
-        // $workerEntries = WorkerEntry::where('created_at', '>=', now()->subDays(30))->orderBy('id', 'desc')->get();
-        // $search_worker= WorkerEntry::all();
-        $workerEntriesCollection = WorkerEntry::where('old_matrix_Data_status ', NULL)->orderBy('id', 'desc');
-        $search_worker = null; // Initialize the variable
-        $workerProcessEntries = WorkerSewingProcessEntry::all();
-
-        // Check if the floor field is selected
-        if (request('floor')) {
-            $workerEntriesCollection = $workerEntriesCollection->where('floor', request('floor'));
-            $search_worker = $workerEntriesCollection->get();
-            session(['search_worker' => $search_worker]);
-        }
-
-        // Check if the id_card_no field is selected
-        if (request('id_card_no')) {
-            $workerEntriesCollection = $workerEntriesCollection->where('id_card_no', request('id_card_no'));
-            $search_worker = $workerEntriesCollection->get();
-            session(['search_worker' => $search_worker]);
-        }
-
-        // Check if the process_type fields are filled
-        if (request('process_type')) {
-            $workerProcessEntries = WorkerSewingProcessEntry::where('sewing_process_type', request('process_type'))->get();
-            $workerEntriesCollection = $workerEntriesCollection->whereIn('id', $workerProcessEntries->pluck('worker_entry_id'));
-            $search_worker = $workerEntriesCollection->get();
-            session(['search_worker' => $search_worker]);
-        }
-
-        // Check if the process_name field is filled
-        if (request('process_name')) {
-            $workerProcessEntries = WorkerSewingProcessEntry::where('sewing_process_name', request('process_name'))->get();
-            // dd($workerProcessEntries);
-            $workerEntriesCollection = $workerEntriesCollection->whereIn('id', $workerProcessEntries->pluck('worker_entry_id'));
-            $search_worker = $workerEntriesCollection->get();
-            session(['search_worker' => $search_worker]);
-        }
-
-        // Check if the recomanded_grade field is filled
-        if (request('recomanded_grade')) {
-            $workerEntriesCollection = $workerEntriesCollection->where('recomanded_grade', request('recomanded_grade'));
-            $search_worker = $workerEntriesCollection->get();
-            session(['search_worker' => $search_worker]);
-        }
-
-
-
-        // Check if the request low_performer field is filled start
-
-        // Check if the request low_performer field is filled
-        if (request('low_performer')) {
-            // Assigning numerical values to grades
-            $grades = [
-                'D' => 1,
-                'C' => 2,
-                'C+' => 3,
-                'C++' => 4,
-                'B' => 5,
-                'B+' => 6,
-                'A' => 7,
-                'A+' => 8,
-            ];
-
-            // Fetch worker entries from the database
-            $workerCollection = WorkerEntry::all(); // Assuming WorkerEntry is your Eloquent model
-
-            // Loop through each worker entry and filter based on the condition
-            $search_worker_ids = [];
-            foreach ($workerCollection as $key => $workerEntry) {
-                if ($workerEntry->present_grade != null && $workerEntry->recomanded_grade != null) {
-                    $present_grade_value = $grades[$workerEntry->present_grade];
-                    $recommended_grade_value = $grades[$workerEntry->recomanded_grade];
-                } else {
-                    // Set default values if grades are not available
-                    $present_grade_value = 9; // Assuming 9 is higher than any grade value
-                    $recommended_grade_value = 0; // Assuming 0 is lower than any grade value
-                }
-
-                // If present grade is less than recommended grade, include in search results
-                if ($present_grade_value > $recommended_grade_value) {
-                    $search_worker_ids[] = $workerEntry->id;
-                }
-            }
-
-            // Filter the workerEntriesCollection based on the collected IDs
-            $workerEntriesCollection = $workerEntriesCollection->whereIn('id', $search_worker_ids);
-
-            // dd($workerEntriesCollection);
-
-            // Store the filtered worker entries in the session
-            $search_worker = $workerEntriesCollection->get();
-            session(['search_worker' => $search_worker]); // Store in the session
-        }
-
-
-        // Check if the request low_performer field is filled end
-
-        // Check if the request high_performer field is filled start
-
-        // Check if the request high_performer field is filled
-        if (request('high_performer')) {
-            // Assigning numerical values to grades
-            $grades = [
-                'D' => 1,
-                'C' => 2,
-                'C+' => 3,
-                'C++' => 4,
-                'B' => 5,
-                'B+' => 6,
-                'A' => 7,
-                'A+' => 8,
-            ];
-
-            // Fetch worker entries from the database
-            $workerCollection = WorkerEntry::all(); // Assuming WorkerEntry is your Eloquent model
-
-            // Loop through each worker entry and filter based on the condition
-            $search_worker_ids = [];
-            foreach ($workerCollection as $key => $workerEntry) {
-                if ($workerEntry->present_grade != null && $workerEntry->recomanded_grade != null) {
-                    $present_grade_value = $grades[$workerEntry->present_grade];
-                    $recommended_grade_value = $grades[$workerEntry->recomanded_grade];
-                } else {
-                    // Set default values if grades are not available
-                    $present_grade_value = 9; // Assuming 9 is higher than any grade value
-                    $recommended_grade_value = 0; // Assuming 0 is lower than any grade value
-                }
-
-                // If present grade is less than recommended grade, include in search results
-                if ($present_grade_value < $recommended_grade_value) {
-                    $search_worker_ids[] = $workerEntry->id;
-                }
-            }
-
-            // Filter the workerEntriesCollection based on the collected IDs
-            $workerEntriesCollection = $workerEntriesCollection->whereIn('id', $search_worker_ids);
-
-            // dd($workerEntriesCollection);
-
-            // Store the filtered worker entries in the session
-            $search_worker = $workerEntriesCollection->get();
-            session(['search_worker' => $search_worker]); // Store in the session
-        }
-
-        // Check if the request high_performer field is filled end
-
-        $workerEntries = $workerEntriesCollection->get();
-
-        // Check if export format is requested
-        $format = strtolower(request('export_format'));
-
-        if ($format === 'xlsx') {
-            // Store the necessary values in the session
-            session(['export_format' => $format]);
-
-            // Retrieve the values from the session
-            $format = session('export_format');
-            $search_worker = session('search_worker');
-
-            if ($search_worker == null) {
-                return redirect()->route('workerEntries.index')->withErrors('First search the data then export');
-            } else {
-                $data = compact('search_worker');
-                // Generate the view content based on the requested format
-                $viewContent = View::make('backend.library.dataEntry.export', $data)->render();
-
-                // Set appropriate headers for the file download
-                $filename = Auth::user()->name . '_' . Carbon::now()->format('Y_m_d') . '_' . time() . '.xls';
-                $headers = [
-                    'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                    'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-                    'Content-Transfer-Encoding' => 'binary',
-                    'Cache-Control' => 'must-revalidate',
-                    'Pragma' => 'public',
-                    'Content-Length' => strlen($viewContent)
-                ];
-
-                // Use the "binary" option in response to ensure the file is downloaded correctly
-                return response()->make($viewContent, 200, $headers);
-            }
-        }
-
-        return view('backend.library.dataEntry.index', compact('workerEntries', 'search_worker'));
-    }
-
-
     // public function index()
     // {
-    //     $workerEntriesCollection = WorkerEntry::whereNull('old_matrix_Data_status')->orderBy('id', 'desc');
-    //     $cacheDuration = 60 * 60 * 24 * 7; // 1 week
-    //     $filtersApplied = false;
-    //     $search_worker = null;
+    //     // //last 1 month data entry worker list order by id desc
+    //     // $workerEntries = WorkerEntry::where('created_at', '>=', now()->subDays(30))->orderBy('id', 'desc')->get();
+    //     // $search_worker= WorkerEntry::all();
+    //     $workerEntriesCollection = WorkerEntry::where('old_matrix_Data_status ', NULL)->orderBy('id', 'desc');
+    //     $search_worker = null; // Initialize the variable
+    //     $workerProcessEntries = WorkerSewingProcessEntry::all();
 
-    //     // Define filterable parameters and their corresponding logic
-    //     $filters = [
-    //         'floor' => fn($value) => WorkerEntry::where('floor', $value)->pluck('id'),
-    //         'id_card_no' => fn($value) => WorkerEntry::where('id_card_no', $value)->pluck('id'),
-    //         'process_type' => fn($value) => WorkerSewingProcessEntry::where('sewing_process_type', $value)->pluck('worker_entry_id'),
-    //         'process_name' => fn($value) => WorkerSewingProcessEntry::where('sewing_process_name', $value)->pluck('worker_entry_id'),
-    //         'recomanded_grade' => fn($value) => WorkerEntry::where('recomanded_grade', $value)->pluck('id'),
-    //         'low_performer' => fn() => $this->filterByPerformance('low'),
-    //         'high_performer' => fn() => $this->filterByPerformance('high'),
-    //     ];
-
-    //     // Apply filters dynamically
-    //     foreach ($filters as $param => $callback) {
-    //         if ($value = request($param)) {
-    //             $filtersApplied = true;
-    //             $cacheKey = "workerEntries_{$param}_" . ($value ?? 'default');
-    //             $workerEntriesCollection = $this->cacheFilterResults($workerEntriesCollection, $cacheKey, $cacheDuration, fn() => $callback($value));
-    //         }
+    //     // Check if the floor field is selected
+    //     if (request('floor')) {
+    //         $workerEntriesCollection = $workerEntriesCollection->where('floor', request('floor'));
+    //         $search_worker = $workerEntriesCollection->get();
+    //         session(['search_worker' => $search_worker]);
     //     }
 
-    //     // Fetch filtered results
+    //     // Check if the id_card_no field is selected
+    //     if (request('id_card_no')) {
+    //         $workerEntriesCollection = $workerEntriesCollection->where('id_card_no', request('id_card_no'));
+    //         $search_worker = $workerEntriesCollection->get();
+    //         session(['search_worker' => $search_worker]);
+    //     }
+
+    //     // Check if the process_type fields are filled
+    //     if (request('process_type')) {
+    //         $workerProcessEntries = WorkerSewingProcessEntry::where('sewing_process_type', request('process_type'))->get();
+    //         $workerEntriesCollection = $workerEntriesCollection->whereIn('id', $workerProcessEntries->pluck('worker_entry_id'));
+    //         $search_worker = $workerEntriesCollection->get();
+    //         session(['search_worker' => $search_worker]);
+    //     }
+
+    //     // Check if the process_name field is filled
+    //     if (request('process_name')) {
+    //         $workerProcessEntries = WorkerSewingProcessEntry::where('sewing_process_name', request('process_name'))->get();
+    //         // dd($workerProcessEntries);
+    //         $workerEntriesCollection = $workerEntriesCollection->whereIn('id', $workerProcessEntries->pluck('worker_entry_id'));
+    //         $search_worker = $workerEntriesCollection->get();
+    //         session(['search_worker' => $search_worker]);
+    //     }
+
+    //     // Check if the recomanded_grade field is filled
+    //     if (request('recomanded_grade')) {
+    //         $workerEntriesCollection = $workerEntriesCollection->where('recomanded_grade', request('recomanded_grade'));
+    //         $search_worker = $workerEntriesCollection->get();
+    //         session(['search_worker' => $search_worker]);
+    //     }
+
+
+
+    //     // Check if the request low_performer field is filled start
+
+    //     // Check if the request low_performer field is filled
+    //     if (request('low_performer')) {
+    //         // Assigning numerical values to grades
+    //         $grades = [
+    //             'D' => 1,
+    //             'C' => 2,
+    //             'C+' => 3,
+    //             'C++' => 4,
+    //             'B' => 5,
+    //             'B+' => 6,
+    //             'A' => 7,
+    //             'A+' => 8,
+    //         ];
+
+    //         // Fetch worker entries from the database
+    //         $workerCollection = WorkerEntry::all(); // Assuming WorkerEntry is your Eloquent model
+
+    //         // Loop through each worker entry and filter based on the condition
+    //         $search_worker_ids = [];
+    //         foreach ($workerCollection as $key => $workerEntry) {
+    //             if ($workerEntry->present_grade != null && $workerEntry->recomanded_grade != null) {
+    //                 $present_grade_value = $grades[$workerEntry->present_grade];
+    //                 $recommended_grade_value = $grades[$workerEntry->recomanded_grade];
+    //             } else {
+    //                 // Set default values if grades are not available
+    //                 $present_grade_value = 9; // Assuming 9 is higher than any grade value
+    //                 $recommended_grade_value = 0; // Assuming 0 is lower than any grade value
+    //             }
+
+    //             // If present grade is less than recommended grade, include in search results
+    //             if ($present_grade_value > $recommended_grade_value) {
+    //                 $search_worker_ids[] = $workerEntry->id;
+    //             }
+    //         }
+
+    //         // Filter the workerEntriesCollection based on the collected IDs
+    //         $workerEntriesCollection = $workerEntriesCollection->whereIn('id', $search_worker_ids);
+
+    //         // dd($workerEntriesCollection);
+
+    //         // Store the filtered worker entries in the session
+    //         $search_worker = $workerEntriesCollection->get();
+    //         session(['search_worker' => $search_worker]); // Store in the session
+    //     }
+
+
+    //     // Check if the request low_performer field is filled end
+
+    //     // Check if the request high_performer field is filled start
+
+    //     // Check if the request high_performer field is filled
+    //     if (request('high_performer')) {
+    //         // Assigning numerical values to grades
+    //         $grades = [
+    //             'D' => 1,
+    //             'C' => 2,
+    //             'C+' => 3,
+    //             'C++' => 4,
+    //             'B' => 5,
+    //             'B+' => 6,
+    //             'A' => 7,
+    //             'A+' => 8,
+    //         ];
+
+    //         // Fetch worker entries from the database
+    //         $workerCollection = WorkerEntry::all(); // Assuming WorkerEntry is your Eloquent model
+
+    //         // Loop through each worker entry and filter based on the condition
+    //         $search_worker_ids = [];
+    //         foreach ($workerCollection as $key => $workerEntry) {
+    //             if ($workerEntry->present_grade != null && $workerEntry->recomanded_grade != null) {
+    //                 $present_grade_value = $grades[$workerEntry->present_grade];
+    //                 $recommended_grade_value = $grades[$workerEntry->recomanded_grade];
+    //             } else {
+    //                 // Set default values if grades are not available
+    //                 $present_grade_value = 9; // Assuming 9 is higher than any grade value
+    //                 $recommended_grade_value = 0; // Assuming 0 is lower than any grade value
+    //             }
+
+    //             // If present grade is less than recommended grade, include in search results
+    //             if ($present_grade_value < $recommended_grade_value) {
+    //                 $search_worker_ids[] = $workerEntry->id;
+    //             }
+    //         }
+
+    //         // Filter the workerEntriesCollection based on the collected IDs
+    //         $workerEntriesCollection = $workerEntriesCollection->whereIn('id', $search_worker_ids);
+
+    //         // dd($workerEntriesCollection);
+
+    //         // Store the filtered worker entries in the session
+    //         $search_worker = $workerEntriesCollection->get();
+    //         session(['search_worker' => $search_worker]); // Store in the session
+    //     }
+
+    //     // Check if the request high_performer field is filled end
+
     //     $workerEntries = $workerEntriesCollection->get();
 
-    //     // Handle session storage
-    //     if ($filtersApplied) {
-    //         session(['search_worker' => $workerEntries]);
-    //         $search_worker = $workerEntries;
-    //     } elseif (request('export_format')) {
-    //         $search_worker = session('search_worker');
-    //     } else {
-    //         session(['search_worker' => null]);
-    //     }
+    //     // Check if export format is requested
+    //     $format = strtolower(request('export_format'));
 
-    //     // Export logic
-    //     if (strtolower(request('export_format')) === 'xlsx') {
+    //     if ($format === 'xlsx') {
+    //         // Store the necessary values in the session
+    //         session(['export_format' => $format]);
+
+    //         // Retrieve the values from the session
+    //         $format = session('export_format');
     //         $search_worker = session('search_worker');
 
-    //         if (!$search_worker) {
-    //             return redirect()->route('workerEntries.index')->withErrors('First search the data then export.');
+    //         if ($search_worker == null) {
+    //             return redirect()->route('workerEntries.index')->withErrors('First search the data then export');
+    //         } else {
+    //             $data = compact('search_worker');
+    //             // Generate the view content based on the requested format
+    //             $viewContent = View::make('backend.library.dataEntry.export', $data)->render();
+
+    //             // Set appropriate headers for the file download
+    //             $filename = Auth::user()->name . '_' . Carbon::now()->format('Y_m_d') . '_' . time() . '.xls';
+    //             $headers = [
+    //                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    //                 'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+    //                 'Content-Transfer-Encoding' => 'binary',
+    //                 'Cache-Control' => 'must-revalidate',
+    //                 'Pragma' => 'public',
+    //                 'Content-Length' => strlen($viewContent)
+    //             ];
+
+    //             // Use the "binary" option in response to ensure the file is downloaded correctly
+    //             return response()->make($viewContent, 200, $headers);
     //         }
-
-    //         $data = compact('search_worker');
-    //         $viewContent = View::make('backend.library.dataEntry.export', $data)->render();
-    //         $filename = Auth::user()->name . '_' . now()->format('Y_m_d') . '_' . time() . '.xls';
-
-    //         return response()->make($viewContent, 200, [
-    //             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    //             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-    //         ]);
     //     }
 
     //     return view('backend.library.dataEntry.index', compact('workerEntries', 'search_worker'));
     // }
 
 
+    public function index()
+    {
+        $workerEntriesCollection = WorkerEntry::whereNull('old_matrix_Data_status')->orderBy('id', 'desc');
+        $cacheDuration = 60 * 60 * 24 * 7; // 1 week
+        $filtersApplied = false;
+        $search_worker = null;
+
+        // Define filterable parameters and their corresponding logic
+        $filters = [
+            'floor' => fn($value) => WorkerEntry::where('floor', $value)->pluck('id'),
+            'id_card_no' => fn($value) => WorkerEntry::where('id_card_no', $value)->pluck('id'),
+            'process_type' => fn($value) => WorkerSewingProcessEntry::where('sewing_process_type', $value)->pluck('worker_entry_id'),
+            'process_name' => fn($value) => WorkerSewingProcessEntry::where('sewing_process_name', $value)->pluck('worker_entry_id'),
+            'present_grade' => fn($value) => WorkerEntry::where('present_grade', $value)->pluck('id'),
+            'recomanded_grade' => fn($value) => WorkerEntry::where('recomanded_grade', $value)->pluck('id'),
+            'low_performer' => fn() => $this->filterByPerformance('low'),
+            'high_performer' => fn() => $this->filterByPerformance('high'),
+        ];
+
+        // Apply filters dynamically
+        foreach ($filters as $param => $callback) {
+            if ($value = request($param)) {
+                $filtersApplied = true;
+                $cacheKey = "workerEntries_{$param}_" . ($value ?? 'default');
+                $workerEntriesCollection = $this->cacheFilterResults($workerEntriesCollection, $cacheKey, $cacheDuration, fn() => $callback($value));
+            }
+        }
+
+        // Fetch filtered results
+        $workerEntries = $workerEntriesCollection->get();
+
+        // Handle session storage
+        if ($filtersApplied) {
+            session(['search_worker' => $workerEntries]);
+            $search_worker = $workerEntries;
+        } elseif (request('export_format')) {
+            $search_worker = session('search_worker');
+        } else {
+            session(['search_worker' => null]);
+        }
+
+        // Export logic
+        if (strtolower(request('export_format')) === 'xlsx') {
+            $search_worker = session('search_worker');
+
+            if (!$search_worker) {
+                return redirect()->route('workerEntries.index')->withErrors('First search the data then export.');
+            }
+
+            $data = compact('search_worker');
+            $viewContent = View::make('backend.library.dataEntry.export', $data)->render();
+            $filename = Auth::user()->name . '_' . now()->format('Y_m_d') . '_' . time() . '.xls';
+
+            return response()->make($viewContent, 200, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]);
+        }
+
+        return view('backend.library.dataEntry.index', compact('workerEntries', 'search_worker'));
+    }
 
 
-    // private function cacheFilterResults($query, $cacheKey, $cacheDuration, $filterCallback)
-    // {
-    //     $ids = Cache::remember($cacheKey, $cacheDuration, $filterCallback);
-    //     return $query->whereIn('id', $ids);
-    // }
 
 
-    // private function filterByPerformance($type)
-    // {
-    //     $grades = [
-    //         'D' => 1,
-    //         'C' => 2,
-    //         'C+' => 3,
-    //         'C++' => 4,
-    //         'B' => 5,
-    //         'B+' => 6,
-    //         'A' => 7,
-    //         'A+' => 8,
-    //     ];
+    private function cacheFilterResults($query, $cacheKey, $cacheDuration, $filterCallback)
+    {
+        $ids = Cache::remember($cacheKey, $cacheDuration, $filterCallback);
+        return $query->whereIn('id', $ids);
+    }
 
-    //     return WorkerEntry::all()->filter(function ($workerEntry) use ($grades, $type) {
-    //         $presentValue = $grades[$workerEntry->present_grade] ?? 9;
-    //         $recommendedValue = $grades[$workerEntry->recomanded_grade] ?? 0;
 
-    //         return $type === 'low'
-    //             ? $presentValue > $recommendedValue
-    //             : $presentValue < $recommendedValue;
-    //     })->pluck('id')->toArray();
-    // }
+    private function filterByPerformance($type)
+    {
+        $grades = [
+            'D' => 1,
+            'C' => 2,
+            'C+' => 3,
+            'C++' => 4,
+            'B' => 5,
+            'B+' => 6,
+            'A' => 7,
+            'A+' => 8,
+        ];
+
+        return WorkerEntry::all()->filter(function ($workerEntry) use ($grades, $type) {
+            $presentValue = $grades[$workerEntry->present_grade] ?? 9;
+            $recommendedValue = $grades[$workerEntry->recomanded_grade] ?? 0;
+
+            return $type === 'low'
+                ? $presentValue > $recommendedValue
+                : $presentValue < $recommendedValue;
+        })->pluck('id')->toArray();
+    }
 
 
 
@@ -495,7 +496,9 @@ class WorkerEntryController extends Controller
 
     public function create()
     {
-        return view('backend.library.dataEntry.create');
+        return view('backend.library.dataEntry.create', [
+            'worker' => new WorkerEntry(),
+        ]);
     }
 
 
@@ -696,6 +699,7 @@ class WorkerEntryController extends Controller
 
     public function matrixData_store(Request $request)
     {
+        // dd($request->all());    // dd($request->all());
         try {
             // Loop through the arrays and update records
             foreach ($request->operation_id as $key => $process_id) {
@@ -712,7 +716,7 @@ class WorkerEntryController extends Controller
                     'efficiency' => $request->efficiency[$key],
                     'necessity_of_helper' => $request->necessity_of_helper,
                     'perception_about_size' => $request->perception_about_size,
-                    'rating' => $request->rating,
+                    'rating' => $request->team_rating,
                     'examination_date' => $examination_date,
                     'dataEditBy' => Auth()->user()->name,
                     'dataEditDate' => now(),

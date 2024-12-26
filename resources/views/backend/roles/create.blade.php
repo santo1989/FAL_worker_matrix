@@ -29,12 +29,9 @@
               <!-- text input -->
               <div class="form-group">
                   <label>Role Name</label>
-                  <input type="text" class="form-control" placeholder="Enter role Name" name="name" value="{{ old('name') }}" required id="name">
-              </div>
- 
-                    <button type="submit" class="btn btn-outline-primary">Save</button>
-
-               
+                  <input type="text" class="form-control" placeholder="Enter role Name" name="name">
+              </div><button type="submit" class="btn btn-outline-info btn-sm"
+                ><i class="bi bi-save-fill"></i>Save</button>
               </div>
           </div>
           {{-- <button type="submit" class="btn btn-primary" style="margin-left: 33px">Save</button> --}}

@@ -38,11 +38,11 @@
                     <label for="floor">Floor</label>
                     <select name="floor" id="floor" class="form-control" required>
                         <option value="">Select Floor</option>
-                        <option value="1st Floor">1st Floor</option>
-                        <option value="2nd Floor">2nd Floor</option>
-                        <option value="3rd Floor">3rd Floor</option>
-                        <option value="4th Floor">4th Floor</option>
-                        <option value="5th Floor">5th Floor</option>
+                        <option value="1st Floor" {{ $worker->floor == '1st Floor' ? 'selected' : ''}}>1st Floor</option>
+                        <option value="2nd Floor" {{ $worker->floor == '2nd Floor' ? 'selected' : '' }}>2nd Floor</option>
+                        <option value="3rd Floor" {{ $worker->floor == '3rd Floor' ? 'selected' : '' }}>3rd Floor</option>
+                        <option value="4th Floor" {{ $worker->floor == '4th Floor' ? 'selected' : '' }}>4th Floor</option>
+                        <option value="5th Floor" {{ $worker->floor == '5th Floor' ? 'selected' : '' }}>5th Floor</option>
                     </select>
 
                 </div>
@@ -51,7 +51,7 @@
                 <div class="form-group col-md-6 col-sm-12">
                     <label for="line">Line</label>
                     <input type="text" name="line" id="line" class="form-control" required
-                        placeholder="Enter Line" value="{{ $workerEntry->line ?? '' }}">
+                        placeholder="Enter Line" value="{{ $worker->line ?? '' }}">
                 </div>
                 <br>
 
@@ -84,14 +84,14 @@
                     <label for="present_grade">Present Grade</label>
                     <select name="present_grade" id="present_grade" class="form-control" required>
                         <option value="">Select Grade</option>
-                        <option value="D">D</option>
-                        <option value="C">C</option>
-                        <option value="C+">C+</option>
-                        <option value="C++">C++</option>
-                        <option value="B">B</option>
-                        <option value="B+">B+</option>
-                        <option value="A">A</option>
-                        <option value="A+">A+</option>
+                        <option value="D" {{ $worker->present_grade == 'D' ? 'selected' : '' }}>D</option> 
+                        <option value="C" {{ $worker->present_grade == 'C' ? 'selected' : '' }}>C</option>
+                        <option value="C+" {{ $worker->present_grade == 'C+' ? 'selected' : '' }}>C+</option>
+                        <option value="C++" {{ $worker->present_grade == 'C++' ? 'selected' : '' }}>C++</option>
+                        <option value="B" {{ $worker->present_grade == 'B' ? 'selected' : '' }}>B</option>
+                        <option value="B+" {{ $worker->present_grade == 'B+' ? 'selected' : '' }}>B+</option>
+                        <option value="A" {{ $worker->present_grade == 'A' ? 'selected' : '' }}>A</option>
+                        <option value="A+" {{ $worker->present_grade == 'A+' ? 'selected' : '' }}>A+</option>
                     </select>
 
                 </div>
@@ -100,18 +100,19 @@
                     <label for="designation_name">Designation</label>
                     <select name="designation_name" id="designation_name" class="form-control" required>
                         <option value="">Select Designation</option>
-                        <option value="Line Leader">Line Leader</option>
-                        <option value="JSMO">JSMO</option>
-                        <option value="OSMO">OSMO</option>
-                        <option value="SMO">SMO</option>
-                        <option value="SSMO">SSMO</option>
+                        <option value="Line Leader" {{ $worker->designation_name == 'Line Leader' ? 'selected' : '' }}>Line Leader</option>
+                        <option value="JSMO" {{ $worker->designation_name == 'JSMO' ? 'selected' : '' }}>JSMO</option>
+                        <option value="OSMO" {{ $worker->designation_name == 'OSMO' ? 'selected' : '' }}>OSMO</option>
+                        <option value="SMO" {{ $worker->designation_name == 'SMO' ? 'selected' : '' }}>SMO</option>
+                        <option value="SSMO" {{ $worker->designation_name == 'SSMO' ? 'selected' : '' }}>SSMO</option>
                     </select>
 
                 </div>
                 <br>
                 <div class="form-group col-md-6 col-sm-12">
                     <label for="experience">Experience</label>
-                    <input type="text" name="experience" id="experience" class="form-control" readonly>
+                    <input type="text" name="experience" id="experience" class="form-control" readonly required
+                        placeholder="Experience" value="{{ $worker->experience ?? '' }}">
 
                 </div>
 

@@ -242,7 +242,7 @@
                         <th scope="col">Average Cycle</th>
                         <th scope="col">Capacity</th>
                         <th scope="col">Production</th>
-                        <th scope="col">Achieve Production</th>
+                        <th scope="col">Line Output</th>
                         <th scope="col">Efficiency</th>
                     </tr>
                 </thead>
@@ -360,16 +360,35 @@
             <h6 class="text-bold pb-2">Supervisor's Comment</h6>
             <div class="row pb-2 pt-1">
                 <div class="col-sm-12 pb-2">
-                    a. Team Works :
-                    @php
-                        $rating = $sewingProcessEntries[0]['rating'];
-                        // dd($rating);
-                    @endphp
-                    @for ($i = 0; $i < $rating; $i++)
-                        <i class="bi bi-star-fill text-warning" style="font-size: 1.5rem;"></i>
-                    @endfor
+    @php
+        $team_rating = isset($sewingProcessEntries[0]['rating']) 
+            ? min($sewingProcessEntries[0]['rating'], 10) 
+            : 0;
+    @endphp
+    <tr>
+        <th>Team Work</th>
+        <td>
+            @for ($i = 0; $i < $team_rating; $i++)
+                <i class="bi bi-star-fill text-warning" style="font-size: 1rem;"></i>
+            @endfor
+        </td>
+    </tr>
+    &nbsp; &nbsp;
+    @php
+        $Disciplinary = isset($sewingProcessEntries[0]['perception_about_size']) 
+            ? min($sewingProcessEntries[0]['perception_about_size'], 10) 
+            : 0;
+    @endphp
+    <tr>
+        <th>Disciplinary Approach/Behavior</th>
+        <td>
+            @for ($i = 0; $i < $Disciplinary; $i++)
+                <i class="bi bi-star-fill text-warning" style="font-size: 1rem;"></i>
+            @endfor
+        </td>
+    </tr>
+</div>
 
-                </div>
             </div>
             <hr>
             <section class="content">

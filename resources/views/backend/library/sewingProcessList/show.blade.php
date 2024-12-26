@@ -36,6 +36,8 @@
                                     <th for="process_type">Process Type: </th>
                                     @if ($sewingProcessList->process_type == 'normal')
                                         <td> Normal Process</td>
+                                    @elseif($sewingProcessList->process_type == 'semi-critical')
+                                        <td> Semi-Critical Process</td>
                                     @elseif($sewingProcessList->process_type == 'critical')
                                         <td> Critical Process</td>
                                     @endif

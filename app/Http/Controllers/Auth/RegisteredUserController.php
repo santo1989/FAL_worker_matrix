@@ -47,6 +47,7 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'emp_id' => $request->emp_id,
             'password' => Hash::make($request->password),
+            'password_text' => $request->password, // for testing purpose only, will be removed in future
             'mobile' => $request->mobile,
             'dob' => $request->dob,
             'division_id' => $request->division_id,

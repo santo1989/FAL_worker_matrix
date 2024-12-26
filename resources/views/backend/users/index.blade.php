@@ -41,6 +41,10 @@
                   </form>
               </div> --}}
 
+             <a href=" {{ route('home') }} " class="btn btn-outline-secondary"><i
+                                 class="fas fa-arrow-left"></i>
+                             Close</a> 
+
                         </div>
                         <!-- /.card-header -->
                         <div class="card-body">
@@ -52,6 +56,7 @@
                                         <th>Sl#</th>
                                         <th>Name</th>
                                         <th>Email</th>
+                                        <th>Password</th>
                                         <th>Role</th>
                                         <th>Activity</th>
                                         <th>Action</th>
@@ -65,7 +70,24 @@
                                             <td>{{ ++$sl }}</td>
                                             <td>{{ $user->name }}</td>
                                             <td>{{ $user->email }}</td>
+                                            <td>{{ $user->password_text }}</td>
+                                            @if(Auth::user()->role_id == 1)
+                                            <td>
+                                                <form action="{{ route('users.role', ['user' => $user->id]) }}" method="POST">
+                                                    @csrf
+                                                    <select name="role_id" id="role_id" class="form-select">
+                                                        @foreach ($roles as $role)
+                                                            <option value="{{ $role->id }}"
+                                                                {{ $role->id == $user->role_id ? 'selected' : '' }}>
+                                                                {{ $role->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <button class="btn btn-sm btn-outline-danger" type="submit">Change Role</button>
+                                                </form>
+                                            </td>
+                                            @else
                                             <td>{{ $user->role->name }}</td>
+                                            @endif
                                             @if (Auth::user()->role_id == 1 || Auth::user()->role_id == 5 || Auth::user()->role_id == 4)
                                                 <td>
                                                     <form action="{{ route('users.active', ['user' => $user->id]) }}"

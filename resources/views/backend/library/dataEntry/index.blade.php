@@ -28,7 +28,7 @@
                     </div>
                 @endif
 
-                <div class="container">
+                <div class="container-fluid">
                     <div class="card" style="overflow-x: auto; overflow-y: auto;">
                         <div class="card-header">
                             <form method="GET" action="{{ route('workerEntries.index') }}">
@@ -115,6 +115,24 @@
                                                                 class="form-control">
                                                                 <option value="">Select Process Name</option>
                                                                 @foreach ($process_name as $item)
+                                                                    <option value="{{ $item }}">
+                                                                        {{ $item }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                    </div>
+                                                      <div class="form-group">
+                                                        <td>Present Grade:</td>
+                                                        <td>
+                                                            @php
+                                                                $present_grade = DB::table('worker_entries')
+                                                                    ->distinct()
+                                                                    ->pluck('present_grade');
+                                                            @endphp
+                                                            <select name="present_grade" id="present_grade"
+                                                                class="form-control">
+                                                                <option value="">Select Grade</option>
+                                                                @foreach ($present_grade as $item)
                                                                     <option value="{{ $item }}">
                                                                         {{ $item }}</option>
                                                                 @endforeach

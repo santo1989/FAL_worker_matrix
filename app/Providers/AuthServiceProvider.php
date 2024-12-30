@@ -55,7 +55,7 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::define('HR', function (User $user) {
 
-            if ($user->role_id == 10002) {
+            if ($user->role_id == 4) {
                 return true;
             }
             return false;

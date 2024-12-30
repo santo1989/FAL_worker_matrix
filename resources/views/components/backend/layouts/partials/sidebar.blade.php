@@ -70,7 +70,18 @@
                         Operator Assessment Sheet Management
                     </a>
 
-                    @if (auth()->user()->role->name == 'Admin' || auth()->user()->role->name == 'HR')
+                    @if (auth()->user()->role->name == 'Admin')
+                        <a class="nav-link" href="{{ route('training_development') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+                            Training & Development Management
+                        </a>
+                        <a class="nav-link" href="{{ route('disciplinary_problems') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+                            Disciplinary Problems Management
+                        </a>
+                    @endif
+
+                     @if (auth()->user()->role_id == 4)
                         <a class="nav-link" href="{{ route('training_development') }}">
                             <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                             Training & Development Management

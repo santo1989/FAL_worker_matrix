@@ -11,7 +11,7 @@
         @include('layouts.supervisor')
     @break
 
-    @case('10002')
+    @case('4')
         @include('layouts.hr_manager')
     @break
 

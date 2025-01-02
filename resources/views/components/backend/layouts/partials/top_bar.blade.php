@@ -11,7 +11,7 @@
          $time_of_day = 'Evening';
      }
      $wishMessage = "Good $time_of_day";
-     
+
  @endphp
  <nav class="sb-topnav navbar navbar-expand navbar-light bg-light text-white"
      style="background-image: linear-gradient(#40c47c,#40c47c,#40c47c); text-color:white;">
@@ -87,7 +87,9 @@
                      data-bs-toggle="dropdown" aria-expanded="false"><img
                          src="{{ asset('images/users/' . auth()->user()->picture) }}" class="rounded-circle"
                          width="50px" height="50px" alt="{{ auth()->user()->name }}">
-                     {{ auth()->user()->name ?? '' }}
+                     <span class="d-none d-md-inline">
+                         {{ auth()->user()->name ?? '' }}
+                     </span>
                  </a>
                  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                      {{-- <li><a class="dropdown-item" href="#!">Settings</a></li>

@@ -19,8 +19,7 @@
                     </a>
 
                 </div>
-            </div>
-            <div class="container">
+             
                 @include('report.dashboard_graph')
             </div>
         </x-backend.layouts.master>

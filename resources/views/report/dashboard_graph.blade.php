@@ -1,32 +1,30 @@
-<x-backend.layouts.master>
+ 
 
-    <x-slot name="pageTitle">
-        Graphical Report
-    </x-slot>
+
     <div class="container">
         <div class="row justify-content-center text-center p-2">
             <div class="col-6">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Last Year</h4>
+                        <h4 class="card-title">Last Month</h4>
                     </div>
                     <div class="card-body">
                         {{-- <canvas id="last_year" width="100" height="100" width="100vw" height="40vh"></canvas> --}}
                         <!-- Add a container for the pie chart -->
-                        <div id="last_year" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                        <div id="last_year" ></div>
                     </div>
                 </div>
             </div>
             <div class="col-6">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">This Year</h4>
+                        <h4 class="card-title">This Month</h4>
                     </div>
                     <div class="card-body">
 
                         {{-- <canvas id="this_year" width="100vw" height="40vh"></canvas> --}}
                         <!-- Add a container for the pie chart -->
-                        <div id="this_year" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                        <div id="this_year" ></div>
 
 
                     </div>
@@ -45,7 +43,7 @@
                         {{-- <canvas id="service_length" width="100vw" height="40vh"></canvas> --}}
 
                         <!-- Add a container for the bar chart -->
-                        <div id="service_length" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                        <div id="service_length" ></div>
 
 
                     </div>
@@ -55,30 +53,42 @@
         </div>
     </div>
 
-
     @php
-        $last_year_grade_list_with_worker = DB::table('worker_entries')
-            ->select('recomanded_grade', DB::raw('COUNT(id_card_no) as total_workers'))
-            ->whereYear('created_at', date('Y') - 1)
-            ->groupBy('recomanded_grade')
-            ->get();
+use Carbon\Carbon;
 
-        $this_year_grade_list_with_worker = DB::table('worker_entries')
-            ->select('recomanded_grade', DB::raw('COUNT(id_card_no) as total_workers'))
-            ->groupBy('recomanded_grade')
-            ->get();
+// Get data for workers grouped by recommended grade for the last month
+$last_year_grade_list_with_worker  = DB::table('worker_entries')
+    ->select('recomanded_grade', DB::raw('COUNT(id_card_no) as total_workers'))
+    ->whereMonth('created_at', Carbon::now()->subMonth()->month)
+    ->whereYear('created_at', Carbon::now()->year)
+    ->groupBy('recomanded_grade')
+    ->get();
 
-        $distinct_service_length_groups = DB::table('worker_entries')
-            ->select(
-                DB::raw('FLOOR(DATEDIFF(DAY, joining_date, GETDATE()) / (365 * 2)) as service_length_group'),
-                DB::raw('COUNT(id_card_no) as total_workers'),
-            )
-            ->groupBy(DB::raw('FLOOR(DATEDIFF(DAY, joining_date, GETDATE()) / (365 * 2))'))
-            ->get();
+// Get data for workers grouped by recommended grade for the current month
+$this_year_grade_list_with_worker  = DB::table('worker_entries')
+    ->select('recomanded_grade', DB::raw('COUNT(id_card_no) as total_workers'))
+    ->whereMonth('created_at', Carbon::now()->month)
+    ->whereYear('created_at', Carbon::now()->year)
+    ->groupBy('recomanded_grade')
+    ->get();
 
-        // dd($distinct_service_length_groups)
+// Calculate service length groups (2-year intervals)
+$distinct_service_length_groups  = DB::table('worker_entries')
+    ->select(
+        DB::raw('FLOOR(DATEDIFF(DAY, joining_date, GETDATE()) / (365 * 2)) as service_length_group'), // Groups every 2 years
+        DB::raw('COUNT(DISTINCT id_card_no) as total_workers') // Count distinct workers
+    )
+    ->whereNull('old_matrix_Data_status')
+    ->groupBy(DB::raw('FLOOR(DATEDIFF(DAY, joining_date, GETDATE()) / (365 * 2))'))
+    ->get();
 
-    @endphp
+// Uncomment to debug
+// dd($service_length_groups);
+
+@endphp
+
+
+    
 
 
     <!-- Highcharts start -->
@@ -162,8 +172,12 @@
     <script src="https://code.highcharts.com/highcharts.js"></script>
 
 
-    <script>
-        // Create the pie chart using Highcharts
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script>
+        // Create the pie chart using Highcharts 
+
         Highcharts.chart('last_year', {
             chart: {
                 type: 'pie'
@@ -290,5 +304,6 @@
         });
     </script>
     <!-- Highcharts CDN End -->
+ 
 
-</x-backend.layouts.master>
+ 

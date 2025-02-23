@@ -3,7 +3,8 @@
 use App\Http\Controllers\CompanyController; 
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DesignationController;
-use App\Http\Controllers\DivisionController; 
+use App\Http\Controllers\DivisionController;
+use App\Http\Controllers\MigrateWorkerListController;
 use App\Http\Controllers\NotificationController; 
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SewingProcessListController; 
@@ -137,6 +138,16 @@ Route::middleware('auth')->group(function () {
     //disciplinary_problems
     Route::get('/disciplinary_problems', [WorkerEntryController::class, 'disciplinary_problems'])->name('disciplinary_problems');
     Route::post('/disciplinary_problems', [WorkerEntryController::class, 'disciplinary_problems_store'])->name('disciplinary_problems_store');
+
+    //migrate_worker_lists
+
+    Route::get('/migrate_worker_lists', [
+        MigrateWorkerListController::class,
+        'index'
+    ])->name('migrate_worker_lists');
+    Route::get('/migrate_worker_lists/create', [MigrateWorkerListController::class,
+     'create'])->name('migrate_worker_lists.create');
+    Route::post('/migrate_worker_lists', [MigrateWorkerListController::class, 'store'])->name('migrate_worker_lists.store');
    
 
 });

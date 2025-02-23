@@ -121,7 +121,7 @@
                                                             </select>
                                                         </td>
                                                     </div>
-                                                      <div class="form-group">
+                                                    <div class="form-group">
                                                         <td>Present Grade:</td>
                                                         <td>
                                                             @php
@@ -228,7 +228,7 @@
                                         </button>
 
                                     </form>
-                                    @if (auth()->user()->role_id == 1)
+                                    @if (auth()->user()->role_id == 1 || auth()->user()->role_id == 3)
                                         {{-- all_data_download download button  --}}
                                         <a href="{{ route('all_data_download') }}" class="btn btn-outline-info">
                                             <i class="fa fa-download" aria-hidden="true"></i> All Data Download </a>
@@ -388,13 +388,13 @@
                                             </td>
                                             <td>{{ $spl->present_grade }}</td>
                                             <td>{{ $spl->recomanded_grade }}</td>
-                                            <td> @if ($spl->recomanded_salary == null || $spl->recomanded_salary == 'N/A')
-                                                Failed 
-                                            @else
-                                                {{ $spl->recomanded_salary }} TK
-                                                
-                                            @endif
-                                                </td>
+                                            <td>
+                                                @if ($spl->recomanded_salary == null || $spl->recomanded_salary == 'N/A')
+                                                    Failed
+                                                @else
+                                                    {{ $spl->recomanded_salary }} TK
+                                                @endif
+                                            </td>
                                             <td>
 
 
@@ -404,7 +404,7 @@
                                                 <x-backend.form.anchor :href="route('workerEntries.show', $spl)" type="show" />
                                                 <x-backend.form.anchor :href="route('workerEntries.approval', $spl)" type="Download" />
                                                 @can('General')
-                                                <a href="{{ route('cyclesData_entry_form', ['workerEntry' => $spl->id]) }}"
+                                                    <a href="{{ route('cyclesData_entry_form', ['workerEntry' => $spl->id]) }}"
                                                         class="btn btn-outline-success my-1 mx-1 btn-sm"><i
                                                             class="bi bi-file"></i>
                                                         Cycle Entry</a>

@@ -18,13 +18,16 @@
 
     <div class="pb-3">
         @csrf
-        <table class="table table-bordered  table-hover">
+         <table class="table table-bordered  table-hover">
             <thead>
                 <tr>
                     <th scope="col">SL</th>
                     <th scope="col">Operation Type</th>
                     <th scope="col"> Machine Type</th>
                     <th scope="col">Operation Name</th>
+                    <th scope="col">SMV</th>
+                    <th scope="col">Target</th>
+                    <th scope="col">Cycle Time</th>
                     <th scope="col">SMV</th>
                     <th scope="col">Target</th>
                     <th scope="col">Cycle Time</th>
@@ -65,51 +68,53 @@
                         </td>
                         <td> {{ ucwords($oe->sewing_process_name) }}</td>
                         <td>
-                            @php
-                                $smv = App\Models\SewingProcessList::where('id', $oe->sewing_process_list_id)
-                                    ->pluck('smv')
-                                    ->first();
+                                @php
+                                    $smv = App\Models\SewingProcessList::where('id', $oe->sewing_process_list_id)
+                                        ->pluck('smv')
+                                        ->first();
 
-                                $smv = number_format($smv, 2);
-                            @endphp
+                                        $smv = number_format($smv, 2);
+                                @endphp
 
-                            {{ $smv }}
+                               {{ $smv }}
 
-                        </td>
+                            </td>
+                            <td>
+                                @php
+                                    $standard_capacity = App\Models\SewingProcessList::where(
+                                        'id',
+                                        $oe->sewing_process_list_id,
+                                    )
+                                        ->pluck('standard_capacity')
+                                        ->first();
+                               
+                                        $target = number_format($standard_capacity, 0);
+                                @endphp
+
+                                {{ $target }}
+                            </td>
+
+                            <td>
+                                @php
+                                    $standard_time_sec = App\Models\SewingProcessList::where(
+                                        'id',
+                                        $oe->sewing_process_list_id,
+                                    )
+                                        ->pluck('standard_time_sec')
+                                        ->first();
+                                       
+
+                                  
+                                        $standard_time_sec = number_format($standard_time_sec, 0);
+                                   
+                                @endphp
+
+                               {{ $standard_time_sec }}
+                            </td>
+
+
                         <td>
-                            @php
-                                $standard_capacity = App\Models\SewingProcessList::where(
-                                    'id',
-                                    $oe->sewing_process_list_id,
-                                )
-                                    ->pluck('standard_capacity')
-                                    ->first();
-
-                                $target = number_format($standard_capacity, 0);
-                            @endphp
-
-                            {{ $target }}
-                        </td>
-
-                        <td>
-                            @php
-                                $standard_time_sec = App\Models\SewingProcessList::where(
-                                    'id',
-                                    $oe->sewing_process_list_id,
-                                )
-                                    ->pluck('standard_time_sec')
-                                    ->first();
-
-                                $standard_time_sec = number_format($standard_time_sec, 0);
-
-                            @endphp
-
-                            {{ $standard_time_sec }}
-                        </td>
-
-
-                        <td>
-                            @if ($oe->sewing_process_avg_cycles == null || $oe->sewing_process_avg_cycles == 0)
+                            @if ($oe->sewing_process_avg_cycles == null)
                                 @php
                                     $modalId = $oe->id;
                                 @endphp

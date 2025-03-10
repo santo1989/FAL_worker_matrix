@@ -19,37 +19,41 @@
                         @endphp
 
                         <?php
-    $joining_date = date("Y-m-d", strtotime($user->joining_date));
-    $dob = date("Y-m-d", strtotime($user->dob));
-    $today = date("Y-m-d");
-
-    // Check if today is the work anniversary or birthday
-    $is_work_anniversary = (date("m-d", strtotime($joining_date)) === date("m-d", strtotime($today)));
-    $is_birthday = (date("m-d", strtotime($dob)) === date("m-d", strtotime($today)));
-
-    if ($is_work_anniversary) {
-        // Calculate years between two dates
-        $joining_years = date_diff(date_create($joining_date), date_create($today))->y;
-
-        // Show work anniversary message
-        echo '<div class="card-header">Happy '.$joining_years.' Year Work Anniversary!</div>
-              <div class="card-body"><h5 class="card-title">Wishing you a wonderful time with us</h5></div>
-              <canvas id="canvas"></canvas>'; // Include the canvas element here for fireworks animation
-    } elseif ($is_birthday) {
-        // Calculate years between two dates
-        $dob_years = date_diff(date_create($dob), date_create($today))->y;
-
-        // Show birthday message
-        echo '<div class="container my-5">
-              <div class="card text-center">
-              <div class="card-header">Happy '.$dob_years.'th Birthday!</div>
-              <div class="card-body">
-              <h5 class="card-title">Wishing you a wonderful day</h5>
-              <p class="card-text">May all your dreams come true.</p>
-              </div></div>
-              <canvas id="canvas"></canvas>'; // Include the canvas element here for fireworks animation
-    }
-?>
+                        $joining_date = date('Y-m-d', strtotime($user->joining_date));
+                        $dob = date('Y-m-d', strtotime($user->dob));
+                        $today = date('Y-m-d');
+                        
+                        // Check if today is the work anniversary or birthday
+                        $is_work_anniversary = date('m-d', strtotime($joining_date)) === date('m-d', strtotime($today));
+                        $is_birthday = date('m-d', strtotime($dob)) === date('m-d', strtotime($today));
+                        
+                        if ($is_work_anniversary) {
+                            // Calculate years between two dates
+                            $joining_years = date_diff(date_create($joining_date), date_create($today))->y;
+                        
+                            // Show work anniversary message
+                            echo '<div class="card-header">Happy ' .
+                                $joining_years .
+                                ' Year Work Anniversary!</div>
+                                      <div class="card-body"><h5 class="card-title">Wishing you a wonderful time with us</h5></div>
+                                      <canvas id="canvas"></canvas>'; // Include the canvas element here for fireworks animation
+                        } elseif ($is_birthday) {
+                            // Calculate years between two dates
+                            $dob_years = date_diff(date_create($dob), date_create($today))->y;
+                        
+                            // Show birthday message
+                            echo '<div class="container my-5">
+                                      <div class="card text-center">
+                                      <div class="card-header">Happy ' .
+                                $dob_years .
+                                'th Birthday!</div>
+                                      <div class="card-body">
+                                      <h5 class="card-title">Wishing you a wonderful day</h5>
+                                      <p class="card-text">May all your dreams come true.</p>
+                                      </div></div>
+                                      <canvas id="canvas"></canvas>'; // Include the canvas element here for fireworks animation
+                        }
+                        ?>
 
 
 

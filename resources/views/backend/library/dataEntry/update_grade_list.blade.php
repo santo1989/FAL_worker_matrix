@@ -31,7 +31,7 @@
                 <div class="container-fluid">
                     <div class="card" style="overflow-x: auto; overflow-y: auto;">
                         <div class="card-header">
-                            <form method="GET" action="{{ route('workerEntries.index') }}">
+                            <form method="GET" action="{{ route('empty_grade_list') }}">
                                 @csrf
                                 <div class="card-header">
                                     <div class="row">
@@ -187,7 +187,7 @@
                                                     </td>
 
                                                     <td>
-                                                        <a href="{{ route('workerEntries.index') }}"
+                                                        <a href="{{ route('empty_grade_list') }}"
                                                             class="btn btn-outline-danger btn-sm"><i
                                                                 class="fa fa-refresh"></i> Reset</a>
                                                     </td>
@@ -209,7 +209,7 @@
 
 
                                     <x-backend.form.anchor :href="route('workerEntries.create')" type="create" />
-                                    <form method="GET" action="{{ route('workerEntries.index') }}" class="d-inline">
+                                    {{-- <form method="GET" action="{{ route('empty_grade_list') }}" class="d-inline">
                                         @csrf
                                         <input type="hidden" name="low_performer" value="low_performer">
 
@@ -219,7 +219,7 @@
 
                                     </form>
 
-                                    <form method="GET" action="{{ route('workerEntries.index') }}" class="d-inline">
+                                    <form method="GET" action="{{ route('empty_grade_list') }}" class="d-inline">
                                         @csrf
                                         <input type="hidden" name="high_performer" value="high_performer">
 
@@ -227,18 +227,14 @@
                                             <i class="fa fa-list" aria-hidden="true"></i> High Performer List
                                         </button>
 
-                                    </form>
-                                    @if (auth()->user()->role_id == 1 || auth()->user()->role_id == 3)
+                                    </form> --}} 
                                         {{-- all_data_download download button  --}}
                                         <a href="{{ route('all_data_download') }}" class="btn btn-outline-info">
-                                            <i class="fa fa-download" aria-hidden="true"></i> All Data Download </a>
-                                    @endif
-                                    <a  href="{{ route('empty_grade_list') }}"
-                                             class="btn btn-sm btn-primary">Unfinished list</a>
+                                            <i class="fa fa-download" aria-hidden="true"></i> All Data Download </a> 
                                 </div>
                                 <div class="col-md-6 col-sm-12 text-md-end">
                                     @if (session('search_worker') || $search_worker)
-                                        <form method="GET" action="{{ route('workerEntries.index') }}">
+                                        <form method="GET" action="{{ route('empty_grade_list') }}">
                                             @csrf
 
                                             <div class="row">
@@ -318,15 +314,15 @@
                                             }
 
                                             // Applying CSS class based on the condition
-                                            $row_class =
-                                                $recommended_grade_value < $present_grade_value ? 'bg-danger' : '';
+                                            // $row_class =
+                                            //     $recommended_grade_value < $present_grade_value ? 'bg-danger' : '';
 
                                         @endphp
 
+{{-- class="{{ $row_class }}" --}}
 
 
-
-                                        <tr class="{{ $row_class }}">
+                                        <tr >
                                             <td>{{ $spl->id }}</td>
                                             <td>{{ $spl->floor }}</td>
                                             <td>

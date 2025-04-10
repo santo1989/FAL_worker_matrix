@@ -102,7 +102,10 @@
                              @foreach ($all_time_total_recomanded_grade as $row)
                                  <tr>
                                      @if ($row->recomanded_grade == '')
-                                         <td><span class="badge badge-danger">Not Update Yet</span></td>
+                                         <td><span class="badge badge-danger">Not Update Yet</span> <a  href="{{ route('empty_grade_list') }}"
+                                             class="btn btn-sm btn-primary">Unfinished list</a></td>
+                                            
+                                        </td>
                                      @else
                                          <td>{{ $row->recomanded_grade }}</td>
                                      @endif

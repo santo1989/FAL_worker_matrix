@@ -148,7 +148,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/migrate_worker_lists/create', [MigrateWorkerListController::class,
      'create'])->name('migrate_worker_lists.create');
     Route::post('/migrate_worker_lists', [MigrateWorkerListController::class, 'store'])->name('migrate_worker_lists.store');
-   
+
+    //empty_grade_list find and update
+    Route::get('/empty_grade_list', [WorkerEntryController::class, 'empty_grade_list'])->name('empty_grade_list');
+
 
 });
 

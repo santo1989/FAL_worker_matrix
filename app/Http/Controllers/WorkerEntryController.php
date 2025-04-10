@@ -1977,4 +1977,72 @@ class WorkerEntryController extends Controller
         // Use the "binary" option in response to ensure the file is downloaded correctly
         return response()->make($viewContent, 200, $headers);
     }
+
+    public function empty_grade_list()
+    {
+        //finding all the worker entries which recomanded_grade is ''
+    
+
+     $workerEntriesCollection = WorkerEntry::where('recomanded_grade', null)->whereNull('old_matrix_Data_status')->DISTINCT('id_card_no')
+            //  ->whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)->orderBy('id', 'desc');
+        $cacheDuration = 60 * 60 * 24 * 7; // 1 week
+        $filtersApplied = false;
+        $search_worker = null;
+
+        // Define filterable parameters and their corresponding logic
+        $filters = [
+            'floor' => fn($value) => WorkerEntry::where('floor', $value)->pluck('id'),
+            'id_card_no' => fn($value) => WorkerEntry::where('id_card_no', $value)->pluck('id'),
+            'process_type' => fn($value) => WorkerSewingProcessEntry::where('sewing_process_type', $value)->pluck('worker_entry_id'),
+            'process_name' => fn($value) => WorkerSewingProcessEntry::where('sewing_process_name', $value)->pluck('worker_entry_id'),
+            'present_grade' => fn($value) => WorkerEntry::where('present_grade', $value)->pluck('id'),
+            'recomanded_grade' => fn($value) => WorkerEntry::where('recomanded_grade', $value)->pluck('id'),
+            'low_performer' => fn() => $this->filterByPerformance('low'),
+            'high_performer' => fn() => $this->filterByPerformance('high'),
+        ];
+
+        // Apply filters dynamically
+        foreach ($filters as $param => $callback) {
+            if ($value = request($param)) {
+                $filtersApplied = true;
+                $cacheKey = "workerEntries_{$param}_" . ($value ?? 'default');
+                $workerEntriesCollection = $this->cacheFilterResults($workerEntriesCollection, $cacheKey, $cacheDuration, fn() => $callback($value));
+            }
+        }
+
+        // Fetch filtered results
+        $workerEntries = $workerEntriesCollection->get();
+
+        // Handle session storage
+        if ($filtersApplied) {
+            session(['search_worker' => $workerEntries]);
+            $search_worker = $workerEntries;
+        } elseif (request('export_format')) {
+            $search_worker = session('search_worker');
+        } else {
+            session(['search_worker' => null]);
+        }
+
+        // Export logic
+        if (strtolower(request('export_format')) === 'xlsx') {
+            $search_worker = session('search_worker');
+
+            if (!$search_worker) {
+                return redirect()->route('empty_grade_list')->withErrors('First search the data then export.');
+            }
+
+            $data = compact('search_worker');
+            $viewContent = View::make('backend.library.dataEntry.export', $data)->render();
+            $filename = Auth::user()->name . '_' . now()->format('Y_m_d') . '_' . time() . '.xls';
+
+            return response()->make($viewContent, 200, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]);
+        }
+
+        return view('backend.library.dataEntry.update_grade_list', compact('workerEntries', 'search_worker'));
+    }
+
 }

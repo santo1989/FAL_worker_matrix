@@ -505,7 +505,7 @@ class WorkerEntryController extends Controller
 
     public function workerEntrys_id_entry(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
 
 
 
@@ -557,9 +557,11 @@ class WorkerEntryController extends Controller
 
     public function workerEntrys_process_entry_form(WorkerEntry $workerEntry)
     {
+        // dd($workerEntry->id);
         $workerEntry = WorkerEntry::find($workerEntry->id);
 
         return view('backend.library.dataEntry.process_entry', compact('workerEntry'));
+        // return redirect()->route('workerEntrys_process_entry_form', $workerEntry->id);
     }
 
     public function workerEntrys_process_entry(Request $request)
@@ -838,6 +840,7 @@ class WorkerEntryController extends Controller
 
     public function edit(WorkerEntry $workerEntry)
     {
+        // dd($workerEntry->id);
         $workerEntry = WorkerEntry::find($workerEntry->id);
         $sewingProcessEntries = WorkerSewingProcessEntry::where('worker_entry_id', $workerEntry->id)->get();
         $cycleListLogs = CycleListLog::where('worker_entry_id', $workerEntry->id)->get();
@@ -913,10 +916,15 @@ class WorkerEntryController extends Controller
         $id_card_no = $request->id;
 
         // Execute the query and retrieve the worker data
-        $worker = WorkerEntry::where('id_card_no', 'LIKE', '%' . $id_card_no . '%')->first();
+        // $worker = WorkerEntry::where('id_card_no', 'LIKE', '%' . $id_card_no . '%')->first();
+        $worker = WorkerEntry::where('id_card_no', $id_card_no)->first();
 
 
-        return view('backend.library.dataEntry.create', compact('worker'));
+        // return view('backend.library.dataEntry.create', compact('worker'));
+        $workerEntry = WorkerEntry::find($worker->id); 
+        $sewingProcessEntries = WorkerSewingProcessEntry::where('worker_entry_id', $workerEntry->id)->get();
+        $cycleListLogs = CycleListLog::where('worker_entry_id', $workerEntry->id)->get();
+        return view('backend.library.dataEntry.edit', compact('workerEntry', 'sewingProcessEntries', 'cycleListLogs'));
     }
 
     public function workerEntrys_process_type_search(Request $request)

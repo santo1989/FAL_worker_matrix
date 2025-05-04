@@ -207,8 +207,9 @@
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
 
-
-                                    <x-backend.form.anchor :href="route('workerEntries.create')" type="create" />
+                                    @can('Admin')
+                                        <x-backend.form.anchor :href="route('workerEntries.create')" type="create" />
+                                    @endcan
                                     <form method="GET" action="{{ route('workerEntries.index') }}" class="d-inline">
                                         @csrf
                                         <input type="hidden" name="low_performer" value="low_performer">
@@ -233,8 +234,8 @@
                                         <a href="{{ route('all_data_download') }}" class="btn btn-outline-info">
                                             <i class="fa fa-download" aria-hidden="true"></i> All Data Download </a>
                                     @endif
-                                    <a  href="{{ route('empty_grade_list') }}"
-                                             class="btn btn-sm btn-primary">Unfinished list</a>
+                                    <a href="{{ route('empty_grade_list') }}" class="btn btn-sm btn-primary">Unfinished
+                                        list</a>
                                 </div>
                                 <div class="col-md-6 col-sm-12 text-md-end">
                                     @if (session('search_worker') || $search_worker)
@@ -429,7 +430,7 @@
                                                             Delete</button>
                                                     </form>
                                                 @endcan
-                                                 @can('Supervisor')
+                                                @can('Supervisor')
                                                     <a href="{{ route('cyclesData_entry_form', ['workerEntry' => $spl->id]) }}"
                                                         class="btn btn-outline-success my-1 mx-1 btn-sm"><i
                                                             class="bi bi-file"></i>

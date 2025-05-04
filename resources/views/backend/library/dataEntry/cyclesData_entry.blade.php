@@ -127,6 +127,17 @@
                                     Cycle Entry
                                 </button>
                             @else
+                            @php
+                                    $modalId = $oe->id;
+                                @endphp
+                                <!-- Button trigger modal -->
+                                <button type="button" class="btn btn-sm btn-outline-dark modal-trigger"
+                                    data-bs-toggle="modal" data-bs-target="#staticBackdrop{{ $oe->id }}"
+                                    data-modal-id="{{ $oe->id }}"
+                                    data-operation-type="{{ $oe->sewing_process_type }}"
+                                    data-operation-name="{{ $oe->sewing_process_name }}">
+                                    Add More Cycle Data
+                                </button> <br>
                                 <input type="text" name="cycles[]"
                                     value="{{ number_format($oe->sewing_process_avg_cycles, 2) }}"
                                     class="form-control cycles-input" readonly>

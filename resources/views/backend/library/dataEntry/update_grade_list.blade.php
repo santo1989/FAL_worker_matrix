@@ -400,6 +400,18 @@
 
                                                 @can('General')
                                                     <x-backend.form.anchor :href="route('workerEntries.edit', $spl)" type="edit" />
+
+                                                    <form style="display:inline"
+                                                        action="{{ route('workerEntries.destroy', ['workerEntry' => $spl->id]) }}"
+                                                        method="POST">
+                                                        @csrf
+                                                        @method('delete')
+
+                                                        <button onclick="return confirm('Are you sure want to delete ?')"
+                                                            class="btn btn-outline-danger my-1 mx-1 btn-sm"
+                                                            type="submit"><i class="bi bi-trash"></i>
+                                                            Delete</button>
+                                                    </form>
                                                 @endcan
                                                 <x-backend.form.anchor :href="route('workerEntries.show', $spl)" type="show" />
                                                 <x-backend.form.anchor :href="route('workerEntries.approval', $spl)" type="Download" />

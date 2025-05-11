@@ -578,10 +578,10 @@ class WorkerEntryController extends Controller
         // dd($oldSewingProcessList, $oldSewingProcessListId, $newSewingProcessListId, $deleteSewingProcessListId);
 
 
-        if ($deleteSewingProcessListId->count() > 0) {
-            CycleListLog::where('worker_entry_id', $request->worker_id)->whereIn('sewing_process_list_id', $deleteSewingProcessListId)->delete();
-            WorkerSewingProcessEntry::where('worker_entry_id', $request->worker_id)->whereIn('sewing_process_list_id', $deleteSewingProcessListId)->delete();
-        }
+        // if ($deleteSewingProcessListId->count() > 0) {
+        //     CycleListLog::where('worker_entry_id', $request->worker_id)->whereIn('sewing_process_list_id', $deleteSewingProcessListId)->delete();
+        //     WorkerSewingProcessEntry::where('worker_entry_id', $request->worker_id)->whereIn('sewing_process_list_id', $deleteSewingProcessListId)->delete();
+        // }
 
 
 

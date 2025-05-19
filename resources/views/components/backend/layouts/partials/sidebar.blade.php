@@ -13,6 +13,10 @@
                         <div class="sb-nav-link-icon"><i class="far fa-address-card"></i></div>
                         Profile
                     </a>
+                    <a class="nav-link" href="{{ route('report.builder') }}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        Report Builder
+                    </a>
                     {{-- start library --}}
 
                     <a class="nav-link collapsed " href="#" data-bs-toggle="collapse"
@@ -180,6 +184,10 @@
                     <a class="nav-link" href="{{ route('users.show', ['user' => auth()->user()->id]) }}">
                         <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                         Profile
+                    </a>
+                    <a class="nav-link" href="{{ route('report.builder') }}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        Report Builder
                     </a>
                     {{-- start library --}}
 

@@ -159,6 +159,10 @@ Route::middleware('auth')->group(function () {
 // all_data_download
 Route::get('/all_data_download', [WorkerEntryController::class, 'all_data_download'])->name('all_data_download');
 
+// report-builder
+Route::get('/report-builder', [WorkerEntryController::class, 'showBuilder'])->name('report.builder');
+Route::post('/generate-report', [WorkerEntryController::class, 'generateReport'])->name('report.generate');
+
 
 
 

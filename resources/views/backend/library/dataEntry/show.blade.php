@@ -82,7 +82,7 @@
                                 alt="{{ $workerEntry->name }}">
                         </div>
                         <div class="col-sm-9 ">
-                            <h1 class="text-dark text-bold">Northern Tosrifa Group.</h1><br> Holding No 4/2 A, Plot 49 &
+                            <h1 class="text-dark text-bold">Fashion Asia Limited (FAL)</h1><br> Holding No 4/2 A, Plot 49 &
                             57
                             135 Gopalpur Munnu Nagar, Tongi, Gazipur Bangladesh
                         </div>
@@ -142,8 +142,8 @@
                         <th scope="col">SMV</th>
                         <th scope="col">Target</th>
                         <th scope="col">Capacity</th>
-                        <th scope="col">Production</th>
-                        <th scope="col">Line Output</th>
+                        {{-- <th scope="col">Production</th>
+                        <th scope="col">Line Output</th> --}}
                         <th scope="col">Cycle Log History</th>
                         <th scope="col">Efficiency</th>
                     </tr>
@@ -166,12 +166,12 @@
                             <td>
                                 {{ number_format($sewingProcessEntry->capacity, 0) ?? 'No Data Found' }}
                             </td>
-                            <td>
+                            {{-- <td>
                                 {{ number_format($sewingProcessEntry->self_production, 0) ?? 'No Data Found' }}
                             </td>
                             <td>
                                 {{ number_format($sewingProcessEntry->achive_production, 0) ?? 'No Data Found' }}
-                            </td>
+                            </td> --}}
                             <td>
                                 <!-- Button trigger modal -->
                                 <button type="button" class="btn btn-outline-info" data-bs-toggle="modal"

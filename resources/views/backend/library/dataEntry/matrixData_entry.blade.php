@@ -30,8 +30,8 @@
                         <th scope="col">Target</th>
                         <th scope="col">Avg Cycles</th>
                         <th scope="col">Capacity</th>
-                        <th scope="col">Production (Self)</th>
-                        <th scope="col">Line Output</th>
+                        <!--  <th scope="col">Production (Self)</th>
+                        <th scope="col">Line Output</th> -->
                         <th scope="col">Efficiency</th>
                     </tr>
                 </thead>
@@ -45,25 +45,6 @@
                             <td>{{ $i++ }}</td>
                             <td>{{ strtoupper($oe->sewing_process_type) }}</td>
                             <td>
-                                {{-- @php
-                                    $machineType = App\Models\SewingProcessList::where(
-                                        'id',
-                                        $oe->sewing_process_list_id,
-                                    )
-                                        ->pluck('machine_type')
-                                        ->first();
-                                @endphp
-                                @if ($machineType = 'LSM')
-                                    LOCK STITCH MACHINE
-                                @elseif ($machineType == 'FLM')
-                                    FLAT LOCK MACHINE
-                                @elseif ($machineType = 'OLM')
-                                    OVER LOCK MACHINE
-                                @elseif ($machineType = 'NM')
-                                    NORMAL MACHINES
-                                @else
-                                    SPECIAL MACHINES
-                                @endif --}}
                                 @php
                                     $machineType = App\Models\SewingProcessList::where(
                                         'id',
@@ -72,26 +53,6 @@
                                     // dd($machineType);
                                 @endphp
                                 {{ $machineType->machine_type }}
-
-                                {{-- @if ($machineType == 'DNL')
-                                    Double Needle Lock Stitch Machine
-                                @elseif($machineType == 'SND')
-                                    Single Needle Lock Stitch Machine
-                                @elseif($machineType == 'OL')
-                                    Over Lock Machine
-                                @elseif($machineType == 'F/L')
-                                    Flat Lock Machine
-                                @elseif($machineType == 'KNS')
-                                    Multi Needle Chain Stitch Machine/ Kanchai Machine
-                                @elseif($machineType == 'F/L/KNS')
-                                    Flat Lock Machine/Multi Needle Chain Stitch Machine/ Kanchai Machine
-                                @elseif($machineType == 'BS')
-                                    Button Stitch Machine
-                                @elseif($machineType == 'BH')
-                                    Button Hole Machine
-                                @elseif($machineType == 'BTK')
-                                    Bartack Machine
-                                @endif --}}
                             </td>
                             <td> {{ ucwords($oe->sewing_process_name) }}</td>
                             <td>
@@ -156,38 +117,31 @@
                                     class="form-control capacity-input" readonly>
                             </td>
 
-                            <td>
-                                @php
-                                    if ($oe->self_production == null) {
-                                        $self_production = '';
-                                    } else {
-                                        $self_production = number_format($oe->self_production, 0);
-                                    }
-                                @endphp
-                                <input type="text" name="production_self[]" value="{{ $self_production }}"
-                                    class="form-control production-self-input">
-                                {{-- @if ($oe->self_production == null)
-                                    <input type="text" name="production_self[]"  
-                                        class="form-control production-self-input">
-                                @else
-                                    <input type="text" name="production_self[]" value="{{  round($oe->self_production) }} "
-                                        class="form-control production-self-input" readonly>
-                                    @endif --}}
-                            </td>
-                            <td>
-                                @php
-                                    if ($oe->achive_production == null) {
-                                        $achive_production = '';
-                                    } else {
-                                        $achive_production = number_format($oe->achive_production, 0);
-                                    }
-                                @endphp
+                            {{-- <td> --}}
+                            @php
+                                if ($oe->self_production == null) {
+                                    $self_production = '';
+                                } else {
+                                    $self_production = number_format($oe->self_production, 0);
+                                }
+                            @endphp
+                            <input type="hidden" name="production_self[]" value="{{ $self_production }}"
+                                class="form-control production-self-input">
 
-                                <input type="text" name="production_achive[]" value="{{ $achive_production }} "
-                                    class="form-control production-achive-input">
-                                {{-- <input type="text" name="production_achive[]" value="{{  number_format($oe->achive_production,0)??'' }}"
-                                    class="form-control production-achive-input"> --}}
-                            </td>
+                            {{-- </td>
+                            <td> --}}
+                            @php
+                                if ($oe->achive_production == null) {
+                                    $achive_production = '';
+                                } else {
+                                    $achive_production = number_format($oe->achive_production, 0);
+                                }
+                            @endphp
+
+                            <input type="hidden" name="production_achive[]" value="{{ $achive_production }} "
+                                class="form-control production-achive-input">
+
+                            {{-- </td> --}}
                             <td>
                                 <input type="text" name="efficiency[]"
                                     value="{{ number_format($oe->efficiency, 2) }}"
@@ -273,79 +227,90 @@
 
                     </td>
                 </tr> --}}
-<tr>
-    <th>Team Work</th>
-    <td>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+                <tr>
+                    <th>Team Work</th>
+                    <td>
+                        <link rel="stylesheet"
+                            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-        <style>
-            .rating {
-                border: none;
-                float: left;
-            }
+                        <style>
+                            .rating {
+                                border: none;
+                                float: left;
+                            }
 
-            .rating>label {
-                color: #90A0A3;
-                float: right;
-            }
+                            .rating>label {
+                                color: #90A0A3;
+                                float: right;
+                            }
 
-            .rating>label:before {
-                font-size: 1.5em;
-                font-family: 'Font Awesome 5 Free';
-                content: "\f005";
-                display: inline-block;
-            }
+                            .rating>label:before {
+                                font-size: 1.5em;
+                                font-family: 'Font Awesome 5 Free';
+                                content: "\f005";
+                                display: inline-block;
+                            }
 
-            .rating>input {
-                display: none;
-            }
+                            .rating>input {
+                                display: none;
+                            }
 
-            .rating>input:checked~label:before,
-            .rating:not(:checked)>label:hover:before,
-            .rating:not(:checked)>label:hover~label:before {
-                color: #F79426;
-            }
+                            .rating>input:checked~label:before,
+                            .rating:not(:checked)>label:hover:before,
+                            .rating:not(:checked)>label:hover~label:before {
+                                color: #F79426;
+                            }
 
-            .rating>input:checked+label:hover:before,
-            .rating>input:checked~label:hover:before,
-            .rating>label:hover~input:checked~label:before,
-            .rating>input:checked~label:hover~label:before {
-                color: #FECE31;
-            }
-        </style>
+                            .rating>input:checked+label:hover:before,
+                            .rating>input:checked~label:hover:before,
+                            .rating>label:hover~input:checked~label:before,
+                            .rating>input:checked~label:hover~label:before {
+                                color: #FECE31;
+                            }
+                        </style>
 
-        <div class="rating">
-            <input type="radio" id="team5" name="team_rating" value="5" {{ $oe->team_rating == 5 ? 'checked' : '' }}>
-            <label class="star" for="team5" title="Awesome"></label>
-            <input type="radio" id="team4" name="team_rating" value="4" {{ $oe->team_rating == 4 ? 'checked' : '' }}>
-            <label class="star" for="team4" title="Great"></label>
-            <input type="radio" id="team3" name="team_rating" value="3" {{ $oe->team_rating == 3 ? 'checked' : '' }}>
-            <label class="star" for="team3" title="Very good"></label>
-            <input type="radio" id="team2" name="team_rating" value="2" {{ $oe->team_rating == 2 ? 'checked' : '' }}>
-            <label class="star" for="team2" title="Good"></label>
-            <input type="radio" id="team1" name="team_rating" value="1" {{ $oe->team_rating == 1 ? 'checked' : '' }}>
-            <label class="star" for="team1" title="Bad"></label>
-        </div>
-    </td>
-</tr>
+                        <div class="rating">
+                            <input type="radio" id="team5" name="team_rating" value="5"
+                                {{ $oe->team_rating == 5 ? 'checked' : '' }}>
+                            <label class="star" for="team5" title="Awesome"></label>
+                            <input type="radio" id="team4" name="team_rating" value="4"
+                                {{ $oe->team_rating == 4 ? 'checked' : '' }}>
+                            <label class="star" for="team4" title="Great"></label>
+                            <input type="radio" id="team3" name="team_rating" value="3"
+                                {{ $oe->team_rating == 3 ? 'checked' : '' }}>
+                            <label class="star" for="team3" title="Very good"></label>
+                            <input type="radio" id="team2" name="team_rating" value="2"
+                                {{ $oe->team_rating == 2 ? 'checked' : '' }}>
+                            <label class="star" for="team2" title="Good"></label>
+                            <input type="radio" id="team1" name="team_rating" value="1"
+                                {{ $oe->team_rating == 1 ? 'checked' : '' }}>
+                            <label class="star" for="team1" title="Bad"></label>
+                        </div>
+                    </td>
+                </tr>
 
-<tr>
-    <th>Disciplinary Approach/Behavior</th>
-    <td>
-        <div class="rating">
-            <input type="radio" id="discipline5" name="perception_about_size" value="5" {{ $oe->perception_about_size == 5 ? 'checked' : '' }}>
-            <label class="star" for="discipline5" title="Excellent"></label>
-            <input type="radio" id="discipline4" name="perception_about_size" value="4" {{ $oe->perception_about_size == 4 ? 'checked' : '' }}>
-            <label class="star" for="discipline4" title="Very Good"></label>
-            <input type="radio" id="discipline3" name="perception_about_size" value="3" {{ $oe->perception_about_size == 3 ? 'checked' : '' }}>
-            <label class="star" for="discipline3" title="Good"></label>
-            <input type="radio" id="discipline2" name="perception_about_size" value="2" {{ $oe->perception_about_size == 2 ? 'checked' : '' }}>
-            <label class="star" for="discipline2" title="Fair"></label>
-            <input type="radio" id="discipline1" name="perception_about_size" value="1" {{ $oe->perception_about_size == 1 ? 'checked' : '' }}>
-            <label class="star" for="discipline1" title="Poor"></label>
-        </div>
-    </td>
-</tr>
+                <tr>
+                    <th>Disciplinary Approach/Behavior</th>
+                    <td>
+                        <div class="rating">
+                            <input type="radio" id="discipline5" name="perception_about_size" value="5"
+                                {{ $oe->perception_about_size == 5 ? 'checked' : '' }}>
+                            <label class="star" for="discipline5" title="Excellent"></label>
+                            <input type="radio" id="discipline4" name="perception_about_size" value="4"
+                                {{ $oe->perception_about_size == 4 ? 'checked' : '' }}>
+                            <label class="star" for="discipline4" title="Very Good"></label>
+                            <input type="radio" id="discipline3" name="perception_about_size" value="3"
+                                {{ $oe->perception_about_size == 3 ? 'checked' : '' }}>
+                            <label class="star" for="discipline3" title="Good"></label>
+                            <input type="radio" id="discipline2" name="perception_about_size" value="2"
+                                {{ $oe->perception_about_size == 2 ? 'checked' : '' }}>
+                            <label class="star" for="discipline2" title="Fair"></label>
+                            <input type="radio" id="discipline1" name="perception_about_size" value="1"
+                                {{ $oe->perception_about_size == 1 ? 'checked' : '' }}>
+                            <label class="star" for="discipline1" title="Poor"></label>
+                        </div>
+                    </td>
+                </tr>
 
                 {{-- <tr>
                     <th>Necessity of Helper</th>
@@ -393,8 +358,8 @@
                                 Not Satisfactory
                             </label>
                         </div>
-                    </td>--}}
-                </tr>
+                    </td> 
+                </tr>--}}
 
 
 
@@ -402,7 +367,7 @@
         </section>
 
         <a type="button" class="btn btn-lg btn-outline-info" href="{{ route('workerEntries.index') }}">Cancel</a>
-        <x-backend.form.saveButton>Save</x-backend.form.saveButton>
+        <x-backend.form.saveButton id="save-button">Save</x-backend.form.saveButton>
 
     </form>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -516,5 +481,15 @@
             // Optional: If the capacity or target changes programmatically, re-trigger the calculation
             $('.capacity-input, .target-input').trigger('input');
         });
+
+        //after click the saveButton all button will be hidden
+        $(document).ready(function() {
+            $('#save-button').on('click', function() {
+                // Hide all buttons except the save button
+                $('button').not(this).hide();
+            });
+        });
+
+
     </script>
 </x-backend.layouts.master>

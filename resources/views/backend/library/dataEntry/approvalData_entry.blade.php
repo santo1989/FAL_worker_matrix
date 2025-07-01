@@ -7,9 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="Worker perfomance Management Softwear from NTG, MIS Department" />
     <meta name="author" content="Md. Hasibul Islam Santo, MIS, NTG" />
-    <title> {{ $pageTitle ?? 'WorkerMatrix' }} </title>
-
-    <!-- <link href="css/styles.css" rel="stylesheet" /> -->
+    <title> {{ $pageTitle ?? 'WorkerMatrix' }} </title> 
 
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -53,26 +51,9 @@
 
 <body class="sb-nav-fixed">
 
-    {{-- <x-backend.layouts.partials.top_bar /> --}}
-
-
-    {{-- <x-backend.layouts.master> 
-    <x-slot name="pageTitle">
-        Operator Assessment System
-    </x-slot>
-
-     <x-slot name='breadCrumb'>
-        <x-backend.layouts.elements.breadcrumb>
-            <x-slot name="pageHeader"> List of Sewing Processes </x-slot>
-
-            <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('sewingProcessList.index') }}">List of Sewing Processes</a></li>
-        </x-backend.layouts.elements.breadcrumb>
-    </x-slot> --}}
-
     <section class="container pt-3" id="printableArea">
         <div class="col-md-12 text-center">
-            {{-- card  1 start --}}
+            <!-- card  1 start -->
             <div class="card mb-6">
                 <div class="card-body">
                     <div class="row">
@@ -82,7 +63,7 @@
                                 alt="{{ $workerEntry->name }}">
                         </div>
                         <div class="col-sm-8 text-left">
-                            <h1 class="text-dark text-bold">Northern Tosrifa Group.</h1><br>
+                            <h1 class="text-dark text-bold">Fashion Asia Limited (FAL)</h1><br>
                             <h6 style="font-size:0.7rem;">Holding No 4/2 A, Plot 49 &
                                 57
                                 135 Gopalpur Munnu Nagar, Tongi, Gazipur Bangladesh</h6>
@@ -92,102 +73,7 @@
             </div>
         </div>
         <h5 class="text-center text-bold">Operator Assessment Sheet</h5>
-        {{-- <div class="row">
-            <div class="col-6">
-                <div class="col-md-12">
-                    <!-- card  1 start -->
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-sm-3">
-                                    <h6 class="mb-0">Date</h6>
-                                </div>
-                                <div class="col-sm-9 text-secondary">
-                                    {{ $workerEntry->examination_date }}
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <div class="col-sm-3">
-                                    <h6 class="mb-0">Name</h6>
-                                </div>
-                                <div class="col-sm-9 text-secondary">
-                                    {{ $workerEntry->employee_name_english }}
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <div class="col-sm-3">
-                                    <h6 class="mb-0">ID No</h6>
-                                </div>
-                                <div class="col-sm-9 text-secondary">
-                                    {{ $workerEntry->id_card_no }}
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <div class="col-sm-3">
-                                    <h6 class="mb-0">Joining Date</h6>
-                                </div>
-                                <div class="col-sm-9 text-secondary">
-                                    {{ $workerEntry->joining_date }}
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <div class="col-sm-3">
-                                    <h6 class="mb-0">Present Grade</h6>
-                                </div>
-                                <div class="col-sm-9 text-secondary">
-                                    {{ $workerEntry->present_grade }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- card  1 end -->
-
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex flex-column align-items-center text-center"> 
-                                <div class="mt-3">
-                                    <p class="text-muted font-size-sm">
-                                        Service Length:
-                                        {{ \Carbon\Carbon::parse($workerEntry->joining_date)->diffForHumans() ?? 'No Data found' }}
-                                    </p>
-                                    <p class="text-muted font-size-sm">
-                                        Mobile:
-                                        {{ $workerEntry->mobile ?? ' ' }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card mt-1">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                                <h6 class="mb-0">Recommended Grade</h6>
-                                <span class="text-secondary">
-                                    {{ $workerEntry->recomanded_grade ?? ' ' }}
-                                </span> 
-                            </li>
-
-                            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                                <h6 class="mb-0">Designation</h6>
-                                <span class="text-secondary">
-                                    {{ $workerEntry->designation_name ?? 'Junior Operator' }}
-                                </span>
-
-
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
+    
         <section class="content pb-3">
             <div class="card mt-1">
                 <div class="card-body">
@@ -241,8 +127,6 @@
                         <th scope="col">Target</th>
                         <th scope="col">Average Cycle</th>
                         <th scope="col">Capacity</th>
-                        <th scope="col">Production</th>
-                        <th scope="col">Line Output</th>
                         <th scope="col">Efficiency</th>
                     </tr>
                 </thead>
@@ -269,12 +153,6 @@
                                 {{ number_format($sewingProcessEntry->capacity, 0) ?? 'No Data Found' }}
                             </td>
                             <td>
-                                {{ number_format($sewingProcessEntry->self_production, 0) ?? 'No Data Found' }}
-                            </td>
-                            <td>
-                                {{ number_format($sewingProcessEntry->achive_production, 0) ?? 'No Data Found' }}
-                            </td>
-                            <td>
                                 {{ isset($sewingProcessEntry->efficiency) ? number_format($sewingProcessEntry->efficiency, 2) : 'No Data Found' }}
                                 %
                             </td>
@@ -287,18 +165,6 @@
         <!-- hr section -->
         <section class="content pt-2">
             <table class="table table-borderless">
-
-                {{-- <tr>
-                    <th>Necessity of Helper</th>
-                    <td>
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="sizeCheckbox" checked disabled>
-                            <label class="custom-control-label"
-                                for="sizeCheckbox">{{ $sewingProcessEntry->necessity_of_helper ?? '' }}</label>
-
-                        </div>
-                    </td>
-                </tr> --}}
                 <tr>
                     <th>Perception About Size</th>
                     <td>

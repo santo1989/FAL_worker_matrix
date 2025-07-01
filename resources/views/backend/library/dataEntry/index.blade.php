@@ -299,6 +299,7 @@
 
                                             // Assigning numerical values to grades
                                             $grades = [
+                                                'F' => 0, // Adding F with value 0
                                                 'D' => 1,
                                                 'C' => 2,
                                                 'C+' => 3,

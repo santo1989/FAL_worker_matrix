@@ -106,6 +106,7 @@ class WorkerEntryController extends Controller
             'B+' => 6,
             'A' => 7,
             'A+' => 8,
+            'F' => 0, // Add F with value 0
         ];
 
         return WorkerEntry::all()->filter(function ($workerEntry) use ($grades, $type) {
@@ -183,6 +184,7 @@ class WorkerEntryController extends Controller
                 'B+' => 6,
                 'A' => 7,
                 'A+' => 8,
+                'F' => 0, // Add F with value 0
             ];
 
             // Fetch worker entries from the database
@@ -233,6 +235,7 @@ class WorkerEntryController extends Controller
                 'B+' => 6,
                 'A' => 7,
                 'A+' => 8,
+                'F' => 0, // Add F with value 0
             ];
 
             // Fetch worker entries from the database
@@ -318,7 +321,7 @@ class WorkerEntryController extends Controller
 
     public function workerEntrys_id_entry(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
 
 
 
@@ -740,196 +743,638 @@ class WorkerEntryController extends Controller
         return view('backend.library.dataEntry.edit', compact('workerEntry', 'sewingProcessEntries', 'cycleListLogs'));
     }
 
+    // public function workerEntrys_process_type_search(Request $request)
+    // {
+    //     // dd($request->all());
+
+    //     $process_type = $request->process_type;
+
+
+    //     // Execute the query and retrieve the worker data
+    //     if ($process_type == 'normal' || $process_type == 'semi-critical' || $process_type == 'critical') {
+    //         $sewingProcessList = SewingProcessList::where('process_type', $process_type)->get();
+    //     }
+
+
+
+    //     // Group sewing processes by both process_type and machine_type
+    //     $groupedProcesses = $sewingProcessList->groupBy(['process_type', 'machine_type']);
+
+
+
+    //     // dd($groupedProcesses);
+
+    //     $workerEntry = WorkerEntry::find($request->worker_id);
+    //     return view('backend.library.dataEntry.process_entry', compact('workerEntry', 'groupedProcesses'));
+    // }
+
+
     public function workerEntrys_process_type_search(Request $request)
     {
-        // dd($request->all());
+        $process_types = $request->input('process_type', []);
 
-        $process_type = $request->process_type;
-
-
-        // Execute the query and retrieve the worker data
-        if ($process_type == 'normal' || $process_type == 'semi-critical' || $process_type == 'critical') {
-            $sewingProcessList = SewingProcessList::where('process_type', $process_type)->get();
+        if (empty($process_types)) {
+            return redirect()->back()->withErrors(['process_type' => 'Please select at least one process type']);
         }
 
+        $sewingProcessList = SewingProcessList::whereIn('process_type', $process_types)->get();
 
-
-        // Group sewing processes by both process_type and machine_type
         $groupedProcesses = $sewingProcessList->groupBy(['process_type', 'machine_type']);
-
-
-
-        // dd($groupedProcesses);
 
         $workerEntry = WorkerEntry::find($request->worker_id);
         return view('backend.library.dataEntry.process_entry', compact('workerEntry', 'groupedProcesses'));
     }
 
-   
+    // public function calculate_grade($worker_id)
+    // {
+    //     // Fetch worker entries and categorize them
+    //     $workerEntries = DB::table('worker_sewing_process_entries')
+    //     ->where('worker_entry_id', $worker_id)
+    //         ->get();
+
+    //     $normal_process = [];
+    //     $semi_critical_process = [];
+    //     $critical_process = [];
+
+    //     foreach ($workerEntries as $workerEntry) {
+    //         if ($workerEntry->sewing_process_type === 'normal') {
+    //             $normal_process[] = $workerEntry->efficiency;
+    //         } elseif ($workerEntry->sewing_process_type === 'semi-critical') {
+    //             $semi_critical_process[] = $workerEntry->efficiency;
+    //         } elseif ($workerEntry->sewing_process_type === 'critical') {
+    //             $critical_process[] = $workerEntry->efficiency;
+    //         }
+    //     }
+
+    //     // Sort processes in descending order
+    //     rsort($normal_process);
+    //     rsort($semi_critical_process);
+    //     rsort($critical_process);
+
+    //     // Define grading table
+    //     $grading_table = [
+    //         ['grade' => 'C', 'max_mc' => 1, 'status' => 'normal', 'min_count' => 2, 'efficiency_min' => 60, 'efficiency_max' => 69, 'salary_range' => '13550-13650 Tk'],
+    //         ['grade' => 'C+', 'max_mc' => 1, 'status' => 'normal', 'min_count' => 2, 'efficiency_min' => 70, 'efficiency_max' => 79, 'salary_range' => '13700-13800 Tk'],
+    //         ['grade' => 'C++', 'max_mc' => 1, 'status' => 'normal', 'min_count' => 2, 'efficiency_min' => 80, 'efficiency_max' => 100, 'salary_range' => '13850-14000 Tk'],
+    //         ['grade' => 'B', 'max_mc' => 2, 'status' => 'semi-critical', 'min_count' => 2, 'efficiency_min' => 70, 'efficiency_max' => 79, 'salary_range' => '14100-14300 Tk'],
+    //         ['grade' => 'B+', 'max_mc' => 2, 'status' => 'semi-critical', 'min_count' => 4, 'efficiency_min' => 80, 'efficiency_max' => 100, 'salary_range' => '14350-14550 Tk'],
+    //         [
+    //             'grade' => 'A',
+    //             'max_mc' => 3,
+    //             'status' => 'critical',
+    //             'min_count' => 2,
+    //             'efficiency_min' => 70,
+    //             'efficiency_max' => 79,
+    //             'salary_range' => '14600-15000 Tk',
+    //             'required_ids' => [79, 56, 60, 59, 75, 72, 73, 61, 74],
+    //             'min_required_ids' => 2,
+    //         ],
+    //         [
+    //             'grade' => 'A+',
+    //             'max_mc' => 4,
+    //             'status' => 'critical',
+    //             'min_count' => 5,
+    //             'efficiency_min' => 80,
+    //             'efficiency_max' => 100,
+    //             'salary_range' => '15100-15300 Tk',
+    //             'required_ids' => [56, 60, 59, 75, 72, 73],
+    //             'min_required_ids' => 4,
+    //         ],
+    //     ];
+
+    //     // Iterate over the grading table (first pass)
+    //     foreach ($grading_table as $row) {
+    //         $process_array = match ($row['status']) {
+    //             'normal' => $normal_process,
+    //             'semi-critical' => $semi_critical_process,
+    //             'critical' => $critical_process,
+    //         };
+
+    //         $filtered_process = array_filter($process_array, function ($efficiency) use ($row) {
+    //             $efficiency_max = $row['efficiency_max'] === PHP_INT_MAX ? 100 : $row['efficiency_max'];
+    //             return $efficiency >= $row['efficiency_min'] && $efficiency <= $efficiency_max;
+    //         });
+
+    //         if (in_array($row['grade'], ['A', 'A+'])) {
+    //             if (!$this->has_required_process_ids($workerEntries, $row['required_ids'], $row['min_required_ids'])) {
+    //                 continue;
+    //             }
+
+    //             if ($row['grade'] === 'A+' && !$this->has_flatlock_and_overlock($workerEntries)) {
+    //                 continue;
+    //             }
+    //         }
+
+    //         if (count($filtered_process) >= $row['min_count']) {
+    //             return $this->calculate_salary($filtered_process, $row);
+    //         }
+    //     }
+
+    //     // Second pass: find the closest match dynamically
+    //     $best_match = null;
+    //     $highest_efficiency = 0;
+
+    //     foreach ($grading_table as $row) {
+    //         $process_array = match ($row['status']) {
+    //             'normal' => $normal_process,
+    //             'semi-critical' => $semi_critical_process,
+    //             'critical' => $critical_process,
+    //         };
+
+    //         $filtered_process = array_filter($process_array, function ($efficiency) use ($row) {
+    //             $efficiency_max = $row['efficiency_max'] === PHP_INT_MAX ? 100 : $row['efficiency_max'];
+    //             return $efficiency >= $row['efficiency_min'] && $efficiency <= $efficiency_max;
+    //         });
+
+    //         if (count($filtered_process) >= $row['min_count']) {
+    //             $avg_efficiency = array_sum($filtered_process) / count($filtered_process);
+    //             if ($avg_efficiency > $highest_efficiency) {
+    //                 $highest_efficiency = $avg_efficiency;
+    //                 $best_match = $row;
+    //             }
+    //         }
+    //     }
+
+    //     if ($best_match) {
+    //         return $this->calculate_salary($filtered_process, $best_match);
+    //     }
+
+    //     // Default return for "Fail"
+    //     return [
+    //         'grade' => 'Fail',
+    //         'salary_range' => 'N/A',
+    //     ];
+    // }
+
+    // /**
+    //  * Helper function to calculate salary for a given grade.
+    //  */
+    // private function calculate_salary($filtered_process, $row)
+    // {
+    //     $avg_efficiency = array_sum($filtered_process) / count($filtered_process);
+    //     $efficiency_max = $row['efficiency_max'] === PHP_INT_MAX ? 100 : $row['efficiency_max'];
+
+    //     $salary_range = explode('-', str_replace(' Tk', '', $row['salary_range']));
+    //     $salary_min = (float)$salary_range[0];
+    //     $salary_max = (float)$salary_range[1];
+
+    //     $salary = $salary_min + (($avg_efficiency - $row['efficiency_min']) / ($efficiency_max - $row['efficiency_min'])) * ($salary_max - $salary_min);
+    //     $salary = round($salary, 2);
+
+    //     return [
+    //         'grade' => $row['grade'],
+    //         'salary_range' => "{$salary}",
+    //     ];
+    // }
+
+    // /**
+    //  * Check if required sewing_process_list_ids are present.
+    //  */
+    // private function has_required_process_ids($entries, $required_ids, $min_count)
+    // {
+    //     $process_ids = $entries->pluck('sewing_process_list_id')->toArray();
+    //     $matching_ids = array_intersect($process_ids, $required_ids);
+
+    //     return count($matching_ids) >= $min_count;
+    // }
+
+    // /**
+    //  * Check if Flat Lock and Overlock processes are present.
+    //  */
+    // private function has_flatlock_and_overlock($entries)
+    // {
+    //     $process_ids = $entries->pluck('sewing_process_list_id')->toArray();
+    //     $flatlock = in_array('F/L', $process_ids);
+    //     $overlock = in_array('OL', $process_ids);
+
+    //     return $flatlock && $overlock;
+    // }
+
+    //     public function calculate_grade($worker_id)
+    // {
+    //     $workerEntries = DB::table('worker_sewing_process_entries')
+    //         ->where('worker_entry_id', $worker_id)
+    //         ->get();
+
+    //     // Categorize processes by type
+    //     $processes = [
+    //         'normal' => [],
+    //         'semi-critical' => [],
+    //         'critical' => []
+    //     ];
+
+    //     foreach ($workerEntries as $entry) {
+    //         if (isset($processes[$entry->sewing_process_type])) {
+    //                 // $processes[$entry->sewing_process_type][] = $entry->efficiency;
+    //                 // Clamp efficiency values to max 100
+    //                 $efficiency = min($entry->efficiency, 100);
+    //                 $processes[$entry->sewing_process_type][] = $efficiency;
+    //         }
+    //     }
+
+    //     // Define new grading table (highest to lowest)
+    //     $grading_table = [
+    //         [
+    //             'grade' => 'A++',
+    //             'status' => ['critical'],
+    //             'min_count' => PHP_INT_MAX,  // Requires ALL critical processes
+    //             'efficiency_min' => 90,
+    //             'efficiency_max' => 100,
+    //             'salary_min' => 15500,
+    //             'salary_max' => PHP_INT_MAX,
+    //             'conditions' => [
+    //                 'must_have_all_critical' => true
+    //             ]
+    //         ],
+    //         [
+    //             'grade' => 'A+',
+    //             'status' => ['critical'],
+    //             'min_count' => 3,
+    //             'efficiency_min' => 75,
+    //             'efficiency_max' => 100,
+    //             'salary_min' => 15250,
+    //             'salary_max' => 15500
+    //         ],
+    //         [
+    //             'grade' => 'A',
+    //             'status' => ['critical'],
+    //             'min_count' => 3,
+    //             'efficiency_min' => 70,
+    //             'efficiency_max' => 100,
+    //             'salary_min' => 14750,
+    //             'salary_max' => 15200
+    //         ],
+    //         [
+    //             'grade' => 'B+',
+    //             'status' => ['semi-critical', 'critical'],
+    //             'min_count' => 3,
+    //             'efficiency_min' => 65,
+    //             'efficiency_max' => 100,
+    //             'salary_min' => 14350,
+    //             'salary_max' => 14700,
+    //             'conditions' => [
+    //                 'min_semi_critical' => 1,
+    //                 'min_critical' => 1
+    //             ]
+    //         ],
+    //         [
+    //             'grade' => 'B',
+    //             'status' => ['semi-critical'],
+    //             'min_count' => 2,
+    //             'efficiency_min' => 60,
+    //             'efficiency_max' => 100,
+    //             'salary_min' => 14100,
+    //             'salary_max' => 14300
+    //         ],
+    //         [
+    //             'grade' => 'C++',
+    //             'status' => ['normal', 'semi-critical'],
+    //             'min_count' => 2,
+    //             'efficiency_min' => 80,
+    //             'efficiency_max' => 100,
+    //             'salary_min' => 13800,
+    //             'salary_max' => 14000,
+    //             'conditions' => [
+    //                 'min_semi_critical' => 1
+    //             ]
+    //         ],
+    //         [
+    //             'grade' => 'C+',
+    //             'status' => ['normal'],
+    //             'min_count' => 2,
+    //             'efficiency_min' => 70,
+    //             'efficiency_max' => 79,
+    //             'salary_min' => 13650,
+    //             'salary_max' => 13750
+    //         ],
+    //         [
+    //             'grade' => 'C',
+    //             'status' => ['normal'],
+    //             'min_count' => 2,
+    //             'efficiency_min' => 60,
+    //             'efficiency_max' => 69,
+    //             'salary_min' => 13550,
+    //             'salary_max' => 13600
+    //         ]
+    //     ];
+
+    //     // Check grades from highest to lowest
+    //     foreach ($grading_table as $grade) {
+    //         $filtered = [];
+    //         $statusCounts = array_fill_keys($grade['status'], 0);
+
+    //         // Collect eligible processes
+    //         foreach ($grade['status'] as $status) {
+    //             foreach ($processes[$status] as $eff) {
+    //                 if ($eff >= $grade['efficiency_min'] && $eff <= $grade['efficiency_max']) {
+    //                     $filtered[] = $eff;
+    //                     $statusCounts[$status]++;
+    //                 }
+    //             }
+    //         }
+
+    //         // Check minimum process count
+    //         if (count($filtered) < $grade['min_count']) {
+    //             continue;
+    //         }
+
+    //         // Special case: A++ requires ALL critical processes
+    //         if (isset($grade['conditions']['must_have_all_critical'])) {
+    //             $criticalCount = count($processes['critical']);
+    //             // $totalCritical = ...;  Fetch total critical processes from DB table
+    //             $totalCritical = DB::table('sewing_process_lists')
+    //                 ->where('process_type', 'critical')
+    //                 ->count();
+    //             if ($criticalCount < $totalCritical) {
+    //                 continue;
+    //             }
+    //         }
+
+    //         // Check additional conditions
+    //         $conditionsMet = true;
+    //         if (isset($grade['conditions'])) {
+    //             foreach ($grade['conditions'] as $cond => $min) {
+    //                 if ($cond === 'min_semi_critical' && $statusCounts['semi-critical'] < $min) {
+    //                     $conditionsMet = false;
+    //                 }
+    //                 if ($cond === 'min_critical' && $statusCounts['critical'] < $min) {
+    //                     $conditionsMet = false;
+    //                 }
+    //             }
+    //         }
+
+    //         if (!$conditionsMet) {
+    //             continue;
+    //         }
+
+    //         // Calculate salary
+    //         $avgEff = array_sum($filtered) / count($filtered);
+    //         $salary = $this->calculate_salary($avgEff, $grade);
+
+    //         return [
+    //             'grade' => $grade['grade'],
+    //             'salary_range' => $salary
+    //         ];
+    //     }
+
+    //     // No grade matched
+    //     return [
+    //         'grade' => 'F',
+    //         'salary_range' => 'N/A'
+    //     ];
+    // }
+
     public function calculate_grade($worker_id)
     {
-        // Fetch worker entries and categorize them
+        // Fetch worker's sewing process entries
         $workerEntries = DB::table('worker_sewing_process_entries')
-        ->where('worker_entry_id', $worker_id)
+            ->where('worker_entry_id', $worker_id)
             ->get();
 
-        $normal_process = [];
-        $semi_critical_process = [];
-        $critical_process = [];
+        // Get machine_type count
+        $worker_machine_type = DB::table('sewing_process_lists')
+            ->where('id',  $workerEntries->pluck('sewing_process_list_id'))
+            ->select('machine_type')
+            ->distinct()
+            ->get();
+        $machine_count = $worker_machine_type->count() ?? 0;
 
-        foreach ($workerEntries as $workerEntry) {
-            if ($workerEntry->sewing_process_type === 'normal') {
-                $normal_process[] = $workerEntry->efficiency;
-            } elseif ($workerEntry->sewing_process_type === 'semi-critical') {
-                $semi_critical_process[] = $workerEntry->efficiency;
-            } elseif ($workerEntry->sewing_process_type === 'critical') {
-                $critical_process[] = $workerEntry->efficiency;
+        // Categorize processes by type and clamp efficiency (max 100%)
+        $processes = [
+            'normal' => [],
+            'semi-critical' => [],
+            'critical' => []
+        ];
+
+        foreach ($workerEntries as $entry) {
+            if (isset($processes[$entry->sewing_process_type])) {
+                $efficiency = min($entry->efficiency, 100);
+                $processes[$entry->sewing_process_type][] = $efficiency;
             }
         }
 
-        // Sort processes in descending order
-        rsort($normal_process);
-        rsort($semi_critical_process);
-        rsort($critical_process);
-
-        // Define grading table
+        // Define grading table (highest to lowest)
         $grading_table = [
-            ['grade' => 'C', 'max_mc' => 1, 'status' => 'normal', 'min_count' => 2, 'efficiency_min' => 60, 'efficiency_max' => 69, 'salary_range' => '13550-13650 Tk'],
-            ['grade' => 'C+', 'max_mc' => 1, 'status' => 'normal', 'min_count' => 2, 'efficiency_min' => 70, 'efficiency_max' => 79, 'salary_range' => '13700-13800 Tk'],
-            ['grade' => 'C++', 'max_mc' => 1, 'status' => 'normal', 'min_count' => 2, 'efficiency_min' => 80, 'efficiency_max' => 100, 'salary_range' => '13850-14000 Tk'],
-            ['grade' => 'B', 'max_mc' => 2, 'status' => 'semi-critical', 'min_count' => 2, 'efficiency_min' => 70, 'efficiency_max' => 79, 'salary_range' => '14100-14300 Tk'],
-            ['grade' => 'B+', 'max_mc' => 2, 'status' => 'semi-critical', 'min_count' => 4, 'efficiency_min' => 80, 'efficiency_max' => 100, 'salary_range' => '14350-14550 Tk'],
+            // Existing critical process grades (A++, A+, A)
             [
-                'grade' => 'A',
-                'max_mc' => 3,
-                'status' => 'critical',
-                'min_count' => 2,
-                'efficiency_min' => 70,
-                'efficiency_max' => 79,
-                'salary_range' => '14600-15000 Tk',
-                'required_ids' => [79, 56, 60, 59, 75, 72, 73, 61, 74],
-                'min_required_ids' => 2,
+                'grade' => 'A++',
+                'status' => ['critical'],
+                'min_count' => PHP_INT_MAX,
+                'efficiency_min' => 90,
+                'efficiency_max' => 100,
+                'salary_min' => 15500,
+                'salary_max' => PHP_INT_MAX,
+                'conditions' => ['must_have_all_critical' => true]
             ],
             [
                 'grade' => 'A+',
-                'max_mc' => 4,
-                'status' => 'critical',
-                'min_count' => 5,
+                'status' => ['critical'],
+                'min_count' => 3,
+                'efficiency_min' => 75, // Default for critical-based A+
+                'efficiency_max' => 100,
+                'salary_min' => 15250,
+                'salary_max' => 15500
+            ],
+            [
+                'grade' => 'A',
+                'status' => ['critical'],
+                'min_count' => 3,
+                'efficiency_min' => 70, // Default for critical-based A
+                'efficiency_max' => 100,
+                'salary_min' => 14750,
+                'salary_max' => 15200
+            ],
+
+            // NEW: Machine count-based grades
+            [
+                'grade' => 'A+',
+                'status' => ['normal', 'semi-critical', 'critical'],
+                'min_count' => 1,
+                'efficiency_min' => 75,
+                'efficiency_max' => 100,
+                'salary_min' => 15250,
+                'salary_max' => 15500,
+                'conditions' => ['machine_count' => 2]
+            ],
+            [
+                'grade' => 'A',
+                'status' => ['critical'],
+                'min_count' => 1,
+                'efficiency_min' => 70,
+                'efficiency_max' => 100,
+                'salary_min' => 14750,
+                'salary_max' => 15200,
+                'conditions' => ['machine_count' => 1]
+            ],
+
+            // Existing non-critical grades (B+, B, etc.)
+            [
+                'grade' => 'B+',
+                'status' => ['semi-critical', 'critical'],
+                'min_count' => 3,
+                'efficiency_min' => 65,
+                'efficiency_max' => 100,
+                'salary_min' => 14350,
+                'salary_max' => 14700,
+                'conditions' => [
+                    'min_semi_critical' => 1,
+                    'min_critical' => 1
+                ]
+            ],
+            [
+                'grade' => 'B',
+                'status' => ['semi-critical'],
+                'min_count' => 2,
+                'efficiency_min' => 60,
+                'efficiency_max' => 100,
+                'salary_min' => 14100,
+                'salary_max' => 14300
+            ],
+
+            // NEW: C++ for normal processes (no semi-critical)
+            [
+                'grade' => 'C++',
+                'status' => ['normal'],
+                'min_count' => 3,
                 'efficiency_min' => 80,
                 'efficiency_max' => 100,
-                'salary_range' => '15100-15300 Tk',
-                'required_ids' => [56, 60, 59, 75, 72, 73],
-                'min_required_ids' => 4,
+                'salary_min' => 13800,
+                'salary_max' => 14000,
+                'conditions' => ['no_semi_critical' => true]
             ],
+            // Existing C++ grade (with semi-critical)
+            [
+                'grade' => 'C++',
+                'status' => ['normal', 'semi-critical'],
+                'min_count' => 2,
+                'efficiency_min' => 80,
+                'efficiency_max' => 100,
+                'salary_min' => 13800,
+                'salary_max' => 14000,
+                'conditions' => ['min_semi_critical' => 1]
+            ],
+            [
+                'grade' => 'C+',
+                'status' => ['normal'],
+                'min_count' => 2,
+                'efficiency_min' => 70,
+                'efficiency_max' => 79,
+                'salary_min' => 13650,
+                'salary_max' => 13750
+            ],
+            [
+                'grade' => 'C',
+                'status' => ['normal'],
+                'min_count' => 2,
+                'efficiency_min' => 60,
+                'efficiency_max' => 69,
+                'salary_min' => 13550,
+                'salary_max' => 13600
+            ]
         ];
 
-        // Iterate over the grading table (first pass)
-        foreach ($grading_table as $row) {
-            $process_array = match ($row['status']) {
-                'normal' => $normal_process,
-                'semi-critical' => $semi_critical_process,
-                'critical' => $critical_process,
-            };
+        // Check grades from highest to lowest
+        foreach ($grading_table as $grade) {
+            $filtered = [];
+            $statusCounts = array_fill_keys($grade['status'], 0);
 
-            $filtered_process = array_filter($process_array, function ($efficiency) use ($row) {
-                $efficiency_max = $row['efficiency_max'] === PHP_INT_MAX ? 100 : $row['efficiency_max'];
-                return $efficiency >= $row['efficiency_min'] && $efficiency <= $efficiency_max;
-            });
-
-            if (in_array($row['grade'], ['A', 'A+'])) {
-                if (!$this->has_required_process_ids($workerEntries, $row['required_ids'], $row['min_required_ids'])) {
-                    continue;
-                }
-
-                if ($row['grade'] === 'A+' && !$this->has_flatlock_and_overlock($workerEntries)) {
-                    continue;
+            // Collect eligible processes
+            foreach ($grade['status'] as $status) {
+                if (!empty($processes[$status])) {
+                    foreach ($processes[$status] as $eff) {
+                        if ($eff >= $grade['efficiency_min'] && $eff <= $grade['efficiency_max']) {
+                            $filtered[] = $eff;
+                            $statusCounts[$status]++;
+                        }
+                    }
                 }
             }
 
-            if (count($filtered_process) >= $row['min_count']) {
-                return $this->calculate_salary($filtered_process, $row);
+            // Skip if minimum process count not met
+            if (count($filtered) < $grade['min_count']) {
+                continue;
             }
-        }
 
-        // Second pass: find the closest match dynamically
-        $best_match = null;
-        $highest_efficiency = 0;
+            // Handle special conditions
+            $conditionsMet = true;
+            if (isset($grade['conditions'])) {
+                foreach ($grade['conditions'] as $cond => $value) {
+                    switch ($cond) {
+                        case 'must_have_all_critical':
+                            $totalCritical = DB::table('sewing_process_lists')
+                                ->where('process_type', 'critical')
+                                ->count();
+                            if (count($processes['critical']) < $totalCritical) {
+                                $conditionsMet = false;
+                            }
+                            break;
 
-        foreach ($grading_table as $row) {
-            $process_array = match ($row['status']) {
-                'normal' => $normal_process,
-                'semi-critical' => $semi_critical_process,
-                'critical' => $critical_process,
-            };
+                        case 'min_semi_critical':
+                            if ($statusCounts['semi-critical'] < $value) {
+                                $conditionsMet = false;
+                            }
+                            break;
 
-            $filtered_process = array_filter($process_array, function ($efficiency) use ($row) {
-                $efficiency_max = $row['efficiency_max'] === PHP_INT_MAX ? 100 : $row['efficiency_max'];
-                return $efficiency >= $row['efficiency_min'] && $efficiency <= $efficiency_max;
-            });
+                        case 'min_critical':
+                            if ($statusCounts['critical'] < $value) {
+                                $conditionsMet = false;
+                            }
+                            break;
 
-            if (count($filtered_process) >= $row['min_count']) {
-                $avg_efficiency = array_sum($filtered_process) / count($filtered_process);
-                if ($avg_efficiency > $highest_efficiency) {
-                    $highest_efficiency = $avg_efficiency;
-                    $best_match = $row;
+                        case 'no_semi_critical':
+                            if (!empty($processes['semi-critical'])) {
+                                $conditionsMet = false;
+                            }
+                            break;
+
+                        case 'machine_count':
+                            if ($machine_count != $value) {
+                                $conditionsMet = false;
+                            }
+                            break;
+                    }
                 }
             }
+
+            if (!$conditionsMet) {
+                continue;
+            }
+
+            // Calculate salary if conditions met
+            $avgEff = count($filtered) > 0 ? array_sum($filtered) / count($filtered) : 0;
+            $salary = $this->calculate_salary($avgEff, $grade);
+
+            return [
+                'grade' => $grade['grade'],
+                'salary_range' => $salary
+            ];
         }
 
-        if ($best_match) {
-            return $this->calculate_salary($filtered_process, $best_match);
-        }
-
-        // Default return for "Fail"
+        // Default grade if no matches
         return [
-            'grade' => 'Fail',
-            'salary_range' => 'N/A',
+            'grade' => 'F',
+            'salary_range' => 'N/A'
         ];
     }
 
-    /**
-     * Helper function to calculate salary for a given grade.
-     */
-    private function calculate_salary($filtered_process, $row)
-    {
-        $avg_efficiency = array_sum($filtered_process) / count($filtered_process);
-        $efficiency_max = $row['efficiency_max'] === PHP_INT_MAX ? 100 : $row['efficiency_max'];
-
-        $salary_range = explode('-', str_replace(' Tk', '', $row['salary_range']));
-        $salary_min = (float)$salary_range[0];
-        $salary_max = (float)$salary_range[1];
-
-        $salary = $salary_min + (($avg_efficiency - $row['efficiency_min']) / ($efficiency_max - $row['efficiency_min'])) * ($salary_max - $salary_min);
-        $salary = round($salary, 2);
-
-        return [
-            'grade' => $row['grade'],
-            'salary_range' => "{$salary}",
-        ];
+private function calculate_salary($avgEff, $grade)
+{
+    $effRange = $grade['efficiency_max'] - $grade['efficiency_min'];
+    $salRange = $grade['salary_max'] - $grade['salary_min'];
+    
+    // Handle open-ended ranges
+    $effUpper = $grade['efficiency_max'] === PHP_INT_MAX ? 100 : $grade['efficiency_max'];
+    $salUpper = $grade['salary_max'] === PHP_INT_MAX ? 20000 : $grade['salary_max']; // Set reasonable max
+    
+    if ($effRange > 0) {
+        $ratio = ($avgEff - $grade['efficiency_min']) / ($effUpper - $grade['efficiency_min']);
+        $salary = $grade['salary_min'] + ($ratio * ($salUpper - $grade['salary_min']));
+    } else {
+        $salary = $grade['salary_min'];
     }
-
-    /**
-     * Check if required sewing_process_list_ids are present.
-     */
-    private function has_required_process_ids($entries, $required_ids, $min_count)
-    {
-        $process_ids = $entries->pluck('sewing_process_list_id')->toArray();
-        $matching_ids = array_intersect($process_ids, $required_ids);
-
-        return count($matching_ids) >= $min_count;
-    }
-
-    /**
-     * Check if Flat Lock and Overlock processes are present.
-     */
-    private function has_flatlock_and_overlock($entries)
-    {
-        $process_ids = $entries->pluck('sewing_process_list_id')->toArray();
-        $flatlock = in_array('F/L', $process_ids);
-        $overlock = in_array('OL', $process_ids);
-
-        return $flatlock && $overlock;
-    }
+    
+    return round(min($salary, $salUpper), 2);
+}
 
 
 

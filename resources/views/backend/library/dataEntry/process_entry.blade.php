@@ -19,7 +19,7 @@
         id="myForm">
         <div class="pb-3">
             @csrf
-            <div class="form-group col-md-12 col-sm-12">
+            {{-- <div class="form-group col-md-12 col-sm-12">
                 <label for="process_type">Process Type</label>
                 <br>
                 @php
@@ -61,7 +61,40 @@
                 </div>
                 <input type="hidden" name="worker_id" value="{{ $workerEntry->id }}">
                 <button type="submit" class="btn btn-outline-info">Search</button>
-            </div>
+            </div> --}}
+
+            <!-- Change radio buttons to checkboxes for multiple selection -->
+<div class="form-group col-md-12 col-sm-12">
+    <label for="process_type">Process Type</label>
+    <br>
+    @php
+        $workerEntry = App\Models\WorkerEntry::find($workerEntry->id);
+        $sewingProcessEntries = App\Models\WorkerSewingProcessEntry::where(
+            'worker_entry_id',
+            $workerEntry->id,
+        )
+            ->distinct()
+            ->pluck('sewing_process_type')
+            ->toArray();
+    @endphp
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" name="process_type[]" id="inlineRadio1" value="normal"
+            @if (in_array('normal', $sewingProcessEntries)) checked @endif>
+        <label class="form-check-label" for="inlineRadio1">Normal Process</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" name="process_type[]" id="inlineRadio2"
+            value="semi-critical" @if (in_array('semi-critical', $sewingProcessEntries)) checked @endif>
+        <label class="form-check-label" for="inlineRadio2">Semi-Critical Process</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" name="process_type[]" id="inlineRadio3"
+            value="critical" @if (in_array('critical', $sewingProcessEntries)) checked @endif>
+        <label class="form-check-label" for="inlineRadio3">Critical Process</label>
+    </div>
+    <input type="hidden" name="worker_id" value="{{ $workerEntry->id }}">
+    <button type="submit" class="btn btn-outline-info">Search</button>
+</div>
 
 
         </div>
@@ -142,7 +175,7 @@ $WorkerSewingProcessEntry = App\Models\WorkerSewingProcessEntry::where('worker_e
         </form>
     @endisset
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
+    {{-- <script>
         document.getElementById('myForm').addEventListener('submit', function(event) {
             var radios = document.getElementsByName('process_type');
             var isChecked = false;
@@ -159,5 +192,17 @@ $WorkerSewingProcessEntry = App\Models\WorkerSewingProcessEntry::where('worker_e
                 event.preventDefault(); // Prevent form submission
             }
         });
-    </script>
+    </script> --}}
+
+    <!-- Update JavaScript validation -->
+<script>
+    document.getElementById('myForm').addEventListener('submit', function(event) {
+        var checkboxes = document.querySelectorAll('input[name="process_type[]"]:checked');
+        
+        if (checkboxes.length === 0) {
+            alert('Please select at least one process type before submitting.');
+            event.preventDefault();
+        }
+    });
+</script>
 </x-backend.layouts.master>

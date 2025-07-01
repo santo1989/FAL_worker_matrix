@@ -28,9 +28,6 @@
                     <th scope="col">SMV</th>
                     <th scope="col">Target</th>
                     <th scope="col">Cycle Time</th>
-                    <th scope="col">SMV</th>
-                    <th scope="col">Target</th>
-                    <th scope="col">Cycle Time</th>
                     <th scope="col">Cycles</th>
                 </tr>
             </thead>

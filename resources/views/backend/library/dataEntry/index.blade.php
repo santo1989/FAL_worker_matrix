@@ -3,14 +3,14 @@
         Operator Assessment Sheet List
     </x-slot>
 
-    <x-slot name='breadCrumb'>
+    {{-- <x-slot name='breadCrumb'>
         <x-backend.layouts.elements.breadcrumb>
             <x-slot name="pageHeader"> Operator Assessment Sheet </x-slot>
 
             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="{{ route('workerEntries.index') }}">Operator Assessment Sheet</a></li>
         </x-backend.layouts.elements.breadcrumb>
-    </x-slot>
+    </x-slot> --}}
 
     <section class="content">
         <div class="container-fluid">
@@ -31,217 +31,170 @@
                 <div class="container-fluid">
                     <div class="card" style="overflow-x: auto; overflow-y: auto;">
                         <div class="card-header">
-                            <form method="GET" action="{{ route('workerEntries.index') }}">
-                                @csrf
+                            <form method="GET" action="{{ route('workerEntries.index') }}" id="filterForm">
+                                @php
+                                    // Combined database queries
+                                    $workerData = DB::table('worker_entries')
+                                        ->select('floor', 'id_card_no', 'present_grade', 'recomanded_grade')
+                                        ->distinct()
+                                        ->get();
+
+                                    $processData = DB::table('worker_sewing_process_entries')
+                                        ->select('sewing_process_type', 'sewing_process_name')
+                                        ->distinct()
+                                        ->get();
+                                @endphp
+
                                 <div class="card-header">
                                     <div class="row">
-                                        <div class="col-md-12 col-sm-12">
-                                            <table
-                                                class="table table-borderless table-responsive text-center text-dark font-weight-bold">
-                                                <tr>
+                                        <div class="col-12">
+                                            <div class="row g-3">
+                                                <!-- Floor -->
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Floor:</label>
+                                                    <select name="floor" class="form-control select2">
+                                                        <option value="">Select Floor</option>
+                                                        @foreach ($workerData->unique('floor') as $item)
+                                                            <option value="{{ $item->floor }}"
+                                                                {{ request('floor') == $item->floor ? 'selected' : '' }}>
+                                                                {{ $item->floor }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                                <!-- ID Card No -->
+                                                <div class="col-md-2">
+                                                    <label class="form-label">ID Card No:</label>
+                                                    {{-- <select name="id_card_no" class="form-control select2">
+                                                        <option value="">Select ID Card No</option>
+                                                        @foreach ($workerData->unique('id_card_no') as $item)
+                                                            <option value="{{ $item->id_card_no }}"
+                                                                {{ request('id_card_no') == $item->id_card_no ? 'selected' : '' }}>
+                                                                {{ $item->id_card_no }}</option>
+                                                        @endforeach
+                                                    </select> --}}
+                                                    <!--showing id card no as text input with data list-->
+                                                    <input type="text" name="id_card_no" class="form-control"
+                                                        placeholder="Enter ID Card No"
+                                                        list="idCardNoList" value="{{ request('id_card_no') }}">
+                                                    <datalist id="idCardNoList">
+                                                        @foreach ($workerData->unique('id_card_no') as $item)
+                                                            <option value="{{ $item->id_card_no }}" 
+                                                                {{ request('id_card_no') == $item->id_card_no ? 'selected' : '' }}>
+                                                                {{ $item->id_card_no }}</option>
+                                                        @endforeach
+                                                    </datalist>
 
 
-                                                    <div class="form-group">
-                                                        <td>Floor:</td>
-                                                        <td>
-                                                            @php
-                                                                $floor = DB::table('worker_entries')
-                                                                    ->distinct()
-                                                                    ->pluck('floor')
-                                                                    ->toArray();
-                                                                //    dd($floor);
-                                                                //    die();
-                                                            @endphp
-                                                            <select name="floor" id="floor" class="form-control">
-                                                                <option value="">Select Floor</option>
-                                                                @foreach ($floor as $item)
-                                                                    <option value="{{ $item }}">
-                                                                        {{ $item }}
-                                                                    </option>
-                                                                @endforeach
-                                                            </select>
-                                                        </td>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <td>ID Card No:</td>
-                                                        <td>
-                                                            @php
-                                                                $id_card_no = DB::table('worker_entries')
-                                                                    ->distinct()
-                                                                    ->pluck('id_card_no');
-                                                            @endphp
-                                                            <select name="id_card_no" id="id_card_no"
-                                                                class="form-control">
-                                                                <option value="">Select ID Card No</option>
-                                                                @foreach ($id_card_no as $item)
-                                                                    <option value="{{ $item }}">
-                                                                        {{ $item }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </td>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <td>Process Type:</td>
-                                                        <td>
-                                                            @php
-                                                                $process_type = DB::table(
-                                                                    'worker_sewing_process_entries',
-                                                                )
-                                                                    ->distinct()
-                                                                    ->pluck('sewing_process_type');
-                                                            @endphp
-                                                            <select name="sewing_process_type" id="sewing_process_type"
-                                                                class="form-control">
-                                                                <option value="">Select Process Type</option>
-                                                                @foreach ($process_type as $item)
-                                                                    <option value="{{ $item }}">
-                                                                        {{ $item }}</option>
-                                                                @endforeach
-                                                            </select>
+                                                </div>
 
-                                                        </td>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <td>Process Name:</td>
-                                                        <td>
-                                                            @php
-                                                                $process_name = DB::table(
-                                                                    'worker_sewing_process_entries',
-                                                                )
-                                                                    ->distinct()
-                                                                    ->pluck('sewing_process_name');
-                                                            @endphp
-                                                            <select name="sewing_process_name" id="sewing_process_name"
-                                                                class="form-control">
-                                                                <option value="">Select Process Name</option>
-                                                                @foreach ($process_name as $item)
-                                                                    <option value="{{ $item }}">
-                                                                        {{ $item }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </td>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <td>Present Grade:</td>
-                                                        <td>
-                                                            @php
-                                                                $present_grade = DB::table('worker_entries')
-                                                                    ->distinct()
-                                                                    ->pluck('present_grade');
-                                                            @endphp
-                                                            <select name="present_grade" id="present_grade"
-                                                                class="form-control">
-                                                                <option value="">Select Grade</option>
-                                                                @foreach ($present_grade as $item)
-                                                                    <option value="{{ $item }}">
-                                                                        {{ $item }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </td>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <td>Recommended Grade:</td>
-                                                        <td>
-                                                            @php
-                                                                $recomanded_grade = DB::table('worker_entries')
-                                                                    ->distinct()
-                                                                    ->pluck('recomanded_grade');
-                                                            @endphp
-                                                            <select name="recomanded_grade" id="recomanded_grade"
-                                                                class="form-control">
-                                                                <option value="">Select Grade</option>
-                                                                @foreach ($recomanded_grade as $item)
-                                                                    <option value="{{ $item }}">
-                                                                        {{ $item }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </td>
-                                                    </div>
-                                                    <td>
-                                                        <button class="btn btn-outline-info btn-sm"
-                                                            onclick="validateForm()"><i class="fa fa-search"></i>
-                                                            Search</button>
+                                                <!-- Process Type -->
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Process Type:</label>
+                                                    <select name="sewing_process_type" class="form-control select2">
+                                                        <option value="">Select Process Type</option>
+                                                        @foreach ($processData->unique('sewing_process_type') as $item)
+                                                            <option value="{{ $item->sewing_process_type }}"
+                                                                {{ request('sewing_process_type') == $item->sewing_process_type ? 'selected' : '' }}>
+                                                                {{ $item->sewing_process_type }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
 
-                                                        <script>
-                                                            function validateForm() {
-                                                                var floor = document.getElementById('floor').value;
-                                                                var id_card_no = document.getElementById('id_card_no').value;
-                                                                var sewing_process_type = document.getElementById('sewing_process_type').value;
-                                                                var sewing_process_name = document.getElementById('sewing_process_name').value;
-                                                                var recomanded_grade = document.getElementById('recomanded_grade').value;
+                                                <!-- Process Name -->
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Process Name:</label>
+                                                    <select name="sewing_process_name" class="form-control select2">
+                                                        <option value="">Select Process Name</option>
+                                                        @foreach ($processData->unique('sewing_process_name') as $item)
+                                                            <option value="{{ $item->sewing_process_name }}"
+                                                                {{ request('sewing_process_name') == $item->sewing_process_name ? 'selected' : '' }}>
+                                                                {{ $item->sewing_process_name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
 
-                                                                if (floor == '' && id_card_no == '' && sewing_process_type == '' && sewing_process_name == '' &&
-                                                                    recomanded_grade == '') {
-                                                                    //alert show in sweet alert
-                                                                    Swal.fire({
-                                                                        icon: 'error',
-                                                                        title: 'Oops...',
-                                                                        text: 'Please Select At Least One Field!',
-                                                                    });
+                                                <!-- Present Grade -->
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Present Grade:</label>
+                                                    <select name="present_grade" class="form-control select2">
+                                                        <option value="">Select Grade</option>
+                                                        @foreach ($workerData->unique('present_grade') as $item)
+                                                            <option value="{{ $item->present_grade }}"
+                                                                {{ request('present_grade') == $item->present_grade ? 'selected' : '' }}>
+                                                                {{ $item->present_grade }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
 
-                                                                    return false;
-                                                                }
-                                                            }
-                                                        </script>
+                                                <!-- Recommended Grade -->
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Recommended Grade:</label>
+                                                    <select name="recomanded_grade" class="form-control select2">
+                                                        <option value="">Select Grade</option>
+                                                        @foreach ($workerData->unique('recomanded_grade') as $item)
+                                                            <option value="{{ $item->recomanded_grade }}"
+                                                                {{ request('recomanded_grade') == $item->recomanded_grade ? 'selected' : '' }}>
+                                                                {{ $item->recomanded_grade }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
 
-                                                    </td>
-
-                                                    <td>
-                                                        <a href="{{ route('workerEntries.index') }}"
-                                                            class="btn btn-outline-danger btn-sm"><i
-                                                                class="fa fa-refresh"></i> Reset</a>
-                                                    </td>
-                                                </tr>
-                                            </table>
+                                                <!-- Action Buttons -->
+                                                <div class="col-md-12 text-end mt-3">
+                                                    <button type="submit" class="btn btn-outline-info btn-sm">
+                                                        <i class="fa fa-search"></i> Search
+                                                    </button>
+                                                    <a href="{{ route('workerEntries.index') }}"
+                                                        class="btn btn-outline-danger btn-sm">
+                                                        <i class="fa fa-refresh"></i> Reset
+                                                    </a>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-
                                 </div>
-
                             </form>
+
+                            
+
                         </div>
                     </div>
 
                     <div class="card" style="overflow-x: auto; overflow-y: auto;">
                         <div class="card-header">
                             <div class="row">
-                                <div class="col-md-6 col-sm-12">
-
+                                <div class="col-md-10 col-sm-12">
                                     @can('Admin')
                                         <x-backend.form.anchor :href="route('workerEntries.create')" type="create" />
                                     @endcan
                                     <form method="GET" action="{{ route('workerEntries.index') }}" class="d-inline">
                                         @csrf
                                         <input type="hidden" name="low_performer" value="low_performer">
-
                                         <button type="submit" class="btn btn-outline-info">
                                             <i class="fa fa-list" aria-hidden="true"></i> Low Performer List
                                         </button>
-
                                     </form>
-
                                     <form method="GET" action="{{ route('workerEntries.index') }}" class="d-inline">
                                         @csrf
                                         <input type="hidden" name="high_performer" value="high_performer">
-
                                         <button type="submit" class="btn btn-outline-warning">
                                             <i class="fa fa-list" aria-hidden="true"></i> High Performer List
                                         </button>
-
                                     </form>
                                     @if (auth()->user()->role_id == 1 || auth()->user()->role_id == 3)
-                                        {{-- all_data_download download button  --}}
                                         <a href="{{ route('all_data_download') }}" class="btn btn-outline-info">
                                             <i class="fa fa-download" aria-hidden="true"></i> All Data Download </a>
                                     @endif
-                                    <a href="{{ route('empty_grade_list') }}" class="btn btn-sm btn-primary">Unfinished
+                                    <a href="{{ route('empty_grade_list') }}"
+                                        class="btn btn-outline-primary"><i  class="fa fa-list" aria-hidden="true"></i>
+                                        Unfinished
                                         list</a>
                                 </div>
-                                <div class="col-md-6 col-sm-12 text-md-end">
+                                <div class="col-md-2 col-sm-12 text-md-end">
                                     @if (session('search_worker') || $search_worker)
                                         <form method="GET" action="{{ route('workerEntries.index') }}">
                                             @csrf
-
                                             <div class="row">
                                                 <div class="col-md-12 col-sm-12">
                                                     <div class="form-group" id="hide_div">
@@ -256,17 +209,14 @@
                                                     </button>
                                                 </div>
                                             </div>
-
                                         </form>
                                     @endif
                                 </div>
                             </div>
                         </div>
-                        <!-- /.card-header -->
+                        <!-- /.card-header id="datatablesSimple"-->
                         <div class="card-body">
-                            {{-- spl Table goes here --}}
-
-                            <table id="datatablesSimple" class="table table-bordered table-hover">
+                            <table class="table table-bordered table-hover">
                                 <thead>
                                     <tr>
                                         <th>Sl#</th>
@@ -281,7 +231,6 @@
                                         <th>Recommended Grade</th>
                                         <th>Recommended Salary</th>
                                         <th>Actions</th>
-
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -295,11 +244,8 @@
                                                 ->whereIn('id', $data->pluck('sewing_process_list_id'))
                                                 ->get('machine_type');
 
-                                            //consider grade value D=1, C=2, C+=3, C++=4, B=5, B+=6, A=7, A+=8 then if $spl->recomanded_grade < $spl->present_grade then it will show red color in the table row
-
-                                            // Assigning numerical values to grades
                                             $grades = [
-                                                'F' => 0, // Adding F with value 0
+                                                'F' => 0,
                                                 'D' => 1,
                                                 'C' => 2,
                                                 'C+' => 3,
@@ -310,7 +256,6 @@
                                                 'A+' => 8,
                                             ];
 
-                                            // Converting grades to numerical values if any of them is not found in the array then it will be 0
                                             if ($spl->present_grade != null && $spl->recomanded_grade != null) {
                                                 $present_grade_value = $grades[$spl->present_grade];
                                                 $recommended_grade_value = $grades[$spl->recomanded_grade];
@@ -319,15 +264,9 @@
                                                 $recommended_grade_value = 0;
                                             }
 
-                                            // Applying CSS class based on the condition
                                             $row_class =
                                                 $recommended_grade_value < $present_grade_value ? 'bg-danger' : '';
-
                                         @endphp
-
-
-
-
                                         <tr class="{{ $row_class }}">
                                             <td>{{ $spl->id }}</td>
                                             <td>{{ $spl->floor }}</td>
@@ -347,35 +286,12 @@
                                                 <ol>
                                                     @foreach ($data as $item)
                                                         <li>{{ ucwords($item->sewing_process_type) }}</li>
-                                                        {{-- @if ($item->sewing_process_type == 'normal')
-                                                        <span class="badge badge-success">Normal Process</span>
-                                                    @elseif ($item->sewing_process_type == 'critical')
-                                                        <span class="badge badge-danger">Critical Process</span>
-                                                    @elseif ($item->sewing_process_type == 'both')
-                                                        <span class="badge badge-warning">Both Process</span>
-                                                    @else
-                                                        <span class="badge badge-dark">No Process</span>
-                                                    @endif --}}
                                                     @endforeach
                                                 </ol>
                                             </td>
                                             <td>
                                                 <ol>
                                                     @foreach ($machine_type as $type)
-                                                        {{-- @if ($type->machine_type == 'LSM')
-                                                        <span class="badge badge-secondary">LOCK STITCH MACHINE</span>
-                                                    @elseif ($type->machine_type == 'FLM')
-                                                        <span class="badge badge-warning">FLAT LOCK MACHINE</span>
-                                                    @elseif ($type->machine_type == 'OLM')
-                                                        <span class="badge badge-info">OVER LOCK MACHINE</span>
-                                                    @elseif ($type->machine_type == 'NM')
-                                                        <span class="badge badge-success">NORMAL MACHINES</span>
-                                                    @elseif ($type->machine_type == 'SM')
-                                                        <span class="badge badge-dark">SPECIAL MACHINES</span>
-                                                    @else
-                                                        <span class="badge badge-dark">No Machine</span>
-                                                    @endif --}}
-
                                                         <li>{{ ucwords($type->machine_type) }}</li>
                                                     @endforeach
                                                 </ol>
@@ -386,9 +302,6 @@
                                                         <li>{{ ucwords($item->sewing_process_name) }}</li>
                                                     @endforeach
                                                 </ol>
-                                                {{-- @foreach ($data as $item)
-                                                    {{ ucwords($item->sewing_process_name) }}
-                                                @endforeach --}}
                                             </td>
                                             <td>{{ $spl->present_grade }}</td>
                                             <td>{{ $spl->recomanded_grade }}</td>
@@ -399,74 +312,17 @@
                                                     {{ $spl->recomanded_salary }} TK
                                                 @endif
                                             </td>
-                                            <td>
-
-
-                                                @can('General')
-                                                    <x-backend.form.anchor :href="route('workerEntries.edit', $spl)" type="edit" />
-
-                                                    <form style="display:inline"
-                                                        action="{{ route('workerEntries.destroy', ['workerEntry' => $spl->id]) }}"
-                                                        method="POST">
-                                                        @csrf
-                                                        @method('delete')
-
-                                                        <button onclick="return confirm('Are you sure want to delete ?')"
-                                                            class="btn btn-outline-danger my-1 mx-1 btn-sm"
-                                                            type="submit"><i class="bi bi-trash"></i>
-                                                            Delete</button>
-                                                    </form>
-                                                @endcan
-                                                <x-backend.form.anchor :href="route('workerEntries.show', $spl)" type="show" />
-                                                <x-backend.form.anchor :href="route('workerEntries.approval', $spl)" type="Download" />
-                                                @can('General')
-                                                    <a href="{{ route('cyclesData_entry_form', ['workerEntry' => $spl->id]) }}"
-                                                        class="btn btn-outline-success my-1 mx-1 btn-sm"><i
-                                                            class="bi bi-file"></i>
-                                                        Cycle Entry</a>
-                                                @endcan
-                                                @can('Admin')
-                                                    <a href="{{ route('cyclesData_entry_form', ['workerEntry' => $spl->id]) }}"
-                                                        class="btn btn-outline-success my-1 mx-1 btn-sm"><i
-                                                            class="bi bi-file"></i>
-                                                        Cycle Entry</a>
-                                                    <x-backend.form.anchor :href="route('workerEntries.edit', $spl)" type="edit" />
-                                                    <form style="display:inline"
-                                                        action="{{ route('workerEntries.destroy', ['workerEntry' => $spl->id]) }}"
-                                                        method="POST">
-                                                        @csrf
-                                                        @method('delete')
-
-                                                        <button onclick="return confirm('Are you sure want to delete ?')"
-                                                            class="btn btn-outline-danger my-1 mx-1 btn-sm"
-                                                            type="submit"><i class="bi bi-trash"></i>
-                                                            Delete</button>
-                                                    </form>
-                                                @endcan
-                                                @can('Supervisor')
-                                                    <a href="{{ route('cyclesData_entry_form', ['workerEntry' => $spl->id]) }}"
-                                                        class="btn btn-outline-success my-1 mx-1 btn-sm"><i
-                                                            class="bi bi-file"></i>
-                                                        Cycle Entry</a>
-                                                    <x-backend.form.anchor :href="route('workerEntries.edit', $spl)" type="edit" />
-                                                    <form style="display:inline"
-                                                        action="{{ route('workerEntries.destroy', ['workerEntry' => $spl->id]) }}"
-                                                        method="POST">
-                                                        @csrf
-                                                        @method('delete')
-
-                                                        <button onclick="return confirm('Are you sure want to delete ?')"
-                                                            class="btn btn-outline-danger my-1 mx-1 btn-sm"
-                                                            type="submit"><i class="bi bi-trash"></i>
-                                                            Delete</button>
-                                                    </form>
-                                                @endcan
-                                            </td>
+                                            {{-- <td></td> --}}
+                                            {!! $spl->actions !!}
                                         </tr>
                                     @endforeach
-
                                 </tbody>
                             </table>
+
+                            <!-- Server-side pagination -->
+                            <div class="d-flex justify-content-center mt-3">
+                                {{ $workerEntries->withQueryString()->links() }}
+                            </div>
                         </div>
                         <!-- /.card-body -->
                     </div>
@@ -479,13 +335,43 @@
     </section>
     @endif
 
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        $(function() {
-            $("#datatablesSimple").DataTable({
-                "responsive": true,
-                "autoWidth": false,
-            });
+        //at list one dropdown should be selected before submitting the form
+        document.getElementById('filterForm').addEventListener('submit', function(event) {
+            const floor = document.querySelector('select[name="floor"]').value;
+            const idCardNo = document.querySelector('select[name="id_card_no"]').value;
+            const processType = document.querySelector('select[name="sewing_process_type"]').value;
+            const processName = document.querySelector('select[name="sewing_process_name"]').value;
+            const presentGrade = document.querySelector('select[name="present_grade"]').value;
+            const recommendedGrade = document.querySelector('select[name="recomanded_grade"]').value;
+
+            if (!floor && !idCardNo && !processType && !processName && !presentGrade && !recommendedGrade) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Please select at least one filter option before submitting the form!'
+                });
+            }
         });
+
+        //when id_card_no is selected, auto-submit the form
+        document.querySelector('input[name="id_card_no"]').addEventListener('input', function() {
+            
+            const idCardNo = this.value;
+            if (idCardNo) {
+                //minimum 5 characters required to submit the form
+                if (idCardNo.length < 5) {
+                    return; // Do not submit if less than 5 characters
+                }
+                document.getElementById('filterForm').submit();
+            }
+        });
+
+       
     </script>
 
+   
 </x-backend.layouts.master>

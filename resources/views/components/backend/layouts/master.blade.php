@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="Worker perfomance Management Softwear from NTG, MIS Department" />
     <meta name="author" content="Md. Hasibul Islam Santo, MIS, NTG" />
-    <title> {{ $pageTitle ?? 'WorkerMatrix' }} </title>
+    <title> {{ $pageTitle ?? 'FALWorkerMatrix' }} </title>
 
     <!-- <link href="css/styles.css" rel="stylesheet" /> -->
 

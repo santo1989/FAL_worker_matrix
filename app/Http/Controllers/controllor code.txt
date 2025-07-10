@@ -1,0 +1,780 @@
+//WorkerEntryController code 
+
+
+    // public function index()
+    // {
+    //     $workerEntriesCollection = WorkerEntry::whereNull('old_matrix_Data_status')->orderBy('id', 'desc');
+    //     $cacheDuration = 60 * 60 ; // 1 hour cache duration
+    //     $filtersApplied = false;
+    //     $search_worker = null;
+
+    //     // Define filterable parameters and their corresponding logic
+    //     $filters = [
+    //         'floor' => fn($value) => WorkerEntry::where('floor', $value)->pluck('id'),
+    //         'id_card_no' => fn($value) => WorkerEntry::where('id_card_no', $value)->pluck('id'),
+    //         'process_type' => fn($value) => WorkerSewingProcessEntry::where('sewing_process_type', $value)->pluck('worker_entry_id'),
+    //         'process_name' => fn($value) => WorkerSewingProcessEntry::where('sewing_process_name', $value)->pluck('worker_entry_id'),
+    //         'present_grade' => fn($value) => WorkerEntry::where('present_grade', $value)->pluck('id'),
+    //         'recomanded_grade' => fn($value) => WorkerEntry::where('recomanded_grade', $value)->pluck('id'),
+    //         'low_performer' => fn() => $this->filterByPerformance('low'),
+    //         'high_performer' => fn() => $this->filterByPerformance('high'),
+    //     ];
+
+    //     // Apply filters dynamically
+    //     foreach ($filters as $param => $callback) {
+    //         if ($value = request($param)) {
+    //             $filtersApplied = true;
+    //             $cacheKey = "workerEntries_{$param}_" . ($value ?? 'default');
+    //             $workerEntriesCollection = $this->cacheFilterResults($workerEntriesCollection, $cacheKey, $cacheDuration, fn() => $callback($value));
+    //         }
+    //     }
+
+    //     // Fetch filtered results
+    //     $workerEntries = $workerEntriesCollection->get();
+
+    //     // Handle session storage
+    //     if ($filtersApplied) {
+    //         session(['search_worker' => $workerEntries]);
+    //         $search_worker = $workerEntries;
+    //     } elseif (request('export_format')) {
+    //         $search_worker = session('search_worker');
+    //     } else {
+    //         session(['search_worker' => null]);
+    //     }
+
+    //     // Export logic
+    //     if (strtolower(request('export_format')) === 'xlsx') {
+    //         $search_worker = session('search_worker');
+
+    //         if (!$search_worker) {
+    //             return redirect()->route('workerEntries.index')->withErrors('First search the data then export.');
+    //         }
+
+    //         $data = compact('search_worker');
+    //         $viewContent = View::make('backend.library.dataEntry.export', $data)->render();
+    //         $filename = Auth::user()->name . '_' . now()->format('Y_m_d') . '_' . time() . '.xls';
+
+    //         return response()->make($viewContent, 200, [
+    //             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    //             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+    //         ]);
+    //     }
+
+    //     // pagination 
+    //     $workerEntries = $workerEntries->paginate(10);
+
+    //     return view('backend.library.dataEntry.index', compact('workerEntries', 'search_worker'));
+    // }
+
+
+
+
+
+
+
+
+    // public function old_index()
+    // {
+    //     // //last 1 month data entry worker list order by id desc
+    //     // $workerEntries = WorkerEntry::where('created_at', '>=', now()->subDays(30))->orderBy('id', 'desc')->get();
+    //     // $search_worker= WorkerEntry::all();
+    //     $workerEntriesCollection = WorkerEntry::where('old_matrix_Data_status ', 1)->orderBy('id', 'desc');
+    //     $search_worker = null; // Initialize the variable
+    //     $workerProcessEntries = WorkerSewingProcessEntry::all();
+
+    //     // Check if the floor field is selected
+    //     if (request('floor')) {
+    //         $workerEntriesCollection = $workerEntriesCollection->where('floor', request('floor'));
+    //         $search_worker = $workerEntriesCollection->get();
+    //         session(['search_worker' => $search_worker]);
+    //     }
+
+    //     // Check if the id_card_no field is selected
+    //     if (request('id_card_no')) {
+    //         $workerEntriesCollection = $workerEntriesCollection->where('id_card_no', request('id_card_no'));
+    //         $search_worker = $workerEntriesCollection->get();
+    //         session(['search_worker' => $search_worker]);
+    //     }
+
+    //     // Check if the process_type fields are filled
+    //     if (request('process_type')) {
+    //         $workerProcessEntries = WorkerSewingProcessEntry::where('sewing_process_type', request('process_type'))->get();
+    //         $workerEntriesCollection = $workerEntriesCollection->whereIn('id', $workerProcessEntries->pluck('worker_entry_id'));
+    //         $search_worker = $workerEntriesCollection->get();
+    //         session(['search_worker' => $search_worker]);
+    //     }
+
+    //     // Check if the process_name field is filled
+    //     if (request('process_name')) {
+    //         $workerProcessEntries = WorkerSewingProcessEntry::where('sewing_process_name', request('process_name'))->get();
+    //         // dd($workerProcessEntries);
+    //         $workerEntriesCollection = $workerEntriesCollection->whereIn('id', $workerProcessEntries->pluck('worker_entry_id'));
+    //         $search_worker = $workerEntriesCollection->get();
+    //         session(['search_worker' => $search_worker]);
+    //     }
+
+    //     // Check if the recomanded_grade field is filled
+    //     if (request('recomanded_grade')) {
+    //         $workerEntriesCollection = $workerEntriesCollection->where('recomanded_grade', request('recomanded_grade'));
+    //         $search_worker = $workerEntriesCollection->get();
+    //         session(['search_worker' => $search_worker]);
+    //     }
+
+
+
+    //     // Check if the request low_performer field is filled start
+
+    //     // Check if the request low_performer field is filled
+    //     if (request('low_performer')) {
+    //         // Assigning numerical values to grades
+    //         $grades = [
+    //             'D' => 1,
+    //             'C' => 2,
+    //             'C+' => 3,
+    //             'C++' => 4,
+    //             'B' => 5,
+    //             'B+' => 6,
+    //             'A' => 7,
+    //             'A+' => 8,
+    //             'F' => 0, // Add F with value 0
+    //         ];
+
+    //         // Fetch worker entries from the database
+    //         $workerCollection = WorkerEntry::all(); // Assuming WorkerEntry is your Eloquent model
+
+    //         // Loop through each worker entry and filter based on the condition
+    //         $search_worker_ids = [];
+    //         foreach ($workerCollection as $key => $workerEntry) {
+    //             if ($workerEntry->present_grade != null && $workerEntry->recomanded_grade != null) {
+    //                 $present_grade_value = $grades[$workerEntry->present_grade];
+    //                 $recommended_grade_value = $grades[$workerEntry->recomanded_grade];
+    //             } else {
+    //                 // Set default values if grades are not available
+    //                 $present_grade_value = 9; // Assuming 9 is higher than any grade value
+    //                 $recommended_grade_value = 0; // Assuming 0 is lower than any grade value
+    //             }
+
+    //             // If present grade is less than recommended grade, include in search results
+    //             if ($present_grade_value > $recommended_grade_value) {
+    //                 $search_worker_ids[] = $workerEntry->id;
+    //             }
+    //         }
+
+    //         // Filter the workerEntriesCollection based on the collected IDs
+    //         $workerEntriesCollection = $workerEntriesCollection->whereIn('id', $search_worker_ids);
+
+    //         // dd($workerEntriesCollection);
+
+    //         // Store the filtered worker entries in the session
+    //         $search_worker = $workerEntriesCollection->get();
+    //         session(['search_worker' => $search_worker]); // Store in the session
+    //     }
+
+
+    //     // Check if the request low_performer field is filled end
+
+    //     // Check if the request high_performer field is filled start
+
+    //     // Check if the request high_performer field is filled
+    //     if (request('high_performer')) {
+    //         // Assigning numerical values to grades
+    //         $grades = [
+    //             'D' => 1,
+    //             'C' => 2,
+    //             'C+' => 3,
+    //             'C++' => 4,
+    //             'B' => 5,
+    //             'B+' => 6,
+    //             'A' => 7,
+    //             'A+' => 8,
+    //             'F' => 0, // Add F with value 0
+    //         ];
+
+    //         // Fetch worker entries from the database
+    //         $workerCollection = WorkerEntry::all(); // Assuming WorkerEntry is your Eloquent model
+
+    //         // Loop through each worker entry and filter based on the condition
+    //         $search_worker_ids = [];
+    //         foreach ($workerCollection as $key => $workerEntry) {
+    //             if ($workerEntry->present_grade != null && $workerEntry->recomanded_grade != null) {
+    //                 $present_grade_value = $grades[$workerEntry->present_grade];
+    //                 $recommended_grade_value = $grades[$workerEntry->recomanded_grade];
+    //             } else {
+    //                 // Set default values if grades are not available
+    //                 $present_grade_value = 9; // Assuming 9 is higher than any grade value
+    //                 $recommended_grade_value = 0; // Assuming 0 is lower than any grade value
+    //             }
+
+    //             // If present grade is less than recommended grade, include in search results
+    //             if ($present_grade_value < $recommended_grade_value) {
+    //                 $search_worker_ids[] = $workerEntry->id;
+    //             }
+    //         }
+
+    //         // Filter the workerEntriesCollection based on the collected IDs
+    //         $workerEntriesCollection = $workerEntriesCollection->whereIn('id', $search_worker_ids);
+
+    //         // dd($workerEntriesCollection);
+
+    //         // Store the filtered worker entries in the session
+    //         $search_worker = $workerEntriesCollection->get();
+    //         session(['search_worker' => $search_worker]); // Store in the session
+    //     }
+
+    //     // Check if the request high_performer field is filled end
+
+    //     $workerEntries = $workerEntriesCollection->get();
+
+    //     // Check if export format is requested
+    //     $format = strtolower(request('export_format'));
+
+    //     if ($format === 'xlsx') {
+    //         // Store the necessary values in the session
+    //         session(['export_format' => $format]);
+
+    //         // Retrieve the values from the session
+    //         $format = session('export_format');
+    //         $search_worker = session('search_worker');
+
+    //         if ($search_worker == null) {
+    //             return redirect()->route('workerEntries.index')->withErrors('First search the data then export');
+    //         } else {
+    //             $data = compact('search_worker');
+    //             // Generate the view content based on the requested format
+    //             $viewContent = View::make('backend.library.dataEntry.export', $data)->render();
+
+    //             // Set appropriate headers for the file download
+    //             $filename = Auth::user()->name . '_' . Carbon::now()->format('Y_m_d') . '_' . time() . '.xls';
+    //             $headers = [
+    //                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    //                 'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+    //                 'Content-Transfer-Encoding' => 'binary',
+    //                 'Cache-Control' => 'must-revalidate',
+    //                 'Pragma' => 'public',
+    //                 'Content-Length' => strlen($viewContent)
+    //             ];
+
+    //             // Use the "binary" option in response to ensure the file is downloaded correctly
+    //             return response()->make($viewContent, 200, $headers);
+    //         }
+    //     }
+
+    //     return view('backend.library.dataEntry.old_index', compact('workerEntries', 'search_worker'));
+    // }
+
+
+    // public function matrixData_store(Request $request)
+    // {
+    //     // dd($request->all());
+
+    //     try {
+    //         // Loop through the arrays and update records
+    //         foreach ($request->operation_id as $key => $process_id) {
+    //             $WorkerSewingProcessEntry = WorkerSewingProcessEntry::where('id', $process_id)->first();
+    //             $examination_date = WorkerEntry::where('id', $request->worker_id)->first()->examination_date;
+    //             // dd($examination_date);
+
+    //             // Update The WorkerSewingProcessEntry record
+    //             $WorkerSewingProcessEntry->update([
+    //                 'smv' => $request->smv[$key],
+    //                 'target' => $request->target[$key],
+    //                 'capacity' => $request->capacity[$key],
+    //                 'self_production' => $request->production_self[$key],
+    //                 'achive_production' => $request->production_achive[$key],
+    //                 'efficiency' => $request->efficiency[$key],
+    //                 'necessity_of_helper' => $request->necessity_of_helper,
+    //                 'perception_about_size' => $request->perception_about_size,
+    //                 'rating' => $request->rating,
+    //                 'examination_date' => $examination_date,
+
+    //                 'dataEditBy' => Auth()->user()->name,
+    //                 'dataEditDate' => now(),
+
+    //             ]);
+    //         }
+
+
+    //         // Calculate the grade
+    //         $Worker = WorkerEntry::where('id', $request->worker_id)->first();
+    //         if ($this->calculate_grade($request->worker_id) == 'Fail') {
+    //             $Worker->update([
+    //                 'recomanded_grade' => $Worker->present_grade,
+    //             ]);
+    //         } else {
+    //             $Worker->update([
+    //                 'recomanded_grade' => $this->calculate_grade($request->worker_id)
+    //             ]);
+    //         }
+
+
+    //         // Redirect or return a success response
+    //         return redirect()->route('workerEntries.index')->with('success', 'Matrix Data inserted successfully!');
+    //     } catch (\Exception $e) {
+    //         // Handle any exceptions or validation errors here
+    //         return redirect()->back()->withErrors($e->getMessage());
+    //     }
+    //     // return route('cyclesData_entry', $request->worker_id);
+    // }
+
+ // public function workerEntrys_process_type_search(Request $request)
+    // {
+    //     // dd($request->all());
+
+    //     $process_type = $request->process_type;
+
+
+    //     // Execute the query and retrieve the worker data
+    //     if ($process_type == 'normal' || $process_type == 'semi-critical' || $process_type == 'critical') {
+    //         $sewingProcessList = SewingProcessList::where('process_type', $process_type)->get();
+    //     }
+
+
+
+    //     // Group sewing processes by both process_type and machine_type
+    //     $groupedProcesses = $sewingProcessList->groupBy(['process_type', 'machine_type']);
+
+
+
+    //     // dd($groupedProcesses);
+
+    //     $workerEntry = WorkerEntry::find($request->worker_id);
+    //     return view('backend.library.dataEntry.process_entry', compact('workerEntry', 'groupedProcesses'));
+    // }
+
+  // public function calculate_grade($worker_id)
+    // {
+    //     // Fetch worker entries and categorize them
+    //     $workerEntries = DB::table('worker_sewing_process_entries')
+    //     ->where('worker_entry_id', $worker_id)
+    //         ->get();
+
+    //     $normal_process = [];
+    //     $semi_critical_process = [];
+    //     $critical_process = [];
+
+    //     foreach ($workerEntries as $workerEntry) {
+    //         if ($workerEntry->sewing_process_type === 'normal') {
+    //             $normal_process[] = $workerEntry->efficiency;
+    //         } elseif ($workerEntry->sewing_process_type === 'semi-critical') {
+    //             $semi_critical_process[] = $workerEntry->efficiency;
+    //         } elseif ($workerEntry->sewing_process_type === 'critical') {
+    //             $critical_process[] = $workerEntry->efficiency;
+    //         }
+    //     }
+
+    //     // Sort processes in descending order
+    //     rsort($normal_process);
+    //     rsort($semi_critical_process);
+    //     rsort($critical_process);
+
+    //     // Define grading table
+    //     $grading_table = [
+    //         ['grade' => 'C', 'max_mc' => 1, 'status' => 'normal', 'min_count' => 2, 'efficiency_min' => 60, 'efficiency_max' => 69, 'salary_range' => '13550-13650 Tk'],
+    //         ['grade' => 'C+', 'max_mc' => 1, 'status' => 'normal', 'min_count' => 2, 'efficiency_min' => 70, 'efficiency_max' => 79, 'salary_range' => '13700-13800 Tk'],
+    //         ['grade' => 'C++', 'max_mc' => 1, 'status' => 'normal', 'min_count' => 2, 'efficiency_min' => 80, 'efficiency_max' => 100, 'salary_range' => '13850-14000 Tk'],
+    //         ['grade' => 'B', 'max_mc' => 2, 'status' => 'semi-critical', 'min_count' => 2, 'efficiency_min' => 70, 'efficiency_max' => 79, 'salary_range' => '14100-14300 Tk'],
+    //         ['grade' => 'B+', 'max_mc' => 2, 'status' => 'semi-critical', 'min_count' => 4, 'efficiency_min' => 80, 'efficiency_max' => 100, 'salary_range' => '14350-14550 Tk'],
+    //         [
+    //             'grade' => 'A',
+    //             'max_mc' => 3,
+    //             'status' => 'critical',
+    //             'min_count' => 2,
+    //             'efficiency_min' => 70,
+    //             'efficiency_max' => 79,
+    //             'salary_range' => '14600-15000 Tk',
+    //             'required_ids' => [79, 56, 60, 59, 75, 72, 73, 61, 74],
+    //             'min_required_ids' => 2,
+    //         ],
+    //         [
+    //             'grade' => 'A+',
+    //             'max_mc' => 4,
+    //             'status' => 'critical',
+    //             'min_count' => 5,
+    //             'efficiency_min' => 80,
+    //             'efficiency_max' => 100,
+    //             'salary_range' => '15100-15300 Tk',
+    //             'required_ids' => [56, 60, 59, 75, 72, 73],
+    //             'min_required_ids' => 4,
+    //         ],
+    //     ];
+
+    //     // Iterate over the grading table (first pass)
+    //     foreach ($grading_table as $row) {
+    //         $process_array = match ($row['status']) {
+    //             'normal' => $normal_process,
+    //             'semi-critical' => $semi_critical_process,
+    //             'critical' => $critical_process,
+    //         };
+
+    //         $filtered_process = array_filter($process_array, function ($efficiency) use ($row) {
+    //             $efficiency_max = $row['efficiency_max'] === PHP_INT_MAX ? 100 : $row['efficiency_max'];
+    //             return $efficiency >= $row['efficiency_min'] && $efficiency <= $efficiency_max;
+    //         });
+
+    //         if (in_array($row['grade'], ['A', 'A+'])) {
+    //             if (!$this->has_required_process_ids($workerEntries, $row['required_ids'], $row['min_required_ids'])) {
+    //                 continue;
+    //             }
+
+    //             if ($row['grade'] === 'A+' && !$this->has_flatlock_and_overlock($workerEntries)) {
+    //                 continue;
+    //             }
+    //         }
+
+    //         if (count($filtered_process) >= $row['min_count']) {
+    //             return $this->calculate_salary($filtered_process, $row);
+    //         }
+    //     }
+
+    //     // Second pass: find the closest match dynamically
+    //     $best_match = null;
+    //     $highest_efficiency = 0;
+
+    //     foreach ($grading_table as $row) {
+    //         $process_array = match ($row['status']) {
+    //             'normal' => $normal_process,
+    //             'semi-critical' => $semi_critical_process,
+    //             'critical' => $critical_process,
+    //         };
+
+    //         $filtered_process = array_filter($process_array, function ($efficiency) use ($row) {
+    //             $efficiency_max = $row['efficiency_max'] === PHP_INT_MAX ? 100 : $row['efficiency_max'];
+    //             return $efficiency >= $row['efficiency_min'] && $efficiency <= $efficiency_max;
+    //         });
+
+    //         if (count($filtered_process) >= $row['min_count']) {
+    //             $avg_efficiency = array_sum($filtered_process) / count($filtered_process);
+    //             if ($avg_efficiency > $highest_efficiency) {
+    //                 $highest_efficiency = $avg_efficiency;
+    //                 $best_match = $row;
+    //             }
+    //         }
+    //     }
+
+    //     if ($best_match) {
+    //         return $this->calculate_salary($filtered_process, $best_match);
+    //     }
+
+    //     // Default return for "Fail"
+    //     return [
+    //         'grade' => 'Fail',
+    //         'salary_range' => 'N/A',
+    //     ];
+    // }
+
+    // /**
+    //  * Helper function to calculate salary for a given grade.
+    //  */
+    // private function calculate_salary($filtered_process, $row)
+    // {
+    //     $avg_efficiency = array_sum($filtered_process) / count($filtered_process);
+    //     $efficiency_max = $row['efficiency_max'] === PHP_INT_MAX ? 100 : $row['efficiency_max'];
+
+    //     $salary_range = explode('-', str_replace(' Tk', '', $row['salary_range']));
+    //     $salary_min = (float)$salary_range[0];
+    //     $salary_max = (float)$salary_range[1];
+
+    //     $salary = $salary_min + (($avg_efficiency - $row['efficiency_min']) / ($efficiency_max - $row['efficiency_min'])) * ($salary_max - $salary_min);
+    //     $salary = round($salary, 2);
+
+    //     return [
+    //         'grade' => $row['grade'],
+    //         'salary_range' => "{$salary}",
+    //     ];
+    // }
+
+    // /**
+    //  * Check if required sewing_process_list_ids are present.
+    //  */
+    // private function has_required_process_ids($entries, $required_ids, $min_count)
+    // {
+    //     $process_ids = $entries->pluck('sewing_process_list_id')->toArray();
+    //     $matching_ids = array_intersect($process_ids, $required_ids);
+
+    //     return count($matching_ids) >= $min_count;
+    // }
+
+    // /**
+    //  * Check if Flat Lock and Overlock processes are present.
+    //  */
+    // private function has_flatlock_and_overlock($entries)
+    // {
+    //     $process_ids = $entries->pluck('sewing_process_list_id')->toArray();
+    //     $flatlock = in_array('F/L', $process_ids);
+    //     $overlock = in_array('OL', $process_ids);
+
+    //     return $flatlock && $overlock;
+    // }
+
+    //     public function calculate_grade($worker_id)
+    // {
+    //     $workerEntries = DB::table('worker_sewing_process_entries')
+    //         ->where('worker_entry_id', $worker_id)
+    //         ->get();
+
+    //     // Categorize processes by type
+    //     $processes = [
+    //         'normal' => [],
+    //         'semi-critical' => [],
+    //         'critical' => []
+    //     ];
+
+    //     foreach ($workerEntries as $entry) {
+    //         if (isset($processes[$entry->sewing_process_type])) {
+    //                 // $processes[$entry->sewing_process_type][] = $entry->efficiency;
+    //                 // Clamp efficiency values to max 100
+    //                 $efficiency = min($entry->efficiency, 100);
+    //                 $processes[$entry->sewing_process_type][] = $efficiency;
+    //         }
+    //     }
+
+    //     // Define new grading table (highest to lowest)
+    //     $grading_table = [
+    //         [
+    //             'grade' => 'A++',
+    //             'status' => ['critical'],
+    //             'min_count' => PHP_INT_MAX,  // Requires ALL critical processes
+    //             'efficiency_min' => 90,
+    //             'efficiency_max' => 100,
+    //             'salary_min' => 15500,
+    //             'salary_max' => PHP_INT_MAX,
+    //             'conditions' => [
+    //                 'must_have_all_critical' => true
+    //             ]
+    //         ],
+    //         [
+    //             'grade' => 'A+',
+    //             'status' => ['critical'],
+    //             'min_count' => 3,
+    //             'efficiency_min' => 75,
+    //             'efficiency_max' => 100,
+    //             'salary_min' => 15250,
+    //             'salary_max' => 15500
+    //         ],
+    //         [
+    //             'grade' => 'A',
+    //             'status' => ['critical'],
+    //             'min_count' => 3,
+    //             'efficiency_min' => 70,
+    //             'efficiency_max' => 100,
+    //             'salary_min' => 14750,
+    //             'salary_max' => 15200
+    //         ],
+    //         [
+    //             'grade' => 'B+',
+    //             'status' => ['semi-critical', 'critical'],
+    //             'min_count' => 3,
+    //             'efficiency_min' => 65,
+    //             'efficiency_max' => 100,
+    //             'salary_min' => 14350,
+    //             'salary_max' => 14700,
+    //             'conditions' => [
+    //                 'min_semi_critical' => 1,
+    //                 'min_critical' => 1
+    //             ]
+    //         ],
+    //         [
+    //             'grade' => 'B',
+    //             'status' => ['semi-critical'],
+    //             'min_count' => 2,
+    //             'efficiency_min' => 60,
+    //             'efficiency_max' => 100,
+    //             'salary_min' => 14100,
+    //             'salary_max' => 14300
+    //         ],
+    //         [
+    //             'grade' => 'C++',
+    //             'status' => ['normal', 'semi-critical'],
+    //             'min_count' => 2,
+    //             'efficiency_min' => 80,
+    //             'efficiency_max' => 100,
+    //             'salary_min' => 13800,
+    //             'salary_max' => 14000,
+    //             'conditions' => [
+    //                 'min_semi_critical' => 1
+    //             ]
+    //         ],
+    //         [
+    //             'grade' => 'C+',
+    //             'status' => ['normal'],
+    //             'min_count' => 2,
+    //             'efficiency_min' => 70,
+    //             'efficiency_max' => 79,
+    //             'salary_min' => 13650,
+    //             'salary_max' => 13750
+    //         ],
+    //         [
+    //             'grade' => 'C',
+    //             'status' => ['normal'],
+    //             'min_count' => 2,
+    //             'efficiency_min' => 60,
+    //             'efficiency_max' => 69,
+    //             'salary_min' => 13550,
+    //             'salary_max' => 13600
+    //         ]
+    //     ];
+
+    //     // Check grades from highest to lowest
+    //     foreach ($grading_table as $grade) {
+    //         $filtered = [];
+    //         $statusCounts = array_fill_keys($grade['status'], 0);
+
+    //         // Collect eligible processes
+    //         foreach ($grade['status'] as $status) {
+    //             foreach ($processes[$status] as $eff) {
+    //                 if ($eff >= $grade['efficiency_min'] && $eff <= $grade['efficiency_max']) {
+    //                     $filtered[] = $eff;
+    //                     $statusCounts[$status]++;
+    //                 }
+    //             }
+    //         }
+
+    //         // Check minimum process count
+    //         if (count($filtered) < $grade['min_count']) {
+    //             continue;
+    //         }
+
+    //         // Special case: A++ requires ALL critical processes
+    //         if (isset($grade['conditions']['must_have_all_critical'])) {
+    //             $criticalCount = count($processes['critical']);
+    //             // $totalCritical = ...;  Fetch total critical processes from DB table
+    //             $totalCritical = DB::table('sewing_process_lists')
+    //                 ->where('process_type', 'critical')
+    //                 ->count();
+    //             if ($criticalCount < $totalCritical) {
+    //                 continue;
+    //             }
+    //         }
+
+    //         // Check additional conditions
+    //         $conditionsMet = true;
+    //         if (isset($grade['conditions'])) {
+    //             foreach ($grade['conditions'] as $cond => $min) {
+    //                 if ($cond === 'min_semi_critical' && $statusCounts['semi-critical'] < $min) {
+    //                     $conditionsMet = false;
+    //                 }
+    //                 if ($cond === 'min_critical' && $statusCounts['critical'] < $min) {
+    //                     $conditionsMet = false;
+    //                 }
+    //             }
+    //         }
+
+    //         if (!$conditionsMet) {
+    //             continue;
+    //         }
+
+    //         // Calculate salary
+    //         $avgEff = array_sum($filtered) / count($filtered);
+    //         $salary = $this->calculate_salary($avgEff, $grade);
+
+    //         return [
+    //             'grade' => $grade['grade'],
+    //             'salary_range' => $salary
+    //         ];
+    //     }
+
+    //     // No grade matched
+    //     return [
+    //         'grade' => 'F',
+    //         'salary_range' => 'N/A'
+    //     ];
+    // }
+
+
+    // private $allowedFields = [
+    //     'worker_entries' => [
+    //         'floor',
+    //         'line',
+    //         'id_card_no',
+    //         'employee_name_english',
+    //         'joining_date',
+    //         'examination_date',
+    //         'present_grade',
+    //         'recomanded_grade',
+    //         'recomanded_salary'
+    //     ],
+    //     'worker_sewing_process_entries' => [
+    //         'sewing_process_name',
+    //         'sewing_process_type',
+    //         'smv',
+    //         'target',
+    //         'sewing_process_avg_cycles',
+    //         'capacity',
+    //         'self_production',
+    //         'achive_production', 
+    //         'efficiency',
+    //         'necessity_of_helper',
+    //         'rating'
+
+
+    //     ],
+    //     'cycle_list_logs' => [
+    //         'start_time',
+    //         'end_time',
+    //         'duration',
+    //         'rejectDataStatus'
+    //     ]
+    // ];
+
+    // public function showBuilder()
+    // {
+    //     return view('report-builder', [
+    //         'fields' => $this->allowedFields
+    //     ]);
+    // }
+
+    // public function generateReport(Request $request)
+    // {
+    //     $request->validate([
+    //         'fields' => 'required|array',
+    //         'fields.*' => 'string'
+    //     ]);
+
+    //     $selectedFields = [];
+    //     $tables = [];
+
+    //     // Validate and parse fields
+    //     foreach ($request->fields as $field) {
+    //         [$table, $column] = explode('.', $field);
+
+    //         if (
+    //             !isset($this->allowedFields[$table]) ||
+    //             !in_array($column, $this->allowedFields[$table])
+    //         ) {
+    //             abort(400, 'Invalid field selection');
+    //         }
+
+    //         $selectedFields[] = "$table.$column as " . str_replace('.', '_', $field);
+    //         $tables[$table] = true;
+    //     }
+
+    //     // Build base query
+    //     $query = DB::table('worker_entries');
+
+    //     // Add joins dynamically
+    //     if (isset($tables['worker_sewing_process_entries'])) {
+    //         $query->join(
+    //             'worker_sewing_process_entries',
+    //             'worker_entries.id',
+    //             '=',
+    //             'worker_sewing_process_entries.worker_entry_id'
+    //         );
+    //     }
+
+    //     if (isset($tables['cycle_list_logs'])) {
+    //         $query->join(
+    //             'cycle_list_logs',
+    //             'worker_sewing_process_entries.id',
+    //             '=',
+    //             'cycle_list_logs.worker_sewing_process_entries_id'
+    //         );
+    //     }
+
+    //     // Execute query
+    //     $results = $query->selectRaw(implode(', ', $selectedFields))->get();
+
+    //     return response()->json([
+    //         'fields' => array_map(fn($f) => str_replace('.', '_', $f), $request->fields),
+    //         'rows' => $results
+    //     ]);
+    // }

@@ -45,6 +45,15 @@ class WorkerEntry extends Model
         return $this->belongsTo(Designation::class);
     }
 
+    public function sewingProcessEntries()
+    {
+        return $this->hasMany(WorkerSewingProcessEntry::class);
+    }
+
+    public function cycleListLogs()
+    {
+        return $this->hasMany(CycleListLog::class);
+    }
     
 
 }

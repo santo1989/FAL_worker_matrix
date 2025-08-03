@@ -24,6 +24,124 @@ use Illuminate\Pagination\Paginator;
 class WorkerEntryController extends Controller
 {
 
+    // public function index()
+    // {
+    //     $workerEntriesCollection = WorkerEntry::with(['sewingProcessEntries' => function ($query) {
+    //         $query->with('sewingProcessList:id,machine_type');
+    //     }])
+    //         ->whereNull('old_matrix_Data_status')
+    //         ->orderBy('id', 'desc');
+
+    //     $cacheDuration = 60 * 60; // 1 hour cache duration
+    //     $filtersApplied = false;
+    //     $search_worker = null;
+
+    //     $filters = [
+    //         'floor' => fn($value) => WorkerEntry::where('floor', $value)->pluck('id'),
+    //         'id_card_no' => fn($value) => WorkerEntry::where('id_card_no', $value)->pluck('id'),
+    //         'sewing_process_type' => fn($value) => WorkerSewingProcessEntry::where('sewing_process_type', $value)->pluck('worker_entry_id'),
+    //         'sewing_process_name' => fn($value) => WorkerSewingProcessEntry::where('sewing_process_name', $value)->pluck('worker_entry_id'),
+    //         'present_grade' => fn($value) => WorkerEntry::where('present_grade', $value)->pluck('id'),
+    //         'recomanded_grade' => fn($value) => WorkerEntry::where('recomanded_grade', $value)->pluck('id'),
+    //         'low_performer' => fn() => $this->filterByPerformance('low'),
+    //         'high_performer' => fn() => $this->filterByPerformance('high'),
+    //     ];
+
+    //     foreach ($filters as $param => $callback) {
+    //         if ($value = request($param)) {
+    //             $filtersApplied = true;
+    //             $cacheKey = "workerEntries_{$param}_" . ($value ?? 'default');
+    //             $workerEntriesCollection = $this->cacheFilterResults($workerEntriesCollection, $cacheKey, $cacheDuration, fn() => $callback($value));
+    //         }
+    //     }
+
+    //     // For AJAX requests, return paginated JSON
+    //     if (request()->ajax()) {
+    //         $workerEntries = $workerEntriesCollection->paginate(10);
+
+    //         $workerEntries->transform(function ($entry) {
+    //             $entry->actions = view('backend.library.dataEntry.partials.actions', ['workerEntry' => $entry])->render();
+    //             return $entry;
+    //         });
+
+    //         return response()->json([
+    //             'workerEntries' => $workerEntries->items(),
+    //             'pagination' => [
+    //                 'current_page' => $workerEntries->currentPage(),
+    //                 'last_page' => $workerEntries->lastPage(),
+    //                 'total' => $workerEntries->total(),
+    //             ],
+    //             'search_worker' => $search_worker
+    //         ]);
+    //     }
+
+    //     // For regular requests, handle filters and export
+    //     if ($filtersApplied) {
+    //         $workerEntries = $workerEntriesCollection->paginate(10);
+    //         session(['search_worker' => $workerEntries]);
+    //         $search_worker = $workerEntries;
+    //     } elseif (request('export_format')) {
+    //         $search_worker = session('search_worker');
+    //     } else {
+    //         $workerEntries = $workerEntriesCollection->paginate(10);
+    //         session(['search_worker' => null]);
+    //     }
+
+    //     if (strtolower(request('export_format')) === 'xlsx') {
+    //         $search_worker = session('search_worker');
+
+    //         if (!$search_worker) {
+    //             return redirect()->route('workerEntries.index')->withErrors('First search the data then export.');
+    //         }
+
+    //         $data = compact('search_worker');
+    //         $viewContent = View::make('backend.library.dataEntry.export', $data)->render();
+    //         $filename = Auth::user()->name . '_' . now()->format('Y_m_d') . '_' . time() . '.xls';
+
+    //         return response()->make($viewContent, 200, [
+    //             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    //             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+    //         ]);
+    //     }
+
+    //     // Add actions for each entry for initial load
+    //     $workerEntries->transform(function ($entry) {
+    //         $entry->actions = view('backend.library.dataEntry.partials.actions', ['workerEntry' => $entry])->render();
+    //         return $entry;
+    //     });
+
+    //     return view('backend.library.dataEntry.index', compact('workerEntries', 'search_worker'));
+    // }
+
+
+
+
+    // private function filterByPerformance($type)
+    // {
+    //     $grades = [
+    //         'D' => 1,
+    //         'C' => 2,
+    //         'C+' => 3,
+    //         'C++' => 4,
+    //         'B' => 5,
+    //         'B+' => 6,
+    //         'A' => 7,
+    //         'A+' => 8,
+    //         'F' => 0, // Add F with value 0
+    //     ];
+
+    //     return WorkerEntry::all()->filter(function ($workerEntry) use ($grades, $type) {
+    //         $presentValue = $grades[$workerEntry->present_grade] ?? 9;
+    //         $recommendedValue = $grades[$workerEntry->recomanded_grade] ?? 0;
+
+    //         return $type === 'low'
+    //             ? $presentValue > $recommendedValue
+    //             : $presentValue < $recommendedValue;
+    //     })->pluck('id')->toArray();
+    // }
+
+
+
     public function index()
     {
         $workerEntriesCollection = WorkerEntry::with(['sewingProcessEntries' => function ($query) {
@@ -34,7 +152,7 @@ class WorkerEntryController extends Controller
 
         $cacheDuration = 60 * 60; // 1 hour cache duration
         $filtersApplied = false;
-        $search_worker = null;
+        $showExportButton = false; // Initialize export button flag
 
         $filters = [
             'floor' => fn($value) => WorkerEntry::where('floor', $value)->pluck('id'),
@@ -55,6 +173,15 @@ class WorkerEntryController extends Controller
             }
         }
 
+        // Store filtered IDs for export and set export button flag
+        if ($filtersApplied) {
+            $filteredIds = $workerEntriesCollection->pluck('id')->toArray();
+            session(['search_worker_ids' => $filteredIds]);
+            $showExportButton = true;
+        } else {
+            session()->forget('search_worker_ids');
+        }
+
         // For AJAX requests, return paginated JSON
         if (request()->ajax()) {
             $workerEntries = $workerEntriesCollection->paginate(10);
@@ -71,28 +198,23 @@ class WorkerEntryController extends Controller
                     'last_page' => $workerEntries->lastPage(),
                     'total' => $workerEntries->total(),
                 ],
-                'search_worker' => $search_worker
             ]);
         }
 
-        // For regular requests, handle filters and export
-        if ($filtersApplied) {
-            $workerEntries = $workerEntriesCollection->paginate(10);
-            session(['search_worker' => $workerEntries]);
-            $search_worker = $workerEntries;
-        } elseif (request('export_format')) {
-            $search_worker = session('search_worker');
-        } else {
-            $workerEntries = $workerEntriesCollection->paginate(10);
-            session(['search_worker' => null]);
-        }
+        // Handle Excel export - FIXED CONDITION
+        if (request('export_format') === 'xlsx') {
+            $filteredIds = session('search_worker_ids', []);
 
-        if (strtolower(request('export_format')) === 'xlsx') {
-            $search_worker = session('search_worker');
-
-            if (!$search_worker) {
+            if (empty($filteredIds)) {
                 return redirect()->route('workerEntries.index')->withErrors('First search the data then export.');
             }
+
+            $search_worker = WorkerEntry::with(['sewingProcessEntries' => function ($query) {
+                $query->with('sewingProcessList:id,machine_type');
+            }])
+                ->whereIn('id', $filteredIds)
+                ->orderBy('id', 'desc')
+                ->get();
 
             $data = compact('search_worker');
             $viewContent = View::make('backend.library.dataEntry.export', $data)->render();
@@ -104,18 +226,15 @@ class WorkerEntryController extends Controller
             ]);
         }
 
+        $workerEntries = $workerEntriesCollection->paginate(10);
+
         // Add actions for each entry for initial load
         $workerEntries->transform(function ($entry) {
             $entry->actions = view('backend.library.dataEntry.partials.actions', ['workerEntry' => $entry])->render();
             return $entry;
         });
 
-        return view('backend.library.dataEntry.index', compact('workerEntries', 'search_worker'));
-    }
-    private function cacheFilterResults($query, $cacheKey, $cacheDuration, $filterCallback)
-    {
-        $ids = Cache::remember($cacheKey, $cacheDuration, $filterCallback);
-        return $query->whereIn('id', $ids);
+        return view('backend.library.dataEntry.index', compact('workerEntries', 'showExportButton'));
     }
 
 
@@ -130,17 +249,40 @@ class WorkerEntryController extends Controller
             'B+' => 6,
             'A' => 7,
             'A+' => 8,
-            'F' => 0, // Add F with value 0
+            'F' => 0
         ];
 
-        return WorkerEntry::all()->filter(function ($workerEntry) use ($grades, $type) {
-            $presentValue = $grades[$workerEntry->present_grade] ?? 9;
-            $recommendedValue = $grades[$workerEntry->recomanded_grade] ?? 0;
+        $presentCase = 'case';
+        $presentBindings = [];
+        foreach ($grades as $grade => $value) {
+            $presentCase .= " when present_grade = ? then ?";
+            $presentBindings[] = $grade;
+            $presentBindings[] = $value;
+        }
+        $presentCase .= ' else 9 end';
 
-            return $type === 'low'
-                ? $presentValue > $recommendedValue
-                : $presentValue < $recommendedValue;
-        })->pluck('id')->toArray();
+        $recommendedCase = 'case';
+        $recommendedBindings = [];
+        foreach ($grades as $grade => $value) {
+            $recommendedCase .= " when recomanded_grade = ? then ?";
+            $recommendedBindings[] = $grade;
+            $recommendedBindings[] = $value;
+        }
+        $recommendedCase .= ' else 0 end';
+
+        $bindings = array_merge($presentBindings, $recommendedBindings);
+        $operator = $type === 'low' ? '>' : '<';
+
+        return WorkerEntry::query()
+            ->whereRaw("({$presentCase}) {$operator} ({$recommendedCase})", $bindings)
+            ->pluck('id')
+            ->toArray();
+    }
+
+    private function cacheFilterResults($query, $cacheKey, $cacheDuration, $filterCallback)
+    {
+        $ids = Cache::remember($cacheKey, $cacheDuration, $filterCallback);
+        return $query->whereIn('id', $ids);
     }
     public function old_index()
     {
@@ -293,7 +435,7 @@ class WorkerEntryController extends Controller
         return view('backend.library.dataEntry.old_index', compact('workerEntries', 'search_worker'));
     }
 
-
+   
 
      public function create()
     {

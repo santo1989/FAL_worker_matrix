@@ -75,11 +75,11 @@
                                                     </select> --}}
                                                     <!--showing id card no as text input with data list-->
                                                     <input type="text" name="id_card_no" class="form-control"
-                                                        placeholder="Enter ID Card No"
-                                                        list="idCardNoList" value="{{ request('id_card_no') }}">
+                                                        placeholder="Enter ID Card No" list="idCardNoList"
+                                                        value="{{ request('id_card_no') }}">
                                                     <datalist id="idCardNoList">
                                                         @foreach ($workerData->unique('id_card_no') as $item)
-                                                            <option value="{{ $item->id_card_no }}" 
+                                                            <option value="{{ $item->id_card_no }}"
                                                                 {{ request('id_card_no') == $item->id_card_no ? 'selected' : '' }}>
                                                                 {{ $item->id_card_no }}</option>
                                                         @endforeach
@@ -156,7 +156,7 @@
                                 </div>
                             </form>
 
-                            
+
 
                         </div>
                     </div>
@@ -186,29 +186,28 @@
                                         <a href="{{ route('all_data_download') }}" class="btn btn-outline-info">
                                             <i class="fa fa-download" aria-hidden="true"></i> All Data Download </a>
                                     @endif
-                                    <a href="{{ route('empty_grade_list') }}"
-                                        class="btn btn-outline-primary"><i  class="fa fa-list" aria-hidden="true"></i>
+                                    <a href="{{ route('empty_grade_list') }}" class="btn btn-outline-primary"><i
+                                            class="fa fa-list" aria-hidden="true"></i>
                                         Unfinished
                                         list</a>
                                 </div>
+                                <!-- Replace the export button section with this -->
                                 <div class="col-md-2 col-sm-12 text-md-end">
-                                    @if (session('search_worker') || $search_worker)
-                                        <form method="GET" action="{{ route('workerEntries.index') }}">
+                                    @if ($showExportButton ?? false)
+                                        <form method="GET" action="{{ route('workerEntries.index') }}"
+                                            id="exportForm">
                                             @csrf
-                                            <div class="row">
-                                                <div class="col-md-12 col-sm-12">
-                                                    <div class="form-group" id="hide_div">
-                                                        <label for="export_format">Export Format:</label>
-                                                        <select name="export_format" id="export_format"
-                                                            class="form-control">
-                                                            <option value="xlsx">Excel (XLS)</option>
-                                                        </select>
-                                                    </div>
-                                                    <button type="submit" class="btn btn-outline-info">
-                                                        <i class="fa fa-file-excel" aria-hidden="true"></i> Export
-                                                    </button>
-                                                </div>
-                                            </div>
+                                            <input type="hidden" name="export_format" value="xlsx">
+                                            <!-- Preserve filter parameters -->
+                                            @foreach (request()->all() as $key => $value)
+                                                @if ($key !== 'export_format' && !in_array($key, ['_token', 'page']))
+                                                    <input type="hidden" name="{{ $key }}"
+                                                        value="{{ $value }}">
+                                                @endif
+                                            @endforeach
+                                            <button type="submit" class="btn btn-outline-info">
+                                                <i class="fa fa-file-excel" aria-hidden="true"></i> Export
+                                            </button>
                                         </form>
                                     @endif
                                 </div>
@@ -359,7 +358,7 @@
 
         //when id_card_no is selected, auto-submit the form
         document.querySelector('input[name="id_card_no"]').addEventListener('input', function() {
-            
+
             const idCardNo = this.value;
             if (idCardNo) {
                 //minimum 5 characters required to submit the form
@@ -369,9 +368,36 @@
                 document.getElementById('filterForm').submit();
             }
         });
+    </script>
+    <!-- Add this script at the bottom -->
+    <script>
+        // Handle export form submission
+        document.getElementById('exportForm')?.addEventListener('submit', function(e) {
+            // Prevent duplicate parameter issues
+            const form = this;
+            const existingParams = new URLSearchParams(window.location.search);
+            const formData = new FormData(form);
 
-       
+            // Clear existing params to avoid duplication
+            existingParams.forEach((value, key) => {
+                if (formData.has(key)) {
+                    formData.delete(key);
+                }
+            });
+
+            // Re-add all parameters
+            existingParams.forEach((value, key) => {
+                formData.append(key, value);
+            });
+
+            // Create new URL
+            const url = new URL(form.action);
+            url.search = new URLSearchParams(formData).toString();
+
+            // Submit via redirect
+            window.location.href = url.toString();
+            e.preventDefault();
+        });
     </script>
 
-   
 </x-backend.layouts.master>

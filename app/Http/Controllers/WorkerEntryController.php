@@ -20,6 +20,10 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Illuminate\Support\Facades\Log;
+use App\Http\Requests\ExcelUploadRequest;
+use DateTime;
 
 class WorkerEntryController extends Controller
 {
@@ -1416,5 +1420,386 @@ class WorkerEntryController extends Controller
             'fields' => array_map(fn($f) => str_replace('.', '_', $f), $request->fields),
             'rows' => $results
         ]);
+    }
+
+    public function showUploadForm()
+    {
+        return view('backend.library.dataEntry.upload_excel');
+    }
+
+    // /**
+    //  * Process Excel upload
+    //  */
+    // public function uploadExcel(ExcelUploadRequest $request)
+    // {
+    //     DB::beginTransaction();
+
+    //     try {
+    //         $file = $request->file('excel_file');
+    //         $spreadsheet = IOFactory::load($file->getPathname());
+    //         $worksheet = $spreadsheet->getActiveSheet();
+    //         $rows = $worksheet->toArray();
+
+    //         // Remove header row
+    //         $header = array_shift($rows);
+
+    //         // Validate header structure
+    //         $expectedHeaders = ['id', 'floor', 'line', 'employee_name_english', 'id_card_no', 'joining_date', 'designation_name', 'present_grade', 'recomanded_grade', 'recomanded_salary', 'experience', 'salary', 'examination_date'];
+    //         if (count($header) < count($expectedHeaders)) {
+    //             throw new \Exception('Invalid Excel format. Please check the column structure.');
+    //         }
+
+    //         $uploadedIdCards = [];
+    //         $processedCount = 0;
+    //         $errors = [];
+
+    //         foreach ($rows as $index => $row) {
+    //             $rowNumber = $index + 2; // +2 because we removed header and Excel rows start at 1
+
+    //             try {
+    //                 // Skip empty rows
+    //                 if (empty(array_filter($row))) {
+    //                     continue;
+    //                 }
+
+    //                 // Map Excel columns to database fields
+    //                 $data = $this->mapExcelRowToData($row);
+
+    //                 // Check for duplicate ID card in uploaded file
+    //                 if (in_array($data['id_card_no'], $uploadedIdCards)) {
+    //                     $errors[] = "Row {$rowNumber}: Duplicate ID card number '{$data['id_card_no']}' in uploaded file";
+    //                     continue;
+    //                 }
+
+    //                 // Check for duplicate ID card in database
+    //                 $existingWorker = WorkerEntry::where('id_card_no', $data['id_card_no'])->first();
+    //                 if ($existingWorker) {
+    //                     $errors[] = "Row {$rowNumber}: ID card number '{$data['id_card_no']}' already exists in database";
+    //                     continue;
+    //                 }
+
+    //                 // Create worker entry
+    //                 WorkerEntry::create($data);
+
+    //                 $uploadedIdCards[] = $data['id_card_no'];
+    //                 $processedCount++;
+    //             } catch (\Exception $e) {
+    //                 $errors[] = "Row {$rowNumber}: " . $e->getMessage();
+    //             }
+    //         }
+
+    //         // If there are any errors, rollback the entire transaction
+    //         if (!empty($errors)) {
+    //             DB::rollBack();
+
+    //             $errorMessage = "Upload failed with " . count($errors) . " error(s):<br>" . implode("<br>", array_slice($errors, 0, 10));
+    //             if (count($errors) > 10) {
+    //                 $errorMessage .= "<br>... and " . (count($errors) - 10) . " more errors";
+    //             }
+
+    //             return redirect()->back()->with('error', $errorMessage);
+    //         }
+
+    //         DB::commit();
+
+    //         return redirect()->route('workerEntries.index')
+    //             ->with('success', "Successfully uploaded {$processedCount} worker records.");
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         Log::error('Excel upload failed: ' . $e->getMessage());
+
+    //         return redirect()->back()
+    //             ->with('error', 'Upload failed: ' . $e->getMessage());
+    //     }
+    // }
+
+    // /**
+    //  * Map Excel row to database data
+    //  */
+    // private function mapExcelRowToData(array $row)
+    // {
+    //     // Assuming Excel columns order based on your sample:
+    //     // 0: id, 1: floor, 2: line, 3: employee_name_english, 4: id_card_no, 
+    //     // 5: joining_date, 6: designation_name, 7: present_grade, 8: recomanded_grade,
+    //     // 9: recomanded_salary, 10: experience, 11: salary, 12: examination_date
+
+    //     // Convert Excel date to proper format
+    //     $joiningDate = $this->parseExcelDate($row[5]);
+    //     $examinationDate = $this->parseExcelDate($row[12]);
+
+    //     // Set designation_id based on designation_name
+    //     $designationId = $this->getDesignationId($row[6]);
+
+    //     return [
+    //         'floor' => $row[1] ?? null,
+    //         'line' => $row[2] ?? null,
+    //         'employee_name_english' => $row[3] ?? null,
+    //         'id_card_no' => $row[4] ?? null,
+    //         'joining_date' => $joiningDate,
+    //         'designation_id' => $designationId,
+    //         'designation_name' => $row[6] ?? null,
+    //         'present_grade' => $row[7] ?? null,
+    //         'recomanded_grade' => $row[8] ?? null,
+    //         'recomanded_salary' => $row[9] !== 'N/A' ? $row[9] : null,
+    //         'experience' => $row[10] ?? null,
+    //         'salary' => $row[11] ?? null,
+    //         'examination_date' => $examinationDate,
+    //         'created_at' => now(),
+    //         'updated_at' => now(),
+    //     ];
+    // }
+
+    // /**
+    //  * Parse Excel date to proper format
+    //  */
+    // private function parseExcelDate($excelDate)
+    // {
+    //     if (empty($excelDate)) {
+    //         return null;
+    //     }
+
+    //     try {
+    //         // If it's already a DateTime object (from PhpSpreadsheet)
+    //         if ($excelDate instanceof \DateTime) {
+    //             return $excelDate->format('Y-m-d');
+    //         }
+
+    //         // If it's a string, try to parse it
+    //         if (is_string($excelDate)) {
+    //             // Remove time portion if exists
+    //             $datePart = explode(' ', $excelDate)[0];
+    //             return Carbon::createFromFormat('Y-m-d', $datePart)->format('Y-m-d');
+    //         }
+
+    //         // If it's an Excel serialized date
+    //         if (is_numeric($excelDate)) {
+    //             return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($excelDate)->format('Y-m-d');
+    //         }
+
+    //         return null;
+    //     } catch (\Exception $e) {
+    //         return null;
+    //     }
+    // }
+
+    /**
+     * Get designation ID based on designation name
+     */
+    private function getDesignationId($designationName)
+    {
+        $designationMap = [
+            'Line Leader' => 1,
+            'JSMO' => 2,
+            'OSMO' => 3,
+            'SMO' => 4,
+            'SSMO' => 5,
+        ];
+
+        return $designationMap[$designationName] ?? null;
+    }
+
+    public function uploadExcel(ExcelUploadRequest $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $file = $request->file('excel_file');
+            $spreadsheet = IOFactory::load($file->getPathname());
+            $worksheet = $spreadsheet->getActiveSheet();
+            $rows = $worksheet->toArray();
+
+            // Remove header row
+            $header = array_shift($rows);
+
+            // Validate header structure based on your Excel file
+            $expectedHeaders = [
+                'division_id',
+                'division_name',
+                'company_id',
+                'company_name',
+                'department_id',
+                'department_name',
+                'designation_id',
+                'designation_name',
+                'employee_name_english',
+                'id_card_no',
+                'joining_date',
+                'present_grade',
+                'recomanded_grade',
+                'recomanded_salary',
+                'experience',
+                'salary',
+                'mobile',
+                'email',
+                'examination_date',
+                'created_at',
+                'updated_at',
+                'floor',
+                'old_matrix_Data_status',
+                'line'
+            ];
+
+            if (count($header) < count($expectedHeaders)) {
+                throw new \Exception('Invalid Excel format. Please check the column structure.');
+            }
+
+            $uploadedIdCards = [];
+            $processedCount = 0;
+            $errors = [];
+
+            foreach ($rows as $index => $row) {
+                $rowNumber = $index + 2; // +2 because we removed header and Excel rows start at 1
+
+                try {
+                    // Skip empty rows
+                    if (empty(array_filter($row))) {
+                        continue;
+                    }
+
+                    // Map Excel columns to database fields based on your Excel structure
+                    $data = $this->mapExcelRowToData($row);
+
+                    // Check for duplicate ID card in uploaded file
+                    if (in_array($data['id_card_no'], $uploadedIdCards)) {
+                        $errors[] = "Row {$rowNumber}: Duplicate ID card number '{$data['id_card_no']}' in uploaded file";
+                        continue;
+                    }
+
+                    // Check for duplicate ID card in database
+                    $existingWorker = WorkerEntry::where('id_card_no', $data['id_card_no'])->first();
+                    if ($existingWorker) {
+                        $errors[] = "Row {$rowNumber}: ID card number '{$data['id_card_no']}' already exists in database";
+                        continue;
+                    }
+
+                    // Create worker entry
+                    WorkerEntry::create($data);
+
+                    $uploadedIdCards[] = $data['id_card_no'];
+                    $processedCount++;
+                } catch (\Exception $e) {
+                    $errors[] = "Row {$rowNumber}: " . $e->getMessage();
+                }
+            }
+
+            // If there are any errors, rollback the entire transaction
+            if (!empty($errors)) {
+                DB::rollBack();
+
+                $errorMessage = "Upload failed with " . count($errors) . " error(s):<br>" . implode("<br>", array_slice($errors, 0, 10));
+                if (count($errors) > 10) {
+                    $errorMessage .= "<br>... and " . (count($errors) - 10) . " more errors";
+                }
+
+                return redirect()->back()->with('error', $errorMessage);
+            }
+
+            DB::commit();
+
+            return redirect()->route('workerEntries.index')
+                ->with('success', "Successfully uploaded {$processedCount} worker records.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Excel upload failed: ' . $e->getMessage());
+
+            return redirect()->back()
+                ->with('error', 'Upload failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Map Excel row to database data based on your Excel structure
+     */
+    private function mapExcelRowToData(array $row)
+    {
+        // Map Excel columns to database fields based on your Excel structure:
+        // 0: division_id, 1: division_name, 2: company_id, 3: company_name,
+        // 4: department_id, 5: department_name, 6: designation_id, 7: designation_name,
+        // 8: employee_name_english, 9: id_card_no, 10: joining_date, 11: present_grade,
+        // 12: recomanded_grade, 13: recomanded_salary, 14: experience, 15: salary,
+        // 16: mobile, 17: email, 18: examination_date, 19: created_at, 20: updated_at,
+        // 21: floor, 22: old_matrix_Data_status, 23: line
+
+        // Convert Excel date to proper format
+        $joiningDate = $this->parseExcelDate($row[10] ?? null); // joining_date
+        $examinationDate = $this->parseExcelDate($row[18] ?? null); // examination_date
+
+        return [
+            'division_id' => $row[0] ?? null,
+            'division_name' => $row[1] ?? null,
+            'company_id' => $row[2] ?? null,
+            'company_name' => $row[3] ?? null,
+            'department_id' => $row[4] ?? null,
+            'department_name' => $row[5] ?? null,
+            'designation_id' => $row[6] ?? null,
+            'designation_name' => $row[7] ?? null,
+            'employee_name_english' => $row[8] ?? null,
+            'id_card_no' => $row[9] ?? null,
+            'joining_date' => $joiningDate,
+            'present_grade' => $row[11] ?? null,
+            'recomanded_grade' => $row[12] ?? null,
+            'recomanded_salary' => $row[13] !== 'NULL' && $row[13] !== null ? $row[13] : null,
+            'experience' => $row[14] ?? null,
+            'salary' => $row[15] ?? null,
+            'mobile' => $row[16] !== 'NULL' && $row[16] !== null ? $row[16] : null,
+            'email' => $row[17] !== 'NULL' && $row[17] !== null ? $row[17] : null,
+            'examination_date' => $examinationDate,
+            'created_at' =>  now(),
+            'updated_at' => now(),
+            'floor' => $row[21] ?? null,
+            'old_matrix_Data_status' => $row[22] !== 'null' && $row[22] !== null ? $row[22] : null,
+            'line' => $row[23] ?? null,
+        ];
+    }
+
+    /**
+     * Parse Excel date to proper format - enhanced version
+     */
+    private function parseExcelDate($excelDate)
+    {
+        if (empty($excelDate) || $excelDate === 'NULL') {
+            return null;
+        }
+
+        try {
+            // If it's already a DateTime object (from PhpSpreadsheet)
+            if ($excelDate instanceof \DateTime) {
+                return $excelDate->format('Y-m-d');
+            }
+
+            // If it's a string, try to parse it
+            if (is_string($excelDate)) {
+                // Handle Excel serial numbers that might be strings
+                if (is_numeric($excelDate)) {
+                    return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($excelDate)->format('Y-m-d');
+                }
+
+                // Remove time portion if exists and try different formats
+                $datePart = explode(' ', $excelDate)[0];
+
+                // Try different date formats
+                $formats = ['Y-m-d', 'd/m/Y', 'm/d/Y', 'd-m-Y', 'm-d-Y'];
+
+                foreach ($formats as $format) {
+                    $date = DateTime::createFromFormat($format, $datePart);
+                    if ($date !== false) {
+                        return $date->format('Y-m-d');
+                    }
+                }
+
+                // If none of the formats work, try Carbon
+                return Carbon::parse($datePart)->format('Y-m-d');
+            }
+
+            // If it's an Excel serialized date (numeric)
+            if (is_numeric($excelDate)) {
+                return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($excelDate)->format('Y-m-d');
+            }
+
+            return null;
+        } catch (\Exception $e) {
+            Log::warning("Failed to parse date: {$excelDate}, Error: " . $e->getMessage());
+            return null;
+        }
     }
 }

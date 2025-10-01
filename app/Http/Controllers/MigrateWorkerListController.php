@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MigrateWorkerList;
+use App\Models\TrainingDevelopment;
 use App\Models\WorkerEntry;
 use Illuminate\Http\Request;
 

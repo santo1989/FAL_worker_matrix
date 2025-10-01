@@ -185,6 +185,9 @@
                                     @if (auth()->user()->role_id == 1 || auth()->user()->role_id == 3)
                                         <a href="{{ route('all_data_download') }}" class="btn btn-outline-info">
                                             <i class="fa fa-download" aria-hidden="true"></i> All Data Download </a>
+                                        <a href="{{ route('workerEntries.uploadForm') }}" class="btn btn-success">
+                                            <i class="fas fa-file-excel"></i> Upload Excel
+                                        </a>
                                     @endif
                                     <a href="{{ route('empty_grade_list') }}" class="btn btn-outline-primary"><i
                                             class="fa fa-list" aria-hidden="true"></i>

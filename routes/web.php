@@ -130,6 +130,10 @@ Route::middleware('auth')->group(function () {
     // workerEntries_Line_Entry
     Route::get('/workerEntries/{workerEntry}/workerEntries_Line_Entry', [WorkerEntryController::class, 'workerEntries_Line_Entry'])->name('workerEntries_Line_Entry');
     Route::put('/workerEntries/workerEntries_Line_Entry_store/{workerEntry}', [WorkerEntryController::class, 'workerEntries_Line_Entry_store'])->name('workerEntries_Line_Entry_store');
+
+    // routes/web.php
+    Route::get('/worker-entries/upload-excel', [WorkerEntryController::class, 'showUploadForm'])->name('workerEntries.uploadForm');
+    Route::post('/worker-entries/upload-excel', [WorkerEntryController::class, 'uploadExcel'])->name('workerEntries.uploadExcel');
     
     //training development
     Route::get('/training_development', [WorkerEntryController::class, 'training_development'])->name('training_development');

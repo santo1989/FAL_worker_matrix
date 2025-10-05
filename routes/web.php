@@ -145,13 +145,18 @@ Route::middleware('auth')->group(function () {
 
     //migrate_worker_lists
 
-    Route::get('/migrate_worker_lists', [
-        MigrateWorkerListController::class,
-        'index'
-    ])->name('migrate_worker_lists');
-    Route::get('/migrate_worker_lists/create', [MigrateWorkerListController::class,
-     'create'])->name('migrate_worker_lists.create');
-    Route::post('/migrate_worker_lists', [MigrateWorkerListController::class, 'store'])->name('migrate_worker_lists.store');
+    // In routes/web.php
+    Route::get('/migrate-worker-lists', [MigrateWorkerListController::class, 'index'])->name('migrate-worker-lists.index');
+    Route::get('/migrate-worker-lists/create', [MigrateWorkerListController::class, 'create'])->name('migrate-worker-lists.create');
+    Route::post('/migrate-worker-lists', [MigrateWorkerListController::class, 'store'])->name('migrate-worker-lists.store');
+    Route::get('/mwlshow/{id}', [MigrateWorkerListController::class, 'mwlshow'])->name('mwlshow');
+    Route::get('/mwledit/{id}', [MigrateWorkerListController::class, 'mwledit'])->name('mwledit');
+    Route::put('/mwlupdate/{id}', [MigrateWorkerListController::class, 'mwlupdate'])->name('mwlupdate');
+    Route::delete('/mwlDestroy/{id}', [MigrateWorkerListController::class, 'mwlDestroy'])->name('mwlDestroy');
+    Route::get('/migrate-worker-lists/bulk/create', [MigrateWorkerListController::class, 'bulkCreate'])->name('migrate-worker-lists.bulk.create');
+    Route::post('/migrate-worker-lists/bulk/store', [MigrateWorkerListController::class, 'bulkStore'])->name('migrate-worker-lists.bulk.store');
+    Route::get('/migrate-worker-lists/export', [MigrateWorkerListController::class, 'export'])->name('migrate-worker-lists.export');
+   
 
     //empty_grade_list find and update
     Route::get('/empty_grade_list', [WorkerEntryController::class, 'empty_grade_list'])->name('empty_grade_list');

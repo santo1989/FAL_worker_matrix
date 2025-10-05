@@ -83,9 +83,13 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                             Disciplinary Problems Management
                         </a>
+                        <a class="nav-link" href="{{ route('migrate-worker-lists.index') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-users-slash"></i></div>
+                            Worker Migration Management
+                        </a>
                     @endif
 
-                     @if (auth()->user()->role_id == 4)
+                    @if (auth()->user()->role_id == 4)
                         <a class="nav-link" href="{{ route('training_development') }}">
                             <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                             Training & Development Management
@@ -93,6 +97,10 @@
                         <a class="nav-link" href="{{ route('disciplinary_problems') }}">
                             <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                             Disciplinary Problems Management
+                        </a>
+                        <a class="nav-link" href="{{ route('migrate-worker-lists.index') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-users-slash"></i></div>
+                            Worker Migration Management
                         </a>
                     @endif
 
@@ -228,6 +236,10 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                             Disciplinary Problems Management
                         </a>
+                        <a class="nav-link" href="{{ route('migrate-worker-lists.index') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-users-slash"></i></div>
+                            Worker Migration Management
+                        </a>
                     @endif
 
                     {{-- <h4 class="sb-sidenav-menu-heading" style="color:#40c47c;">LIBRARY</h4> --}}
@@ -316,6 +328,10 @@
                     <a class="nav-link" href="{{ route('workerEntries.index') }}">
                         <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                         Operator Assessment Sheet Management
+                    </a>
+                    <a class="nav-link" href="{{ route('migrate-worker-lists.index') }}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-users-slash"></i></div>
+                        Worker Migration Management
                     </a>
 
 

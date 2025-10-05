@@ -14,27 +14,36 @@ class CreateMigrateWorkerListsTable extends Migration
     public function up()
     {
         Schema::create('migrate_worker_lists', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('division_id')->nullable();
-            $table->string('division_name')->nullable();
-            $table->unsignedBigInteger('company_id')->nullable();
-            $table->string('company_name')->nullable();
-            $table->unsignedBigInteger('department_id')->nullable();
-            $table->string('department_name')->nullable();
-            $table->unsignedBigInteger('designation_id')->nullable();
-            $table->string('designation_name')->nullable();
-            $table->string('employee_name_english')->nullable();
-            $table->string('id_card_no')->nullable();
-            $table->date('joining_date')->nullable();
-            $table->string('present_grade')->nullable();
-            $table->string('migration_reson')->nullable();
-            $table->date('last_working_date')->nullable();
-            $table->string('service_length')->nullable();
-            $table->string('last_salary')->nullable();
-            $table->string('migrate_month')->nullable();
-            $table->string('data_entry_by')->nullable();
-            $table->unsignedBigInteger('user_id')->nullable();
+            // Worker Entry Data (store all worker data as JSON)
+            $table->unsignedBigInteger('original_worker_entry_id');
+            $table->json('worker_entry_data');
+
+            // Related Data (store all related records as JSON)
+            $table->json('sewing_process_entries_data');
+            $table->json('cycle_list_logs_data');
+            $table->json('training_developments_data');
+            $table->json('disciplinary_problems_data');
+
+            // Migration Information
+            $table->string('id_card_no');
+            $table->string('employee_name_english');
+            $table->enum('migration_reason', ['resigned', 'terminated', 'retired', 'transferred', 'inactive', 'other']);
+            $table->date('migration_date');
+            $table->date('last_working_date');
+            $table->string('service_length');
+            $table->decimal('last_salary', 10, 2)->nullable();
+            $table->string('migrate_month');
+            $table->string('data_entry_by');
+            $table->unsignedBigInteger('user_id');
+            $table->text('notes')->nullable();
+
             $table->timestamps();
+
+            // Indexes for better performance
+            $table->index('original_worker_entry_id');
+            $table->index('id_card_no');
+            $table->index('migration_date');
+            $table->index('migration_reason');
         });
     }
 

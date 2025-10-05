@@ -54,6 +54,20 @@ class WorkerEntry extends Model
     {
         return $this->hasMany(CycleListLog::class);
     }
-    
+
+    public function trainingDevelopments()
+    {
+        return $this->hasMany(TrainingDevelopment::class);
+    }
+
+    public function disciplinaryProblems()
+    {
+        return $this->hasMany(DisciplinaryProblem::class);
+    }
+
+    public function migrateWorkerLists()
+    {
+        return $this->hasMany(MigrateWorkerList::class, 'original_worker_entry_id');
+    }
 
 }

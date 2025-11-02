@@ -54,6 +54,12 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Operator Assessment Sheet Management
                             </a>
+                            <a class="nav-link" href="{{ route('exam.index') }}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-user-check"></i></div>
+                                New Recruitment Management
+                            </a>
+
+                            </a>
                             {{-- <a class="nav-link" href="">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Entry Form
@@ -67,6 +73,11 @@
                     <a class="nav-link" href="{{ route('workerEntries.create') }}">
                         <div class="sb-nav-link-icon"><i class="fas fa-tasks"></i></div>
                         Assessment Sheet Entry Form
+                    </a>
+
+                    <a class="nav-link" href="{{ route('exam.create') }}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-pen"></i></div>
+                        New Recruitment Entry Form
                     </a>
 
                     <a class="nav-link" href="{{ route('workerEntries.index') }}">
@@ -177,6 +188,11 @@
                         <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                         Operator Assessment Sheet Management
                     </a>
+                    <a class="nav-link" href="{{ route('exam.index') }}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-user-check"></i></div>
+                        New Recruitment Management
+                    </a>
+                    
 
 
                 </div>
@@ -212,6 +228,10 @@
                     <a class="nav-link" href="{{ route('workerEntries.index') }}">
                         <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                         Operator Assessment Sheet Management
+                    </a>
+                    <a class="nav-link" href="{{ route('exam.index') }}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-user-check"></i></div>
+                        New Recruitment Management
                     </a>
 
                     <div class="collapse" id="collapseLayoutslibrary" aria-labelledby="headinglibrary"

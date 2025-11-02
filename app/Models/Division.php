@@ -31,15 +31,5 @@ class Division extends Model
         return $this->hasMany(User::class);
     }
 
-    public function costControls()
-    {
-        return $this->hasMany(CostControl::class);
-    }
-
-    public function buyers()
-    {
-        return $this->hasMany(Buyer::class);
-    }
-
     
 }

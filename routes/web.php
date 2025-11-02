@@ -1,15 +1,16 @@
 <?php
- 
-use App\Http\Controllers\CompanyController; 
+
+use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DesignationController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\MigrateWorkerListController;
-use App\Http\Controllers\NotificationController; 
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\SewingProcessListController; 
+use App\Http\Controllers\SewingProcessListController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkerEntryController;
+use App\Http\Controllers\ExamController;
 use App\Models\Notification;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
 //     return view('welcome');
-    
+
 // });
 
 Route::get('/', function () {
@@ -49,6 +50,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/home', function () {
         return view('backend.home');
     })->name('home');
+
+    // Backwards compatibility: some views reference route name 'dashboard' — alias it to 'home'
+    Route::get('/dashboard', function () {
+        return redirect()->route('home');
+    })->name('dashboard');
 
     //role
 
@@ -88,7 +94,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/divisions/{division}/edit', [DivisionController::class, 'edit'])->name('divisions.edit');
     Route::put('/divisions/{division}', [DivisionController::class, 'update'])->name('divisions.update');
     Route::delete('/divisions/{division}', [DivisionController::class, 'destroy'])->name('divisions.destroy');
-   
+
     // companies
     Route::resource('companies', CompanyController::class);
 
@@ -104,23 +110,40 @@ Route::middleware('auth')->group(function () {
 
     //workerEntry 
 
-    Route::get('/workerEntries', [WorkerEntryController::class, 'index'
-    ])->name('workerEntries.index'); 
+    Route::get('/workerEntries', [
+        WorkerEntryController::class,
+        'index'
+    ])->name('workerEntries.index');
     Route::get('/old_index', [WorkerEntryController::class, 'old_index'])->name('old_index');
     Route::post('/workerEntries/workerEntrys_id_search', [WorkerEntryController::class, 'workerEntrys_id_search'])->name('workerEntrys_id_search');
     Route::get('/workerEntries/create', [WorkerEntryController::class, 'create'])->name('workerEntries.create');
     Route::post('/workerEntrys_id_entry', [WorkerEntryController::class, 'workerEntrys_id_entry'])->name('workerEntrys_id_entry');
-    Route::get('/workerEntrys_process_entry_form/{workerEntry}', [WorkerEntryController::class, 'workerEntrys_process_entry_form'])->name('workerEntrys_process_entry_form'); 
+    Route::get('/workerEntrys_process_entry_form/{workerEntry}', [WorkerEntryController::class, 'workerEntrys_process_entry_form'])->name('workerEntrys_process_entry_form');
     Route::post('/workerEntries/workerEntrys_process_type_search', [WorkerEntryController::class, 'workerEntrys_process_type_search'])->name('workerEntrys_process_type_search');
     Route::post('/workerEntries/workerEntrys_process_entry/{workerEntry}', [WorkerEntryController::class, 'workerEntrys_process_entry'])->name('workerEntrys_process_entry');
-    Route::get('/cyclesData_entry_form/{workerEntry}', [WorkerEntryController::class, 'cyclesData_entry_form'])->name('cyclesData_entry_form'); 
+    Route::get('/cyclesData_entry_form/{workerEntry}', [WorkerEntryController::class, 'cyclesData_entry_form'])->name('cyclesData_entry_form');
     Route::get('/cyclesData_entry/{workerEntry}', [WorkerEntryController::class, 'cyclesData_entry'])->name('cyclesData_entry');
     Route::post('/workerEntries/cyclesData_store/{oe}', [WorkerEntryController::class, 'cyclesData_store'])->name('cyclesData_store');
 
 
-    
+
     Route::get('/workerEntrys_matrixData_entry_form/{workerEntry}', [WorkerEntryController::class, 'workerEntrys_matrixData_entry_form'])->name('workerEntrys_matrixData_entry_form');
     Route::post('/matrixData', [WorkerEntryController::class, 'matrixData_store'])->name('matrixData_store');
+
+    // Exam module (new)
+    Route::get('/exam', [ExamController::class, 'index'])->name('exam.index');
+    Route::get('/exam/create', [ExamController::class, 'create'])->name('exam.create');
+    Route::post('/exam/store', [ExamController::class, 'store'])->name('exam.store');
+    Route::get('/exam/process_entry_form/{candidate}', [ExamController::class, 'process_entry_form'])->name('exam.process_entry_form');
+    Route::post('/exam/process_entry', [ExamController::class, 'process_entry'])->name('exam.process_entry');
+    Route::post('/exam/process_type_search', [ExamController::class, 'process_type_search'])->name('exam.process_type_search');
+    Route::get('/exam/cyclesData_entry_form/{candidate}', [ExamController::class, 'cyclesData_entry_form'])->name('exam.cyclesData_entry_form');
+    Route::post('/exam/cyclesData_store', [ExamController::class, 'cyclesData_store'])->name('exam.cyclesData_store');
+    Route::get('/exam/matrixData_entry_form/{candidate}', [ExamController::class, 'matrixData_entry_form'])->name('exam.matrixData_entry_form');
+    Route::post('/exam/matrixData_store', [ExamController::class, 'matrixData_store'])->name('exam.matrixData_store');
+    Route::get('/exam/addToWorkerEntries/{candidate}', [ExamController::class, 'addToWorkerEntries'])->name('exam.addToWorkerEntries');
+    Route::get('/exam/{candidate}', [ExamController::class, 'show'])->name('exam.show');
+    Route::delete('/exam/{candidate}', [ExamController::class, 'destroy'])->name('exam.destroy');
     Route::get('/workerEntries/{workerEntry}', [WorkerEntryController::class, 'show'])->name('workerEntries.show');
     Route::get('/workerEntries/approval/{workerEntry}', [WorkerEntryController::class, 'approval'])->name('workerEntries.approval');
     Route::post('/approval', [WorkerEntryController::class, 'approval_store'])->name('approval_store');
@@ -134,7 +157,7 @@ Route::middleware('auth')->group(function () {
     // routes/web.php
     Route::get('/worker-entries/upload-excel', [WorkerEntryController::class, 'showUploadForm'])->name('workerEntries.uploadForm');
     Route::post('/worker-entries/upload-excel', [WorkerEntryController::class, 'uploadExcel'])->name('workerEntries.uploadExcel');
-    
+
     //training development
     Route::get('/training_development', [WorkerEntryController::class, 'training_development'])->name('training_development');
     Route::post('/training_development', [WorkerEntryController::class, 'training_development_store'])->name('training_development_store');
@@ -156,12 +179,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/migrate-worker-lists/bulk/create', [MigrateWorkerListController::class, 'bulkCreate'])->name('migrate-worker-lists.bulk.create');
     Route::post('/migrate-worker-lists/bulk/store', [MigrateWorkerListController::class, 'bulkStore'])->name('migrate-worker-lists.bulk.store');
     Route::get('/migrate-worker-lists/export', [MigrateWorkerListController::class, 'export'])->name('migrate-worker-lists.export');
-   
+
 
     //empty_grade_list find and update
     Route::get('/empty_grade_list', [WorkerEntryController::class, 'empty_grade_list'])->name('empty_grade_list');
-
-
 });
 
 

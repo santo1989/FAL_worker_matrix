@@ -89,10 +89,9 @@
                                             class="fa fa-search"></i> Search</button>
                                     <a href="{{ route('exam.index') }}" class="btn btn-outline-danger btn-sm"><i
                                             class="fa fa-refresh"></i> Reset</a>
-                                    @can('Admin')
-                                        <a href="{{ route('exam.create') }}" class="btn btn-primary btn-sm">New
-                                            Candidate</a>
-                                    @endcan
+                                    
+                                        <a href="{{ route('exam.create') }}" class="btn btn-primary btn-sm">Start New
+                                            Candidate Exam</a>
                                 </div>
                             </div>
                         </form>

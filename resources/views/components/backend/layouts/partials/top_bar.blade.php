@@ -1,5 +1,6 @@
  @php
      use Carbon\Carbon;
+     use Illuminate\Support\Str;
      date_default_timezone_set('Asia/Dhaka');
      $current_time = Carbon::now();
      $time_of_day = '';
@@ -50,21 +51,33 @@
                      {{ $notifications_count ?? '' }}
                  </span>
              </a>
-             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" style="min-width:320px;">
+                 <li class="px-2 py-1 d-flex justify-content-between align-items-center">
+                     <strong>Notifications</strong>
+                     <div>
+                         <a href="{{ route('notifications.index') }}" class="small me-2">View all</a>
+                         <a href="#" id="markAllRead" class="small">Mark all read</a>
+                     </div>
+                 </li>
+                 <li>
+                     <hr class="dropdown-divider">
+                 </li>
 
                  @forelse ($notifications as $notification)
-                     <li>
-                         <a class="dropdown-item" href="{{ route('notification.read', $notification->id) }}">
-                             <div class="row">
-                                 <div class="col-md-12">
-                                     {{-- <p class="text-dark"><img src="{{ asset('images/users/' . $notification->user->picture) }}" class="rounded-circle"
-                                        width="50px" height="50px" alt="{{ $notification->user->name }}">{{ $notification->user->name }}</p> --}}
-                                     <p class="text-dark">{{ $notification->message }}</p>
-                                     {{-- <p class="text-dark">{{ $notification->created_at->diffForHumans() }}</p> --}}
-                                 </div>
+                     <li class="px-2">
+                         <div class="d-flex justify-content-between align-items-start">
+                             <a class="text-decoration-none text-dark flex-grow-1"
+                                 href="{{ route('notification.read', $notification->id) }}"
+                                 data-id="{{ $notification->id }}">
+                                 <div class="fw-bold">{{ Str::limit($notification->message, 80) }}</div>
+                                 <div class="small text-muted">
+                                     {{ optional($notification->created_at)->diffForHumans() }}</div>
+                             </a>
+                             <div class="ms-2">
+                                 <a href="#" class="text-danger delete-notification"
+                                     data-id="{{ $notification->id }}" title="Delete"><i class="fa fa-trash"></i></a>
                              </div>
-                         </a>
-
+                         </div>
                      </li>
                  @empty
                      <li>
@@ -140,4 +153,36 @@
      //             console.error('Service worker registration failed:', error);
      //         });
      // }
+ </script>
+ <script>
+     (function() {
+         var token = document.querySelector('meta[name="csrf-token"]') ? document.querySelector(
+             'meta[name="csrf-token"]').getAttribute('content') : null;
+         $('#markAllRead').on('click', function(e) {
+             e.preventDefault();
+             if (!token) return alert('CSRF token not found');
+             $.ajax({
+                 url: '{{ route('notification.markAllRead') }}',
+                 method: 'POST',
+                 data: {
+                     _token: token
+                 },
+                 success: function(resp) {
+                     if (resp.ok) location.reload();
+                 }
+             });
+         });
+         // delete notification in dropdown
+         $('.delete-notification').on('click', function(e) {
+             e.preventDefault();
+             if (!token) return alert('CSRF token not found');
+             if (!confirm('Delete this notification?')) return;
+             var id = $(this).data('id');
+             $.post("{{ url('/notification') }}" + "/" + id + "/delete", {
+                 _token: token
+             }, function(resp) {
+                 if (resp.ok) location.reload();
+             });
+         });
+     })();
  </script>

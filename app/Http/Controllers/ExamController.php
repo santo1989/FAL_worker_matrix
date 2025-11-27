@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\ExamCandidate;
 use App\Models\ExamProcessEntry;
 use App\Models\ExamCycleLog;
+use App\Models\ExamApproval;
 use App\Models\SewingProcessList;
 use App\Models\WorkerEntry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ExamController extends Controller
 {
@@ -456,12 +458,47 @@ class ExamController extends Controller
 
     public function addToWorkerEntries(ExamCandidate $candidate)
     {
-        // create worker entry minimal using nid and name
+        // Legacy direct promotion - keep for backwards compat but prefer approvals
         $worker = WorkerEntry::create([
             'employee_name_english' => $candidate->name,
             'id_card_no' => $candidate->nid,
             'examination_date' => $candidate->examination_date ?? now()->format('Y-m-d'),
         ]);
+
+        // copy process entries and cycle logs into worker tables
+        $entries = ExamProcessEntry::where('exam_candidate_id', $candidate->id)->get();
+        foreach ($entries as $entry) {
+            $w = $worker->workerSewingProcessEntries()->create([
+                'sewing_process_list_id' => $entry->sewing_process_list_id,
+                'worker_name' => $candidate->name,
+                'sewing_process_name' => $entry->sewing_process_name,
+                'sewing_process_type' => $entry->sewing_process_type,
+                'smv' => $entry->smv,
+                'target' => $entry->target,
+                'sewing_process_avg_cycles' => $entry->sewing_process_avg_cycles,
+                'capacity' => $entry->capacity,
+                'self_production' => $entry->self_production,
+                'achive_production' => $entry->achive_production,
+                'efficiency' => $entry->efficiency,
+                'examination_date' => $candidate->examination_date ?? now()->format('Y-m-d'),
+            ]);
+
+            // copy cycles
+            $cycles = ExamCycleLog::where('exam_process_entry_id', $entry->id)->get();
+            foreach ($cycles as $cycle) {
+                $worker->cycleListLogs()->create([
+                    'worker_sewing_process_entries_id' => $w->id,
+                    'sewing_process_list_id' => $entry->sewing_process_list_id,
+                    'worker_name' => $candidate->name,
+                    'sewing_process_name' => $entry->sewing_process_name,
+                    'sewing_process_type' => $entry->sewing_process_type,
+                    'start_time' => $cycle->start_time,
+                    'end_time' => $cycle->end_time,
+                    'duration' => $cycle->duration,
+                    'rejectDataStatus' => $cycle->rejectDataStatus,
+                ]);
+            }
+        }
 
         return redirect()->route('workerEntrys_process_entry_form', $worker->id);
     }
@@ -478,7 +515,297 @@ class ExamController extends Controller
         // result_data is cast to array in the model; use it directly
         $result = $candidate->result_data ?: null;
 
-        return view('backend.exam.show', compact('candidate', 'entries', 'result'));
+        // load latest approval if any
+        $approval = ExamApproval::where('exam_candidate_id', $candidate->id)->latest()->first();
+
+        return view('backend.exam.show', compact('candidate', 'entries', 'result', 'approval'));
+    }
+
+    public function requestAddToWorker(Request $request, ExamCandidate $candidate)
+    {
+        $this->authorize('create', ExamApproval::class);
+
+        // Fix validation rules
+        $validationRules = [
+            'type' => 'required|in:agreed,negotiation',
+        ];
+
+        if ($request->type === 'negotiation') {
+            $validationRules['requested_salary'] = 'required|numeric|min:0';
+        } else {
+            $validationRules['hidden_requested_salary'] = 'required|numeric|min:0';
+        }
+
+        $request->validate($validationRules);
+
+        // dd($request->all(), $validationRules);
+
+        // Determine requested salary based on type
+        if ($request->type === 'agreed') {
+            $requestedSalary = $request->hidden_requested_salary;
+        } else {
+            $requestedSalary = $request->requested_salary;
+        }
+
+        // dd($requestedSalary);
+
+        // Ensure we have a valid salary value
+        if ($requestedSalary === null || $requestedSalary < 0) {
+            return redirect()->back()->withErrors(['requested_salary' => 'Please provide a valid salary value.']);
+        }
+
+        if (ExamApproval::where('exam_candidate_id', $candidate->id)->where('status', 'pending')->exists()) {
+            return redirect()->back()->with('error', 'There is already a pending approval for this candidate.');
+        }
+
+        $approval = ExamApproval::create([
+            'exam_candidate_id' => $candidate->id,
+            'requested_by' => Auth::id(),
+            'requested_salary' => $requestedSalary,
+            'type' => $request->type,
+            'status' => 'pending',
+        ]);
+
+        // Notify approvers based on approver_roles and approver_users tables
+        $approverRoleIds = \App\Models\ApproverRole::pluck('role_id')->toArray();
+        $approverUserIds = \App\Models\ApproverUser::pluck('user_id')->toArray();
+
+        $query = \App\Models\User::query();
+        $query->where(function ($q) use ($approverRoleIds, $approverUserIds) {
+            if (!empty($approverRoleIds)) {
+                $q->orWhereIn('role_id', $approverRoleIds);
+            }
+            if (!empty($approverUserIds)) {
+                $q->orWhereIn('id', $approverUserIds);
+            }
+        });
+
+        // fallback: include HR role (role_id == 4) and any GM role users to ensure there's at least some approver
+        $fallback = \App\Models\User::where(function ($q) {
+            $q->where('role_id', 4)->orWhereHas('role', function ($r) {
+                $r->whereRaw('LOWER(name)=?', ['gm']);
+            });
+        });
+
+        $approvers = $query->get();
+        if ($approvers->isEmpty()) {
+            $approvers = $fallback->get();
+        }
+
+        foreach ($approvers->unique('id') as $appUser) {
+            $appUser->notify(new \App\Notifications\ApprovalRequestedNotification($approval));
+        }
+
+        return redirect()->back()->with('success', 'Promotion request submitted for approval');
+    }
+
+    public function approveApproval(Request $request, ExamApproval $approval)
+    {
+
+        $this->authorize('approve', $approval);
+
+        if ($approval->status !== 'pending') {
+            return redirect()->back()->with('error', 'Approval already processed');
+        }
+
+        DB::transaction(function () use ($approval) {
+            $approval->update([
+                'status' => 'approved',
+                'approved_by' => Auth::id(),
+                'approved_at' => now(),
+            ]);
+
+            // finalize: create worker entry and copy related data
+            $this->finalizeAddToWorkerEntries($approval);
+        });
+
+        // notify requester
+        $approval->requester && $approval->requester->notify(new \App\Notifications\ApprovalProcessedNotification($approval));
+
+        return redirect()->back()->with('success', 'Approved and candidate promoted');
+    }
+
+    public function rejectApproval(Request $request, ExamApproval $approval)
+    {
+        $this->authorize('reject', $approval);
+
+        if ($approval->status !== 'pending') {
+            return redirect()->back()->with('error', 'Approval already processed');
+        }
+
+        $approval->update([
+            'status' => 'rejected',
+            'approved_by' => Auth::id(),
+            'approved_at' => now(),
+        ]);
+
+        // notify requester
+        $approval->requester && $approval->requester->notify(new \App\Notifications\ApprovalProcessedNotification($approval));
+
+        return redirect()->back()->with('success', 'Promotion request rejected');
+    }
+
+    public function approvalsIndex(Request $request)
+    {
+        $this->authorize('viewAny', ExamApproval::class);
+        // List approvals with optional filters: type and status
+        $q = ExamApproval::with('candidate', 'requester')->orderByDesc('created_at');
+
+        if ($type = $request->input('type')) {
+            $q->where('type', $type);
+        }
+
+        if ($status = $request->input('status')) {
+            $q->where('status', $status);
+        }
+
+        $approvals = $q->paginate(50)->appends($request->query());
+
+        return view('backend.exam.approvals_index', compact('approvals'));
+    }
+
+    public function bulkApprove(Request $request)
+    {
+        $ids = $request->input('approval_ids', []);
+        if (empty($ids) || !is_array($ids)) {
+            return redirect()->back()->with('error', 'No approvals selected');
+        }
+
+        $approvals = ExamApproval::whereIn('id', $ids)->where('status', 'pending')->get();
+
+        DB::transaction(function () use ($approvals) {
+            foreach ($approvals as $approval) {
+                $approval->update([
+                    'status' => 'approved',
+                    'approved_by' => Auth::id(),
+                    'approved_at' => now(),
+                ]);
+
+                // finalize for each
+                $this->finalizeAddToWorkerEntries($approval);
+
+                // notify requester (defensive: don't let notification errors break the batch)
+                try {
+                    if ($approval->requester) {
+                        $approval->requester->notify(new \App\Notifications\ApprovalProcessedNotification($approval));
+                    }
+                } catch (\Throwable $e) {
+                    // log and continue
+                    Log::warning('ApprovalProcessedNotification failed: ' . $e->getMessage(), ['approval_id' => $approval->id]);
+                }
+            }
+        });
+
+        return redirect()->back()->with('success', 'Selected approvals approved and finalized');
+    }
+
+    public function bulkReject(Request $request)
+    {
+        $ids = $request->input('approval_ids', []);
+        if (empty($ids) || !is_array($ids)) {
+            return redirect()->back()->with('error', 'No approvals selected');
+        }
+
+        $approvals = ExamApproval::whereIn('id', $ids)->where('status', 'pending')->get();
+
+        DB::transaction(function () use ($approvals) {
+            foreach ($approvals as $approval) {
+                $approval->update([
+                    'status' => 'rejected',
+                    'approved_by' => Auth::id(),
+                    'approved_at' => now(),
+                ]);
+
+                // notify requester
+                $approval->requester && $approval->requester->notify(new \App\Notifications\ApprovalProcessedNotification($approval));
+            }
+        });
+
+        return redirect()->back()->with('success', 'Selected approvals rejected');
+    }
+
+    /**
+     * Delete a single approval. Admin only.
+     */
+    public function destroyApproval(ExamApproval $approval)
+    {
+        $user = Auth::user();
+        if (strtolower(optional($user->role)->name ?? '') !== 'admin') {
+            abort(403, 'Unauthorized');
+        }
+
+        $approval->delete();
+
+        return redirect()->back()->with('success', 'Approval deleted');
+    }
+
+    /**
+     * Bulk delete approvals. Admin only.
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $user = Auth::user();
+        if (strtolower(optional($user->role)->name ?? '') !== 'admin') {
+            abort(403, 'Unauthorized');
+        }
+
+        $ids = $request->input('approval_ids', []);
+        if (empty($ids) || !is_array($ids)) {
+            return redirect()->back()->with('error', 'No approvals selected');
+        }
+
+        ExamApproval::whereIn('id', $ids)->delete();
+
+        return redirect()->back()->with('success', 'Selected approvals deleted');
+    }
+
+    private function finalizeAddToWorkerEntries(ExamApproval $approval)
+    {
+        $candidate = $approval->candidate;
+
+        // create worker entry minimal using nid and name
+        $worker = WorkerEntry::create([
+            'employee_name_english' => $candidate->name,
+            'id_card_no' => $candidate->nid,
+            'examination_date' => $candidate->examination_date ?? now()->format('Y-m-d'),
+        ]);
+
+        $entries = ExamProcessEntry::where('exam_candidate_id', $candidate->id)->get();
+        foreach ($entries as $entry) {
+            $w = $worker->workerSewingProcessEntries()->create([
+                'sewing_process_list_id' => $entry->sewing_process_list_id,
+                'worker_name' => $candidate->name,
+                'sewing_process_name' => $entry->sewing_process_name,
+                'sewing_process_type' => $entry->sewing_process_type,
+                'smv' => $entry->smv,
+                'target' => $entry->target,
+                'sewing_process_avg_cycles' => $entry->sewing_process_avg_cycles,
+                'capacity' => $entry->capacity,
+                'self_production' => $entry->self_production,
+                'achive_production' => $entry->achive_production,
+                'efficiency' => $entry->efficiency,
+                'examination_date' => $candidate->examination_date ?? now()->format('Y-m-d'),
+            ]);
+
+            // copy cycles
+            $cycles = ExamCycleLog::where('exam_process_entry_id', $entry->id)->get();
+            foreach ($cycles as $cycle) {
+                $worker->cycleListLogs()->create([
+                    'worker_sewing_process_entries_id' => $w->id,
+                    'sewing_process_list_id' => $entry->sewing_process_list_id,
+                    'worker_name' => $candidate->name,
+                    'sewing_process_name' => $entry->sewing_process_name,
+                    'sewing_process_type' => $entry->sewing_process_type,
+                    'start_time' => $cycle->start_time,
+                    'end_time' => $cycle->end_time,
+                    'duration' => $cycle->duration,
+                    'rejectDataStatus' => $cycle->rejectDataStatus,
+                ]);
+            }
+        }
+
+        // mark candidate as promoted (optional)
+        $candidate->update(['exam_passed' => 2]); // 2 = promoted (custom)
     }
 
     public function destroy(ExamCandidate $candidate)

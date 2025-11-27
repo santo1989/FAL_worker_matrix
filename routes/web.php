@@ -56,6 +56,10 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('home');
     })->name('dashboard');
 
+    // Approver settings (admin)
+    Route::get('/settings/approvers', [\App\Http\Controllers\ApproverSettingsController::class, 'index'])->name('settings.approvers.index');
+    Route::post('/settings/approvers', [\App\Http\Controllers\ApproverSettingsController::class, 'update'])->name('settings.approvers.update');
+
     //role
 
     Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
@@ -142,6 +146,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/exam/matrixData_entry_form/{candidate}', [ExamController::class, 'matrixData_entry_form'])->name('exam.matrixData_entry_form');
     Route::post('/exam/matrixData_store', [ExamController::class, 'matrixData_store'])->name('exam.matrixData_store');
     Route::get('/exam/addToWorkerEntries/{candidate}', [ExamController::class, 'addToWorkerEntries'])->name('exam.addToWorkerEntries');
+    Route::post('/exam/request_add_to_worker/{candidate}', [ExamController::class, 'requestAddToWorker'])->name('exam.request_add_to_worker');
+    Route::post('/exam/approvals/{approval}/approve', [ExamController::class, 'approveApproval'])->name('exam.approvals.approve');
+    Route::post('/exam/approvals/{approval}/reject', [ExamController::class, 'rejectApproval'])->name('exam.approvals.reject');
+    Route::get('/exam/approvals', [ExamController::class, 'approvalsIndex'])->name('exam.approvals.index');
+    Route::post('/exam/approvals/bulk_approve', [ExamController::class, 'bulkApprove'])->name('exam.approvals.bulk_approve');
+    Route::post('/exam/approvals/bulk_reject', [ExamController::class, 'bulkReject'])->name('exam.approvals.bulk_reject');
+    // Admin-only delete routes for approvals
+    Route::delete('/exam/approvals/{approval}', [ExamController::class, 'destroyApproval'])->name('exam.approvals.destroy');
+    Route::post('/exam/approvals/bulk_delete', [ExamController::class, 'bulkDestroy'])->name('exam.approvals.bulk_delete');
     Route::get('/exam/{candidate}', [ExamController::class, 'show'])->name('exam.show');
     Route::delete('/exam/{candidate}', [ExamController::class, 'destroy'])->name('exam.destroy');
     Route::get('/workerEntries/{workerEntry}', [WorkerEntryController::class, 'show'])->name('workerEntries.show');
@@ -216,6 +229,11 @@ Route::post('/generate-report', [WorkerEntryController::class, 'generateReport']
 
 
 
+Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+Route::post('/notification/{id}/mark-read', [NotificationController::class, 'markRead'])->name('notification.markRead');
+Route::post('/notification/{id}/mark-unread', [NotificationController::class, 'markUnread'])->name('notification.markUnread');
+Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notification.markAllRead');
+Route::post('/notification/{id}/delete', [NotificationController::class, 'destroy'])->name('notification.delete');
 Route::get('/read/{notification}', [NotificationController::class, 'read'])->name('notification.read');
 
 

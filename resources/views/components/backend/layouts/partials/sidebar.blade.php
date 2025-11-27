@@ -1,6 +1,12 @@
 <div id="layoutSidenav_nav">
     <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion" style="color:#40c47c;">
         <div class="sb-sidenav-menu">
+            @if (auth()->user() && optional(auth()->user()->role)->name != 'General')
+                <a class="nav-link" href="{{ route('exam.approvals.index') }}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-check-circle"></i></div>
+                    Approvals
+                </a>
+            @endif
             @can('Admin')
                 <div class="nav">
                     <div class="sb-sidenav-menu-heading"></div>
@@ -192,7 +198,7 @@
                         <div class="sb-nav-link-icon"><i class="fas fa-user-check"></i></div>
                         New Recruitment Management
                     </a>
-                    
+
 
 
                 </div>

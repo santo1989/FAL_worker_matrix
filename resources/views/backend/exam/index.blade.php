@@ -157,14 +157,6 @@
                                         <td>{{ $result ?? '-' }}</td>
                                         <td>{{ $cand->exam_passed ? 'Yes' : 'No' }}</td>
                                         <td>
-                                            <a href="{{ route('exam.show', $cand->id) }}"
-                                                class="btn btn-sm btn-secondary">Show</a>
-                                            <a href="{{ route('exam.process_entry_form', $cand->id) }}"
-                                                class="btn btn-sm btn-info">Process</a>
-                                            <a href="{{ route('exam.cyclesData_entry_form', $cand->id) }}"
-                                                class="btn btn-sm btn-warning">Cycles</a>
-                                            <a href="{{ route('exam.matrixData_entry_form', $cand->id) }}"
-                                                class="btn btn-sm btn-success">Matrix</a>
                                             @php
                                                 // fetch latest approval for this candidate and check promoted state
                                                 $approval = \App\Models\ExamApproval::where(
@@ -184,49 +176,44 @@
                                                         ->first();
                                                 }
                                             @endphp
-                                            @if ($canPromote)
-                                                @can('create', \App\Models\ExamApproval::class)
-                                                    <button type="button" class="btn btn-primary btn-sm"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#promoteModal-{{ $cand->id }}">Promote to
-                                                        Worker</button>
+
+                                            @if ($isPromoted)
+                                                <a href="{{ route('exam.show', $cand->id) }}"
+                                                    class="btn btn-sm btn-secondary">Show</a>
+                                                @if ($worker)
+                                                    <a href="{{ route('workerEntries.show', $worker->id) }}"
+                                                        class="btn btn-sm btn-success">View Worker</a>
+                                                @else
+                                                    <span class="badge bg-success ms-2">Promoted</span>
+                                                @endif
+                                            @elseif (!$cand->exam_passed)
+                                                <a href="{{ route('exam.show', $cand->id) }}"
+                                                    class="btn btn-sm btn-secondary">Show</a>
+                                                @can('Admin')
+                                                    <form method="POST" action="{{ route('exam.destroy', $cand->id) }}"
+                                                        class="d-inline"
+                                                        onsubmit="return confirm('Delete candidate and all related exam data?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                                    </form>
                                                 @endcan
                                             @else
-                                                @if ($isPromoted)
-                                                    @if ($worker)
-                                                        <a href="{{ route('workerEntries.show', $worker->id) }}"
-                                                            class="btn btn-sm btn-success">View Worker</a>
-                                                    @else
-                                                        <span class="badge bg-success">Promoted</span>
-                                                    @endif
-                                                    {{-- disable other actions for promoted candidate --}}
-                                                    <button class="btn btn-sm btn-secondary ms-1" disabled>Show</button>
-                                                    <button class="btn btn-sm btn-secondary ms-1"
-                                                        disabled>Process</button>
-                                                    <button class="btn btn-sm btn-secondary ms-1"
-                                                        disabled>Cycles</button>
-                                                    <button class="btn btn-sm btn-secondary ms-1"
-                                                        disabled>Matrix</button>
-                                                @elseif (isset($approval) && $approval->status === 'pending')
-                                                    <span class="badge bg-warning">Promotion Pending</span>
-                                                    @if (isset($approval) && $approval->status === 'pending')
-                                                        @can('approve', $approval)
-                                                            <div class="mt-2">
-                                                                <form method="POST"
-                                                                    action="{{ route('exam.approvals.approve', $approval->id) }}"
-                                                                    style="display:inline-block">
-                                                                    @csrf
-                                                                    <button class="btn btn-sm btn-success">Approve</button>
-                                                                </form>
-                                                                <form method="POST"
-                                                                    action="{{ route('exam.approvals.reject', $approval->id) }}"
-                                                                    style="display:inline-block; margin-left:8px;">
-                                                                    @csrf
-                                                                    <button class="btn btn-sm btn-danger">Reject</button>
-                                                                </form>
-                                                            </div>
-                                                        @endcan
-                                                    @endif
+                                                <a href="{{ route('exam.show', $cand->id) }}"
+                                                    class="btn btn-sm btn-secondary">Show</a>
+                                                <a href="{{ route('exam.process_entry_form', $cand->id) }}"
+                                                    class="btn btn-sm btn-info">Process</a>
+                                                <a href="{{ route('exam.cyclesData_entry_form', $cand->id) }}"
+                                                    class="btn btn-sm btn-warning">Cycles</a>
+                                                <a href="{{ route('exam.matrixData_entry_form', $cand->id) }}"
+                                                    class="btn btn-sm btn-success">Matrix</a>
+                                                @if ($canPromote)
+                                                    @can('create', \App\Models\ExamApproval::class)
+                                                        <button type="button" class="btn btn-primary btn-sm"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#promoteModal-{{ $cand->id }}">Promote to
+                                                            Worker</button>
+                                                    @endcan
                                                 @endif
                                             @endif
 

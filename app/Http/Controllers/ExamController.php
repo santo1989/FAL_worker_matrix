@@ -547,10 +547,23 @@ class ExamController extends Controller
             $requestedSalary = $request->requested_salary;
         }
 
-        // dd($requestedSalary);
+        // Normalize requested salary: handle arrays/objects safely and coerce to float
+        if (is_array($requestedSalary) || is_object($requestedSalary)) {
+            // try to extract numeric values from array/object
+            $flat = [];
+            $iter = (array) $requestedSalary;
+            array_walk_recursive($iter, function ($v) use (&$flat) {
+                if (is_numeric($v)) $flat[] = $v;
+            });
+            if (!empty($flat)) {
+                $requestedSalary = round(array_sum($flat) / count($flat), 2);
+            } else {
+                $requestedSalary = null;
+            }
+        }
 
         // Ensure we have a valid salary value
-        if ($requestedSalary === null || $requestedSalary < 0) {
+        if ($requestedSalary === null || !is_numeric($requestedSalary) || $requestedSalary < 0) {
             return redirect()->back()->withErrors(['requested_salary' => 'Please provide a valid salary value.']);
         }
 
@@ -593,7 +606,11 @@ class ExamController extends Controller
         }
 
         foreach ($approvers->unique('id') as $appUser) {
-            $appUser->notify(new \App\Notifications\ApprovalRequestedNotification($approval));
+            try {
+                $appUser->notify(new \App\Notifications\ApprovalRequestedNotification($approval));
+            } catch (\Throwable $e) {
+                Log::warning('ApprovalRequestedNotification failed: ' . $e->getMessage(), ['approval_id' => $approval->id, 'user_id' => $appUser->id]);
+            }
         }
 
         return redirect()->back()->with('success', 'Promotion request submitted for approval');
@@ -768,6 +785,9 @@ class ExamController extends Controller
             'employee_name_english' => $candidate->name,
             'id_card_no' => $candidate->nid,
             'examination_date' => $candidate->examination_date ?? now()->format('Y-m-d'),
+            'present_grade' => $candidate->result_data['grade'] ?? null,
+            'recomanded_grade' => $candidate->result_data['grade'] ?? null,
+            'salary' => $candidate->result_data['salary_range'] ?? null,
         ]);
 
         $entries = ExamProcessEntry::where('exam_candidate_id', $candidate->id)->get();

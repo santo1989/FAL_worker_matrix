@@ -781,6 +781,9 @@ class WorkerEntryController extends Controller
             'experience' => $experience ?? $workerEntry->experience,
             'salary' => $request->salary ?? $workerEntry->salary,
             'line' => $request->line ?? $workerEntry->line,
+            'floor' => $request->floor ?? $workerEntry->floor,
+            
+            'id_card_no' => $request->id_card_no ?? $workerEntry->id_card_no,
         ]);
         return redirect()->route('workerEntrys_process_entry_form', $workerEntry->id);
     }

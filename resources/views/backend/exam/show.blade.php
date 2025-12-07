@@ -401,8 +401,16 @@
 
                         <div class="mb-3 d-none" id="negotiation_input_wrapper">
                             <label for="requested_salary" class="form-label">Negotiated Salary (TK)</label>
+                            @php
+                                $recNumeric = $recommendedNumeric ?? null;
+                                $maxNegotiated = null;
+                                if (is_numeric($recNumeric)) {
+                                    $maxNegotiated = (int) floor($recNumeric + $recNumeric * 0.03);
+                                }
+                            @endphp
                             <input type="number" step="0.01" class="form-control" name="requested_salary"
-                                id="requested_salary" placeholder="Enter negotiated salary">
+                                id="requested_salary" placeholder="Enter negotiated salary"
+                                @if ($maxNegotiated) max="{{ $maxNegotiated }}" @endif>
                             @php
                                 $rec = $result['salary_range'] ?? null;
                                 if (is_array($rec)) {
@@ -419,6 +427,10 @@
                                 }
                             @endphp
                             <div class="form-text">Recommended: {{ $recDisplay }} TK</div>
+                            @if (!empty($maxNegotiated))
+                                <div class="form-text text-muted">Max allowed negotiated salary: {{ $maxNegotiated }}
+                                    TK</div>
+                            @endif
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -451,8 +463,19 @@
                 }
             }
 
-            // update hidden when negotiation input changes
+            // update hidden when negotiation input changes (clamp to max if provided)
             negotiationInput && negotiationInput.addEventListener('input', function() {
+                try {
+                    var max = this.getAttribute('max');
+                    if (max && this.value !== '') {
+                        var num = parseFloat(this.value);
+                        var maxNum = parseFloat(max);
+                        if (!isNaN(num) && !isNaN(maxNum) && num > maxNum) {
+                            this.value = maxNum;
+                        }
+                    }
+                } catch (e) {}
+
                 if (neg.checked) {
                     hiddenSalary.value = this.value || '';
                 }

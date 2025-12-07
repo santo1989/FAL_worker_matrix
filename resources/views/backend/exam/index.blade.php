@@ -319,15 +319,19 @@
                                                                         <label for="requested_salary"
                                                                             class="form-label">Negotiated Salary
                                                                             (TK)</label>
-                                                                        <input type="number" step="0.01"
-                                                                            class="form-control"
-                                                                            name="requested_salary"
-                                                                            id="requested_salary_{{ $cand->id }}"
-                                                                            placeholder="Enter negotiated salary">
+
                                                                         @php
+                                                                            // compute max allowed negotiated salary = floor(recommended + 3%)
                                                                             $rec =
                                                                                 $cand->result_data['salary_range'] ??
                                                                                 null;
+                                                                            $recNumeric = $recommendedNumeric ?? null;
+                                                                            $maxNegotiated = null;
+                                                                            if (is_numeric($recNumeric)) {
+                                                                                $maxNegotiated = (int) floor(
+                                                                                    $recNumeric + $recNumeric * 0.03,
+                                                                                );
+                                                                            }
                                                                             if (is_array($rec)) {
                                                                                 $nums = array_values(
                                                                                     array_filter($rec, 'is_numeric'),
@@ -349,6 +353,17 @@
                                                                         @endphp
                                                                         <div class="form-text">Recommended:
                                                                             {{ $recDisplay }} TK</div>
+                                                                        @if ($maxNegotiated)
+                                                                            <div class="form-text text-muted">Max
+                                                                                allowed negotiated salary:
+                                                                                {{ $maxNegotiated }} TK</div>
+                                                                        @endif
+                                                                        <input type="number" step="0.01"
+                                                                            class="form-control"
+                                                                            name="requested_salary"
+                                                                            id="requested_salary_{{ $cand->id }}"
+                                                                            placeholder="Enter negotiated salary"
+                                                                            max="{{ $maxNegotiated }}">
                                                                     </div>
                                                                 </div>
                                                                 <div class="modal-footer">
@@ -402,6 +417,17 @@
                                 if (neg && neg.checked) {
                                     wrapper && wrapper.classList.remove('d-none');
                                     if (hiddenSalary && negotiationInput) {
+                                        // clamp negotiation input to max if provided
+                                        try {
+                                            var max = negotiationInput.getAttribute('max');
+                                            if (max && negotiationInput.value !== '') {
+                                                var num = parseFloat(negotiationInput.value);
+                                                var maxNum = parseFloat(max);
+                                                if (!isNaN(num) && !isNaN(maxNum) && num > maxNum) {
+                                                    negotiationInput.value = maxNum;
+                                                }
+                                            }
+                                        } catch (e) {}
                                         hiddenSalary.value = negotiationInput.value || '';
                                     }
                                 } else {
@@ -413,11 +439,36 @@
                             }
 
                             if (neg && negotiationInput) {
+                                // attach single input listener to clamp and update hidden salary
                                 negotiationInput.addEventListener('input', function() {
+                                    try {
+                                        var max = this.getAttribute('max');
+                                        if (max && this.value !== '') {
+                                            var num = parseFloat(this.value);
+                                            var maxNum = parseFloat(max);
+                                            if (!isNaN(num) && !isNaN(maxNum) && num > maxNum) {
+                                                this.value = maxNum;
+                                            }
+                                        }
+                                    } catch (e) {}
+
                                     if (neg.checked && hiddenSalary) {
                                         hiddenSalary.value = this.value || '';
                                     }
                                 });
+
+                                // initialize hidden salary value from negotiation input (clamped)
+                                try {
+                                    var maxInit = negotiationInput.getAttribute('max');
+                                    if (maxInit && negotiationInput.value !== '') {
+                                        var n = parseFloat(negotiationInput.value);
+                                        var m = parseFloat(maxInit);
+                                        if (!isNaN(n) && !isNaN(m) && n > m) {
+                                            negotiationInput.value = m;
+                                        }
+                                    }
+                                } catch (e) {}
+                                hiddenSalary.value = negotiationInput.value || '';
                             }
 
                             agreed && agreed.addEventListener && agreed.addEventListener('change', toggle);

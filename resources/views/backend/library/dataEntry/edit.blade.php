@@ -32,7 +32,7 @@
                 <div class="form-group col-md-6 col-sm-12">
                     <label for="id_card_no">Card No</label>
                     <input type="number" name="id_card_no" id="id_card_no" class="form-control" required
-                        placeholder="Enter Card No" value="{{ $workerEntry->id_card_no ?? '' }}" readonly>
+                        placeholder="Enter Card No" value="{{ $workerEntry->id_card_no ?? '' }}" >
                 </div>
                 <br>
                 <div class="form-group col-md-6 col-sm-12">
@@ -85,6 +85,21 @@
                         placeholder="Enter Line" value="{{ $workerEntry->line ?? '' }}">
                 </div>
                 <br>
+                <!--floor -->
+               <div class="form-group col-md-6 col-sm-12">
+                    <label for="floor">Floor</label>
+                    <select name="floor" id="floor" class="form-control" required>
+                        <option value="">Select Floor</option>
+                        <option value="1st Floor" {{ $workerEntry->floor == '1st Floor' ? 'selected' : ''}}>1st Floor</option>
+                        <option value="2nd Floor" {{ $workerEntry->floor == '2nd Floor' ? 'selected' : '' }}>2nd Floor</option>
+                        <option value="3rd Floor" {{ $workerEntry->floor == '3rd Floor' ? 'selected' : '' }}>3rd Floor</option>
+                        <option value="4th Floor" {{ $workerEntry->floor == '4th Floor' ? 'selected' : '' }}>4th Floor</option>
+                        <option value="5th Floor" {{ $workerEntry->floor == '5th Floor' ? 'selected' : '' }}>5th Floor</option>
+                    </select>
+
+                </div>
+                <br>
+                <!--floor -->
 
 
             </div>

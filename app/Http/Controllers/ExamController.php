@@ -459,11 +459,33 @@ class ExamController extends Controller
     public function addToWorkerEntries(ExamCandidate $candidate)
     {
         // Legacy direct promotion - keep for backwards compat but prefer approvals
-        $worker = WorkerEntry::create([
+        // compute recommended numeric salary from candidate result_data if available
+        $rec = $candidate->result_data['salary_range'] ?? null;
+        $recommendedNumeric = null;
+        if ($rec) {
+            if (is_array($rec)) {
+                $nums = array_values(array_filter($rec, 'is_numeric'));
+                if (!empty($nums)) {
+                    $recommendedNumeric = round(array_sum($nums) / count($nums), 2);
+                }
+            } elseif (is_numeric($rec)) {
+                $recommendedNumeric = round($rec, 2);
+            }
+        }
+
+        $workerData = [
             'employee_name_english' => $candidate->name,
             'id_card_no' => $candidate->nid,
+            'nid' => $candidate->nid,
             'examination_date' => $candidate->examination_date ?? now()->format('Y-m-d'),
-        ]);
+        ];
+
+        if ($recommendedNumeric !== null) {
+            $workerData['salary'] = $recommendedNumeric;
+            $workerData['recomanded_salary'] = $recommendedNumeric;
+        }
+
+        $worker = WorkerEntry::create($workerData);
 
         // copy process entries and cycle logs into worker tables
         $entries = ExamProcessEntry::where('exam_candidate_id', $candidate->id)->get();
@@ -525,13 +547,36 @@ class ExamController extends Controller
     {
         $this->authorize('create', ExamApproval::class);
 
+        // compute recommended numeric and max negotiation (3% above recommended)
+        $rec = $candidate->result_data['salary_range'] ?? null;
+        $recommendedNumeric = null;
+        if ($rec) {
+            if (is_array($rec)) {
+                $nums = array_values(array_filter($rec, 'is_numeric'));
+                if (!empty($nums)) {
+                    $recommendedNumeric = round(array_sum($nums) / count($nums), 2);
+                }
+            } elseif (is_numeric($rec)) {
+                $recommendedNumeric = round($rec, 2);
+            }
+        }
+
+        $maxNegotiated = null;
+        if (is_numeric($recommendedNumeric)) {
+            $maxNegotiated = (int) floor($recommendedNumeric + ($recommendedNumeric * 0.03));
+        }
+
         // Fix validation rules
         $validationRules = [
             'type' => 'required|in:agreed,negotiation',
         ];
 
         if ($request->type === 'negotiation') {
-            $validationRules['requested_salary'] = 'required|numeric|min:0';
+            $rule = 'required|numeric|min:0';
+            if ($maxNegotiated !== null) {
+                $rule .= '|max:' . $maxNegotiated;
+            }
+            $validationRules['requested_salary'] = $rule;
         } else {
             $validationRules['hidden_requested_salary'] = 'required|numeric|min:0';
         }
@@ -781,14 +826,39 @@ class ExamController extends Controller
         $candidate = $approval->candidate;
 
         // create worker entry minimal using nid and name
-        $worker = WorkerEntry::create([
+        // prefer using approved requested_salary; fallback to candidate's recommended numeric
+        $salaryToSet = null;
+        if (isset($approval->requested_salary) && is_numeric($approval->requested_salary)) {
+            $salaryToSet = round($approval->requested_salary, 2);
+        } else {
+            $rec = $candidate->result_data['salary_range'] ?? null;
+            if ($rec) {
+                if (is_array($rec)) {
+                    $nums = array_values(array_filter($rec, 'is_numeric'));
+                    if (!empty($nums)) {
+                        $salaryToSet = round(array_sum($nums) / count($nums), 2);
+                    }
+                } elseif (is_numeric($rec)) {
+                    $salaryToSet = round($rec, 2);
+                }
+            }
+        }
+
+        $workerPayload = [
             'employee_name_english' => $candidate->name,
             'id_card_no' => $candidate->nid,
+            'nid' => $candidate->nid,
             'examination_date' => $candidate->examination_date ?? now()->format('Y-m-d'),
             'present_grade' => $candidate->result_data['grade'] ?? null,
             'recomanded_grade' => $candidate->result_data['grade'] ?? null,
-            'salary' => $candidate->result_data['salary_range'] ?? null,
-        ]);
+        ];
+
+        if ($salaryToSet !== null) {
+            $workerPayload['salary'] = $salaryToSet;
+            $workerPayload['recomanded_salary'] = $salaryToSet;
+        }
+
+        $worker = WorkerEntry::create($workerPayload);
 
         $entries = ExamProcessEntry::where('exam_candidate_id', $candidate->id)->get();
         foreach ($entries as $entry) {

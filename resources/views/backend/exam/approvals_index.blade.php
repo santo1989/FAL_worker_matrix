@@ -63,6 +63,8 @@
                                 <th>Status</th>
                                 <th>Requested By</th>
                                 <th>Requested At</th>
+                                <th>Approved By</th>
+                                <th>Approved At</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -71,11 +73,11 @@
                                 <tr>
                                     <td>
                                         @can('approve', \App\Models\ExamApproval::class)
-                                        @if($a->status === 'pending')
-                                            <input type="checkbox" name="approval_ids[]" value="{{ $a->id }}">
-                                        @else
-                                            -
-                                        @endif
+                                            @if ($a->status === 'pending')
+                                                <input type="checkbox" name="approval_ids[]" value="{{ $a->id }}">
+                                            @else
+                                                -
+                                            @endif
                                         @endcan
                                     </td>
                                     <td>{{ $a->id }}</td>
@@ -143,28 +145,37 @@
                                         {{ $created }}
                                     </td>
                                     <td>
+                                        @php
+                                            $approved = $a->approved_at ? $a->approver->name ?? '-' : '-';
+                                            if (is_array($approved) || is_object($approved)) {
+                                                $approved = json_encode($approved);
+                                            }
+                                        @endphp
+                                        {{ $approved }}
+                                    </td>
+                                    <td>
+                                        @php
+                                            $approvedAt = $a->approved_at;
+                                            if (is_object($approvedAt) && method_exists($approvedAt, 'toDateTimeString')) {
+                                                $approvedAt = $approvedAt->toDateTimeString();
+                                            } elseif (is_array($approvedAt)) {
+                                                $approvedAt = json_encode($approvedAt);
+                                            }
+                                        @endphp
+                                        {{ $approvedAt }}
+                                    </td>
+                                    <td>
                                         @if ($a->status === 'pending')
                                             @can('approve', $a)
-                                                <form method="POST" action="{{ route('exam.approvals.approve', $a->id) }}"
-                                                    style="display:inline-block">
-                                                    @csrf
-                                                    <button class="btn btn-sm btn-success">Approve</button>
-                                                </form>
-                                                <form method="POST" action="{{ route('exam.approvals.reject', $a->id) }}"
-                                                    style="display:inline-block; margin-left:6px">
-                                                    @csrf
-                                                    <button class="btn btn-sm btn-danger">Reject</button>
-                                                </form>
+                                                {{-- <button type="button" class="btn btn-sm btn-success approve-btn"
+                                                    data-url="{{ route('exam.approvals.approve', $a->id) }}">Approve</button>
+                                                <button type="button" class="btn btn-sm btn-danger reject-btn ms-1"
+                                                    data-url="{{ route('exam.approvals.reject', $a->id) }}">Reject</button> --}}
                                             @endcan
                                             @if (strtolower(optional(auth()->user()->role)->name ?? '') === 'admin')
-                                                <form method="POST"
-                                                    action="{{ route('exam.approvals.destroy', $a->id) }}"
-                                                    style="display:inline-block; margin-left:6px">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="btn btn-sm btn-outline-secondary"
-                                                        onclick="return confirm('Delete this approval?')">Delete</button>
-                                                </form>
+                                                <button type="button"
+                                                    class="btn btn-sm btn-outline-secondary delete-approval-btn ms-1"
+                                                    data-url="{{ route('exam.approvals.destroy', $a->id) }}">Delete</button>
                                             @endif
                                         @else
                                             -
@@ -208,6 +219,72 @@
                 const form = document.getElementById('bulkForm');
                 form.action = '{{ route('exam.approvals.bulk_delete') }}';
                 form.submit();
+            });
+        })();
+    </script>
+
+    <script>
+        (function() {
+            const csrf = document.querySelector('meta[name="csrf-token"]') ? document.querySelector(
+                'meta[name="csrf-token"]').getAttribute('content') : '{{ csrf_token() }}';
+
+            function sendAction(url, method) {
+                return fetch(url, {
+                    method: method,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': csrf,
+                        'Accept': 'application/json'
+                    }
+                }).then(function(res) {
+                    if (!res.ok) throw new Error('Network response was not ok');
+                    return res.json().catch(() => ({}));
+                });
+            }
+
+            // Approve buttons
+            document.querySelectorAll('.approve-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    if (!confirm('Approve this request?')) return;
+                    const url = btn.getAttribute('data-url');
+                    sendAction(url, 'POST')
+                        .then(function() {
+                            location.reload();
+                        })
+                        .catch(function(err) {
+                            alert('Approve failed: ' + err.message);
+                        });
+                });
+            });
+
+            // Reject buttons
+            document.querySelectorAll('.reject-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    if (!confirm('Reject this request?')) return;
+                    const url = btn.getAttribute('data-url');
+                    sendAction(url, 'POST')
+                        .then(function() {
+                            location.reload();
+                        })
+                        .catch(function(err) {
+                            alert('Reject failed: ' + err.message);
+                        });
+                });
+            });
+
+            // Delete approval (admin)
+            document.querySelectorAll('.delete-approval-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    if (!confirm('Delete this approval?')) return;
+                    const url = btn.getAttribute('data-url');
+                    sendAction(url, 'DELETE')
+                        .then(function() {
+                            location.reload();
+                        })
+                        .catch(function(err) {
+                            alert('Delete failed: ' + err.message);
+                        });
+                });
             });
         })();
     </script>

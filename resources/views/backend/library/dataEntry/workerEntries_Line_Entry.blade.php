@@ -33,13 +33,13 @@
                 <div class="form-group col-md-6 col-sm-12">
                     <label for="id_card_no">Card No</label>
                     <input type="number" name="id_card_no" id="id_card_no" class="form-control" required
-                        placeholder="Enter Card No" value="{{ $workerEntry->id_card_no ?? '' }}" >
+                        placeholder="Enter Card No" value="{{ $workerEntry->id_card_no ?? '' }}">
                 </div>
                 <br>
                 <div class="form-group col-md-6 col-sm-12">
                     <label for="joining_date">Join Date</label>
                     <input type="date" name="joining_date" id="joining_date" class="form-control" required
-                        placeholder="Enter Join Date" value="{{ $workerEntry->joining_date ?? '' }}" >
+                        placeholder="Enter Join Date" value="{{ $workerEntry->joining_date ?? '' }}">
                 </div>
                 <br>
                 <div class="form-group col-md-6 col-sm-12">
@@ -60,7 +60,7 @@
                 <br>
                 <div class="form-group col-md-6 col-sm-12">
                     <label for="designation_name">Designation</label>
-                    <select name="designation_name" id="designation_name" class="form-control" required >
+                    <select name="designation_name" id="designation_name" class="form-control" required>
                         <option value="">Select Designation</option>
                         <option value="Line Leader"
                             {{ $workerEntry->designation_name == 'Line Leader' ? 'selected' : '' }}>
@@ -96,17 +96,30 @@
                     <label for="floor">Floor</label>
                     <select name="floor" id="floor" class="form-control" required>
                         <option value="">Select Floor</option>
-                        <option value="1st Floor" {{ $workerEntry->floor == '1st Floor' ? 'selected' : ''}}>1st Floor</option>
-                        <option value="2nd Floor" {{ $workerEntry->floor == '2nd Floor' ? 'selected' : '' }}>2nd Floor</option>
-                        <option value="3rd Floor" {{ $workerEntry->floor == '3rd Floor' ? 'selected' : '' }}>3rd Floor</option>
-                        <option value="4th Floor" {{ $workerEntry->floor == '4th Floor' ? 'selected' : '' }}>4th Floor</option>
-                        <option value="5th Floor" {{ $workerEntry->floor == '5th Floor' ? 'selected' : '' }}>5th Floor</option>
+                        <option value="1st Floor" {{ $workerEntry->floor == '1st Floor' ? 'selected' : '' }}>1st Floor
+                        </option>
+                        <option value="2nd Floor" {{ $workerEntry->floor == '2nd Floor' ? 'selected' : '' }}>2nd Floor
+                        </option>
+                        <option value="3rd Floor" {{ $workerEntry->floor == '3rd Floor' ? 'selected' : '' }}>3rd Floor
+                        </option>
+                        <option value="4th Floor" {{ $workerEntry->floor == '4th Floor' ? 'selected' : '' }}>4th Floor
+                        </option>
+                        <option value="5th Floor" {{ $workerEntry->floor == '5th Floor' ? 'selected' : '' }}>5th Floor
+                        </option>
                     </select>
 
                 </div>
 
 
             </div>
+            <input type="hidden" name="division_id" value="{{ Auth::user()->division_id }}">
+            <input type="hidden" name="division_name" value="{{ Auth::user()->division->name }}">
+            <input type="hidden" name="company_id" value="{{ Auth::user()->company_id }}">
+            <input type="hidden" name="company_name" value="{{ Auth::user()->company->name }}">
+            <input type="hidden" name="department_id" value="{{ Auth::user()->department_id }}">
+            <input type="hidden" name="department_name" value="{{ Auth::user()->department->name }}">
+            <input type="hidden" name="nid" value="{{ $workerEntry->id_card_no ?? '' }}">
+
             <br>
             <a type="button" class="btn btn-lg btn-outline-info" id="cancelbutton"
                 href="{{ route('workerEntries.index') }}">Cancel</a>

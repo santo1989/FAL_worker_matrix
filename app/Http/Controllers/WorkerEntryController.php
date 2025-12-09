@@ -1200,9 +1200,50 @@ class WorkerEntryController extends Controller
         // dd($request->all());
         $workerEntry = WorkerEntry::find($workerEntry->id);
 
+        $joiningDate = Carbon::parse($request->joining_date);
+        $now = Carbon::now();
+
+        $years = $joiningDate->diffInYears($now);
+        $months = $joiningDate->diffInMonths($now) % 12; // Calculate remaining months after years
+        $days = $joiningDate->diffInDays($now) % 30; // Calculate remaining days after months
+
+        $experience = "{$years} years {$months} months {$days} days";
+
+        if (
+            $request->designation_name == "Line Leader"
+        ) {
+            $designation_id = 1;
+        } elseif ($request->designation_name == "JSMO") {
+            $designation_id = 2;
+        } elseif ($request->designation_name == "OSMO") {
+            $designation_id = 3;
+        } elseif ($request->designation_name == "SMO") {
+            $designation_id = 4;
+        } elseif ($request->designation_name == "SSMO") {
+            $designation_id = 5;
+        }
+
         // data Entry by id card
         $workerEntry->update([
+            'division_id' => $request->division_id,
+            'division_name' => $request->division_name,
+            'company_id' => $request->company_id,
+            'company_name' => $request->company_name,
+            'department_id' => $request->department_id,
+            'department_name' => $request->department_name,
+            'employee_name_english' => $request->employee_name_english ?? $workerEntry->employee_name_english,
+            'joining_date' => $request->joining_date ?? $workerEntry->joining_date,
+            'examination_date' => $request->examination_date ?? $workerEntry->examination_date,
+            'designation_id' => $designation_id ?? $workerEntry->designation_id,
+            'designation_name' => $request->designation_name ?? $workerEntry->designation_name,
+            'present_grade' => $request->present_grade ?? $workerEntry->present_grade,
+            'experience' => $experience ?? $workerEntry->experience,
+            'salary' => $request->salary ?? $workerEntry->salary,
             'line' => $request->line ?? $workerEntry->line,
+            'floor' => $request->floor ?? $workerEntry->floor,
+
+            'id_card_no' => $request->id_card_no ?? $workerEntry->id_card_no,
+            'nid' => $request->nid ?? $workerEntry->nid,
         ]);
         return redirect()->route('workerEntries.index');
     }

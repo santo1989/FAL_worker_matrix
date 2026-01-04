@@ -382,6 +382,33 @@
                         <p><strong>Grade:</strong> {{ $result['grade'] }}</p>
                         <p><strong>Recommended Salary:</strong> {{ $modalRecDisplay }} TK</p>
 
+                        <div class="row mb-3">
+                            <div class="form-group col-md-6 col-sm-12">
+                                <label for="floor">Floor</label>
+                                @php
+                                    $selectedFloor = optional($worker ?? null)->floor;
+                                @endphp
+                                <select name="floor" id="floor" class="form-control" required>
+                                    <option value="">Select Floor</option>
+                                    <option value="1st Floor" {{ $selectedFloor === '1st Floor' ? 'selected' : '' }}>
+                                        1st Floor</option>
+                                    <option value="2nd Floor" {{ $selectedFloor === '2nd Floor' ? 'selected' : '' }}>
+                                        2nd Floor</option>
+                                    <option value="3rd Floor" {{ $selectedFloor === '3rd Floor' ? 'selected' : '' }}>
+                                        3rd Floor</option>
+                                    <option value="4th Floor" {{ $selectedFloor === '4th Floor' ? 'selected' : '' }}>
+                                        4th Floor</option>
+                                    <option value="5th Floor" {{ $selectedFloor === '5th Floor' ? 'selected' : '' }}>
+                                        5th Floor</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6 col-sm-12">
+                                <label for="line">Line</label>
+                                <input type="text" name="line" id="line" class="form-control" required
+                                    placeholder="Enter Line" value="{{ optional($worker ?? null)->line ?? '' }}">
+                            </div>
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label">Choose action</label>
                             <div>
@@ -395,6 +422,13 @@
                                     <input class="form-check-input" type="radio" name="type"
                                         id="type_negotiation" value="negotiation">
                                     <label class="form-check-label" for="type_negotiation">Negotiate salary</label>
+                                </div>
+                                <!-- Special Case for Add any salary input -->
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="type"
+                                        id="type_Special_Case_salary" value="Special_Case_salary">
+                                    <label class="form-check-label" for="type_Special_Case_salary">Special Case
+                                        Salary</label>
                                 </div>
                             </div>
                         </div>
@@ -432,6 +466,16 @@
                                     TK</div>
                             @endif
                         </div>
+                        <div class="mb-3 d-none" id="Special_Case_input_wrapper">
+                            <label for="Special_Case_salary" class="form-label">Special Case Salary (TK)</label>
+                            <input type="number" step="0.01" class="form-control" name="Special_Case_salary"
+                                id="Special_Case_salary" placeholder="Enter Special Case salary">
+                            <label for="Special_Case_reason" class="form-label mt-2">Reason for Special Case Salary</label>
+                            <input type="text" class="form-control mt-2" name="Special_Case_reason"
+                                id="Special_Case_reason" placeholder="Enter reason for Special Case salary">
+                        </div>
+
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -450,17 +494,30 @@
             const hiddenSalary = document.getElementById('hidden_requested_salary');
             const negotiationInput = document.getElementById('requested_salary');
             const recommendedNumeric = {!! json_encode($recommendedNumeric) !!};
+            const specialCase = document.getElementById('type_Special_Case_salary');
+            const specialCaseWrapper = document.getElementById('Special_Case_input_wrapper');
+            const specialCaseInput = document.getElementById('Special_Case_salary');
+            
 
             function toggle() {
                 if (neg.checked) {
                     wrapper.classList.remove('d-none');
-                    // use negotiation input value (if any)
+                    specialCaseWrapper.classList.add('d-none');
                     hiddenSalary.value = negotiationInput.value || '';
-                } else {
-                    wrapper.classList.add('d-none');
-                    // agree -> set to recommended numeric (may be empty)
-                    hiddenSalary.value = recommendedNumeric !== null ? recommendedNumeric : '';
+                    return;
                 }
+
+                if (specialCase && specialCase.checked) {
+                    specialCaseWrapper.classList.remove('d-none');
+                    wrapper.classList.add('d-none');
+                    hiddenSalary.value = specialCaseInput ? specialCaseInput.value || '' : '';
+                    return;
+                }
+
+                wrapper.classList.add('d-none');
+                specialCaseWrapper.classList.add('d-none');
+                // agree -> set to recommended numeric (may be empty)
+                hiddenSalary.value = recommendedNumeric !== null ? recommendedNumeric : '';
             }
 
             // update hidden when negotiation input changes (clamp to max if provided)
@@ -481,8 +538,16 @@
                 }
             });
 
+            // update hidden when special case salary changes
+            specialCaseInput && specialCaseInput.addEventListener('input', function() {
+                if (specialCase && specialCase.checked) {
+                    hiddenSalary.value = this.value || '';
+                }
+            });
+
             agreed.addEventListener('change', toggle);
             neg.addEventListener('change', toggle);
+            specialCase && specialCase.addEventListener('change', toggle);
 
             // initialize on load
             toggle();

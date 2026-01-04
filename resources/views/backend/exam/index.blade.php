@@ -189,7 +189,7 @@
                                             @elseif (!$cand->exam_passed)
                                                 <a href="{{ route('exam.show', $cand->id) }}"
                                                     class="btn btn-sm btn-secondary">Show</a>
-                                                @can('Admin')
+                                                {{-- @can('Admin')
                                                     <form method="POST" action="{{ route('exam.destroy', $cand->id) }}"
                                                         class="d-inline"
                                                         onsubmit="return confirm('Delete candidate and all related exam data?');">
@@ -197,7 +197,7 @@
                                                         @method('DELETE')
                                                         <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                                     </form>
-                                                @endcan
+                                                @endcan --}}
                                             @else
                                                 <a href="{{ route('exam.show', $cand->id) }}"
                                                     class="btn btn-sm btn-secondary">Show</a>
@@ -287,6 +287,31 @@
                                                                         {{ $cand->result_data['grade'] }}</p>
                                                                     <p><strong>Recommended Salary:</strong>
                                                                         {{ $modalRecDisplay }} TK</p>
+                                                                   
+                                                                       <div class="form-group col-md-6 col-sm-12">
+                        <label for="floor_{{ $cand->id }}">Floor</label>
+                        @php
+                            $selectedFloor = optional($worker)->floor;
+                        @endphp
+                        <select name="floor" id="floor_{{ $cand->id }}" class="form-control" required>
+                            <option value="">Select Floor</option>
+                            <option value="1st Floor" {{ $selectedFloor === '1st Floor' ? 'selected' : '' }}>1st Floor</option>
+                            <option value="2nd Floor" {{ $selectedFloor === '2nd Floor' ? 'selected' : '' }}>2nd Floor</option>
+                            <option value="3rd Floor" {{ $selectedFloor === '3rd Floor' ? 'selected' : '' }}>3rd Floor</option>
+                            <option value="4th Floor" {{ $selectedFloor === '4th Floor' ? 'selected' : '' }}>4th Floor</option>
+                            <option value="5th Floor" {{ $selectedFloor === '5th Floor' ? 'selected' : '' }}>5th Floor</option>
+                        </select>
+
+                    </div>
+                    <br>
+                    <!-- line -->
+                    <div class="form-group col-md-6 col-sm-12">
+                        <label for="line_{{ $cand->id }}">Line</label>
+                        <input type="text" name="line" id="line_{{ $cand->id }}" class="form-control" required
+                            placeholder="Enter Line" value="{{ optional($worker)->line ?? '' }}">
+                    </div>
+                    <br>
+                                                                    
 
                                                                     <div class="mb-3">
                                                                         <label class="form-label">Choose action</label>
@@ -311,6 +336,17 @@
                                                                                     for="type_negotiation_{{ $cand->id }}">Negotiate
                                                                                     salary</label>
                                                                             </div>
+                                                                            <!-- Special Case for Add any salary input -->
+                                                                            <div class="form-check form-check-inline">
+                                                                                <input class="form-check-input"
+                                                                                    type="radio" name="type"
+                                                                                    id="type_Special_Case_salary_{{ $cand->id }}"
+                                                                                    value="Special_Case_salary">
+                                                                                <label class="form-check-label"
+                                                                                    for="type_Special_Case_salary_{{ $cand->id }}">Special
+                                                                                    Case Salary</label>
+                                                                            </div>
+
                                                                         </div>
                                                                     </div>
 
@@ -365,6 +401,27 @@
                                                                             placeholder="Enter negotiated salary"
                                                                             max="{{ $maxNegotiated }}">
                                                                     </div>
+                                                                    <div class="mb-3 d-none"
+                                                                        id="Special_Case_input_wrapper_{{ $cand->id }}">
+                                                                        <label
+                                                                            for="Special_Case_salary_{{ $cand->id }}"
+                                                                            class="form-label">Special Case Salary
+                                                                            (TK)</label>
+                                                                        <input type="number" step="0.01"
+                                                                            class="form-control"
+                                                                            name="Special_Case_salary"
+                                                                            id="Special_Case_salary_{{ $cand->id }}"
+                                                                            placeholder="Enter Special Case salary">
+                                                                        <label
+                                                                            for="Special_Case_reason_{{ $cand->id }}"
+                                                                            class="form-label mt-2">Reason for Special
+                                                                            Case Salary</label>
+                                                                        <input type="text"
+                                                                            class="form-control mt-2"
+                                                                            name="Special_Case_reason"
+                                                                            id="Special_Case_reason_{{ $cand->id }}"
+                                                                            placeholder="Enter reason for Special Case salary">
+                                                                    </div>
                                                                 </div>
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary"
@@ -408,6 +465,9 @@
                             var wrapper = document.getElementById('negotiation_input_wrapper_' + id);
                             var hiddenSalary = document.getElementById('hidden_requested_salary_' + id);
                             var negotiationInput = document.getElementById('requested_salary_' + id);
+                            var specialCase = document.getElementById('type_Special_Case_salary_' + id);
+                            var specialCaseWrapper = document.getElementById('Special_Case_input_wrapper_' + id);
+                            var specialCaseInput = document.getElementById('Special_Case_salary_' + id);
 
                             // derive recommended numeric from hidden input initial value
                             var recommendedNumeric = (hiddenSalary && hiddenSalary.value !== '') ? hiddenSalary.value :
@@ -416,6 +476,7 @@
                             function toggle() {
                                 if (neg && neg.checked) {
                                     wrapper && wrapper.classList.remove('d-none');
+                                    specialCaseWrapper && specialCaseWrapper.classList.add('d-none');
                                     if (hiddenSalary && negotiationInput) {
                                         // clamp negotiation input to max if provided
                                         try {
@@ -430,11 +491,22 @@
                                         } catch (e) {}
                                         hiddenSalary.value = negotiationInput.value || '';
                                     }
-                                } else {
+                                    return;
+                                }
+
+                                if (specialCase && specialCase.checked) {
+                                    specialCaseWrapper && specialCaseWrapper.classList.remove('d-none');
                                     wrapper && wrapper.classList.add('d-none');
                                     if (hiddenSalary) {
-                                        hiddenSalary.value = (recommendedNumeric !== null) ? recommendedNumeric : '';
+                                        hiddenSalary.value = specialCaseInput ? specialCaseInput.value || '' : '';
                                     }
+                                    return;
+                                }
+
+                                wrapper && wrapper.classList.add('d-none');
+                                specialCaseWrapper && specialCaseWrapper.classList.add('d-none');
+                                if (hiddenSalary) {
+                                    hiddenSalary.value = (recommendedNumeric !== null) ? recommendedNumeric : '';
                                 }
                             }
 
@@ -471,8 +543,19 @@
                                 hiddenSalary.value = negotiationInput.value || '';
                             }
 
+                            // update hidden when special case salary changes
+                            if (specialCaseInput) {
+                                specialCaseInput.addEventListener('input', function() {
+                                    if (specialCase && specialCase.checked && hiddenSalary) {
+                                        hiddenSalary.value = this.value || '';
+                                    }
+                                });
+                            }
+
                             agreed && agreed.addEventListener && agreed.addEventListener('change', toggle);
                             neg && neg.addEventListener && neg.addEventListener('change', toggle);
+                            specialCase && specialCase.addEventListener && specialCase.addEventListener('change',
+                                toggle);
 
                             // initialize state when modal is shown (cover cases where modal opened later)
                             modalEl.addEventListener('show.bs.modal', function() {

@@ -60,6 +60,16 @@
             <div class="row pb-3">
                 @csrf
 
+                <div class="col-md-6 mb-3">
+                    <label for="process_search" class="form-label">Search by Process Name</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="process_search"
+                            placeholder="Type to search (e.g. collar attach)">
+                        <button type="button" class="btn btn-outline-secondary" id="process_search_btn">Search</button>
+                        <button type="button" class="btn btn-outline-danger" id="process_search_reset">Reset</button>
+                    </div>
+                </div>
+
                 <div class="form-group col-md-12 col-sm-12">
                     @foreach ($groupedProcesses as $processType => $machineTypes)
                         <h3 class="text-center">{{ strtoupper($processType) }}</h3>
@@ -137,5 +147,39 @@ $ExamProcessEntry = App\Models\ExamProcessEntry::where('exam_candidate_id', $can
                 event.preventDefault();
             }
         });
+
+        // Dynamic process name search: filters visible process cards/rows
+        (function() {
+            const searchInput = document.getElementById('process_search');
+            const searchBtn = document.getElementById('process_search_btn');
+            const resetBtn = document.getElementById('process_search_reset');
+
+            function applyFilter() {
+                const term = (searchInput?.value || '').trim().toLowerCase();
+                const rows = document.querySelectorAll('[id^="checkbox_"]');
+
+                rows.forEach(function(inputEl) {
+                    const label = inputEl.closest('label');
+                    if (!label) return;
+                    const text = label.textContent || '';
+                    const match = term === '' || text.toLowerCase().includes(term);
+                    label.classList.toggle('d-none', !match);
+                });
+            }
+
+            searchBtn && searchBtn.addEventListener('click', applyFilter);
+            searchInput && searchInput.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    applyFilter();
+                }
+            });
+            resetBtn && resetBtn.addEventListener('click', function() {
+                if (searchInput) {
+                    searchInput.value = '';
+                }
+                applyFilter();
+            });
+        })();
     </script>
 </x-backend.layouts.master>

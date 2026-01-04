@@ -540,7 +540,10 @@ class ExamController extends Controller
         // load latest approval if any
         $approval = ExamApproval::where('exam_candidate_id', $candidate->id)->latest()->first();
 
-        return view('backend.exam.show', compact('candidate', 'entries', 'result', 'approval'));
+        // fetch worker entry if already promoted (match by nid / id card)
+        $worker = WorkerEntry::where('id_card_no', $candidate->nid)->latest()->first();
+
+        return view('backend.exam.show', compact('candidate', 'entries', 'result', 'approval', 'worker'));
     }
 
     public function requestAddToWorker(Request $request, ExamCandidate $candidate)
@@ -568,7 +571,9 @@ class ExamController extends Controller
 
         // Fix validation rules
         $validationRules = [
-            'type' => 'required|in:agreed,negotiation',
+            'type' => 'required|in:agreed,negotiation,Special_Case_salary',
+            'floor' => 'required|string|max:191',
+            'line' => 'required|string|max:191',
         ];
 
         if ($request->type === 'negotiation') {
@@ -577,6 +582,9 @@ class ExamController extends Controller
                 $rule .= '|max:' . $maxNegotiated;
             }
             $validationRules['requested_salary'] = $rule;
+        } elseif ($request->type === 'Special_Case_salary') {
+            $validationRules['Special_Case_salary'] = 'required|numeric|min:0';
+            $validationRules['Special_Case_reason'] = 'required|string|max:255';
         } else {
             $validationRules['hidden_requested_salary'] = 'required|numeric|min:0';
         }
@@ -588,8 +596,10 @@ class ExamController extends Controller
         // Determine requested salary based on type
         if ($request->type === 'agreed') {
             $requestedSalary = $request->hidden_requested_salary;
-        } else {
+        } elseif ($request->type === 'negotiation') {
             $requestedSalary = $request->requested_salary;
+        } else {
+            $requestedSalary = $request->Special_Case_salary;
         }
 
         // Normalize requested salary: handle arrays/objects safely and coerce to float
@@ -622,26 +632,42 @@ class ExamController extends Controller
             'requested_salary' => $requestedSalary,
             'type' => $request->type,
             'status' => 'pending',
+            'floor' => $request->floor,
+            'line' => $request->line,
+            'special_case_salary' => $request->type === 'Special_Case_salary' ? $requestedSalary : null,
+            'special_case_reason' => $request->type === 'Special_Case_salary' ? $request->Special_Case_reason : null,
         ]);
 
         // Notify approvers based on approver_roles and approver_users tables
         $approverRoleIds = \App\Models\ApproverRole::pluck('role_id')->toArray();
         $approverUserIds = \App\Models\ApproverUser::pluck('user_id')->toArray();
 
-        $query = \App\Models\User::query();
-        $query->where(function ($q) use ($approverRoleIds, $approverUserIds) {
-            if (!empty($approverRoleIds)) {
-                $q->orWhereIn('role_id', $approverRoleIds);
-            }
-            if (!empty($approverUserIds)) {
-                $q->orWhereIn('id', $approverUserIds);
-            }
-        });
+        // For Special Case salary, restrict to GM, HR, or Admin roles only
+        if ($request->type === 'Special_Case_salary') {
+            $query = \App\Models\User::query();
+            $query->where(function ($q) {
+                // HR role (role_id == 4), Admin, or GM
+                $q->where('role_id', 4)
+                  ->orWhereHas('role', function ($r) {
+                      $r->whereRaw('LOWER(name) IN (?, ?)', ['gm', 'admin']);
+                  });
+            });
+        } else {
+            $query = \App\Models\User::query();
+            $query->where(function ($q) use ($approverRoleIds, $approverUserIds) {
+                if (!empty($approverRoleIds)) {
+                    $q->orWhereIn('role_id', $approverRoleIds);
+                }
+                if (!empty($approverUserIds)) {
+                    $q->orWhereIn('id', $approverUserIds);
+                }
+            });
+        }
 
-        // fallback: include HR role (role_id == 4) and any GM role users to ensure there's at least some approver
+        // fallback: include HR role (role_id == 4) and any GM/Admin role users to ensure there's at least some approver
         $fallback = \App\Models\User::where(function ($q) {
             $q->where('role_id', 4)->orWhereHas('role', function ($r) {
-                $r->whereRaw('LOWER(name)=?', ['gm']);
+                $r->whereRaw('LOWER(name) IN (?, ?)', ['gm', 'admin']);
             });
         });
 
@@ -851,6 +877,8 @@ class ExamController extends Controller
             'examination_date' => $candidate->examination_date ?? now()->format('Y-m-d'),
             'present_grade' => $candidate->result_data['grade'] ?? null,
             'recomanded_grade' => $candidate->result_data['grade'] ?? null,
+            'floor' => $approval->floor,
+            'line' => $approval->line,
         ];
 
         if ($salaryToSet !== null) {

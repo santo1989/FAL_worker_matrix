@@ -20,7 +20,7 @@
         <form action="{{ route('exam.store') }}" method="post">
             @csrf
             <div class="form-group">
-                <label>NID</label>
+                <label>NID / Birth Registration Number</label>
                 <input name="nid" class="form-control" required />
             </div>
             <div class="form-group">

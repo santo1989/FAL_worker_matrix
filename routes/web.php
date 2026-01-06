@@ -171,6 +171,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/worker-entries/upload-excel', [WorkerEntryController::class, 'showUploadForm'])->name('workerEntries.uploadForm');
     Route::post('/worker-entries/upload-excel', [WorkerEntryController::class, 'uploadExcel'])->name('workerEntries.uploadExcel');
 
+    //printPage
+    Route::get('/printPage/{workerEntry}', [WorkerEntryController::class, 'printPage'])->name('printPage');
+
     //training development
     Route::get('/training_development', [WorkerEntryController::class, 'training_development'])->name('training_development');
     Route::post('/training_development', [WorkerEntryController::class, 'training_development_store'])->name('training_development_store');

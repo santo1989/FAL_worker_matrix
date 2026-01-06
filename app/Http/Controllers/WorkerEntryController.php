@@ -1846,4 +1846,28 @@ class WorkerEntryController extends Controller
             return null;
         }
     }
+
+    public function printPage(WorkerEntry $workerEntry)
+    {
+        $workerEntry = WorkerEntry::find($workerEntry->id);
+        //only show the data which smv, sewing_process_avg_cycles, capacity, self_production,achive_production is not null
+        $sewingProcessEntries = WorkerSewingProcessEntry::where('worker_entry_id', $workerEntry->id)
+            ->whereNotNull('smv')
+            ->whereNotNull('sewing_process_avg_cycles')
+            ->whereNotNull('capacity')
+            // ->whereNotNull('self_production')
+            // ->whereNotNull('achive_production')
+            ->get();
+
+        $curiosity_to_lern = WorkerSewingProcessEntry::where('worker_entry_id', $workerEntry->id)->whereNull('smv')
+            ->whereNull('sewing_process_avg_cycles')
+            ->whereNull('capacity')
+            ->whereNull('self_production')
+            ->whereNull('achive_production')
+            ->get();
+
+        $cycleListLogs = CycleListLog::where('worker_entry_id', $workerEntry->id)->get();
+        // dd($cycleListLogs, $sewingProcessEntries);
+        return view('backend.library.dataEntry.printPage', compact('workerEntry', 'sewingProcessEntries', 'curiosity_to_lern', 'cycleListLogs'));
+    }
 }

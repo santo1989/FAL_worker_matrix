@@ -14,6 +14,8 @@
     @endcan
     <x-backend.form.anchor :href="route('workerEntries.show', $workerEntry)" type="show" />
     <x-backend.form.anchor :href="route('workerEntries.approval', $workerEntry)" type="Download" />
+    <!--printPage-->
+    <x-backend.form.anchor :href="route('printPage', $workerEntry)" type="PrintPage" />
     @can('General')
         <a href="{{ route('cyclesData_entry_form', ['workerEntry' => $workerEntry->id]) }}"
             class="btn btn-outline-success my-1 mx-1 btn-sm">

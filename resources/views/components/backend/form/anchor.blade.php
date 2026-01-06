@@ -18,6 +18,14 @@
             $buttonClass = 'btn btn-sm btn-outline-info';
             $iconClass = 'bi bi-eye';
             break;
+        case 'Download':
+            $buttonClass = 'btn btn-sm btn-outline-primary';
+            $iconClass = 'bi bi-download';
+            break;
+        case 'PrintPage':
+            $buttonClass = 'btn btn-sm btn-outline-dark';
+            $iconClass = 'bi bi-printer';
+            break;
         default:
             $buttonClass = 'btn btn-sm btn-outline-warning';
             $iconClass = 'bi bi-save';

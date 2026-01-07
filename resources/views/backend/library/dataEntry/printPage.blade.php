@@ -84,19 +84,19 @@
                                 {{ \Carbon\Carbon::parse($workerEntry->examination_date)->format('d-M-Y') ?? 'No Data Found' }}
                             </td>
                             <th>Joining Date</th>
-                            <td>{{ \Carbon\Carbon::parse($workerEntry->joining_date)->format('d-M-Y') ?? 'No Data Found' }}
+                            <td>
                             </td>
-                            
+
                         </tr>
-                       
+
                         <tr>
                             <th>Operator Name</th>
                             <td>{{ $workerEntry->employee_name_english ?? 'No Data Found' }}</td>
                             <th>ID No / NID / Birth Reg No</th>
                             <td>{{ $workerEntry->id_card_no ?? 'No Data Found' }}</td>
-                            
+
                         </tr>
- <tr>
+                        <tr>
                             <th>Floor</th>
                             <td>
                                 {{ $workerEntry->floor ?? 'No Data Found' }}
@@ -111,27 +111,28 @@
                             <td> </td>
                         </tr>
 
-                       
 
-                        
-                        
-                        
-                         <!--4. present address
+
+
+
+
+                        <!--4. present address
 5. permanent address-->
                         <tr>
                             <th>Present Address</th>
                             <td></td>
-                            </tr>
+                        </tr>
                         <tr></tr>
-                            <th>Permanent Address</th>
-                            <td></td>
+                        <th>Permanent Address</th>
+                        <td></td>
                         </tr>
                         <tr>
                             <th>Grade</th>
                             <td class="text-bold">{{ $workerEntry->recomanded_grade ?? ' ' }}</td>
-                            
-                             <th>Salary</th>
-                            <td class="text-bold">{{ number_format($workerEntry->recomanded_salary, decimals: 0) }} TK</td>
+
+                            <th>Salary</th>
+                            <td class="text-bold">{{ number_format($workerEntry->recomanded_salary, decimals: 0) }} TK
+                            </td>
 
                         </tr>
                         </tr>

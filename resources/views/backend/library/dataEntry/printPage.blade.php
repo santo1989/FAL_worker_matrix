@@ -49,12 +49,12 @@
 
 </head>
 
-<body class="sb-nav-fixed">
+<body>
 
-    <section class="container pt-3" id="printableArea">
-        <div class="col-md-12 text-center">
+    <section class="container pb-2 pt-2" id="printableArea">
+         
             <!-- card  1 start -->
-            <div class="card mb-6">
+            <div class="card mt-1">
                 <div class="card-body">
                     <div class="row">
 
@@ -71,10 +71,10 @@
                     </div>
                 </div>
             </div>
-        </div>
+         
         <h5 class="text-center text-bold">Operator Assessment Sheet</h5>
 
-        <section class="content pb-3">
+        <section class="content pb-2 pt-2">
             <div class="card mt-1">
                 <div class="card-body">
                     <table class="table table-borderless ">
@@ -104,27 +104,33 @@
                             <th>Line</th>
                             <td>{{ $workerEntry->line ?? 'No Data Found' }}</td>
                         </tr>
-                        <tr>
+                        <tr rowspan="6">
                             <th>Father Name</th>
-                            <td> </td>
+                            <td> 
+
+                            </td>
+                            
+                        </tr>
+                        <tr rowspan="6">
                             <th>Husband Name</th>
-                            <td> </td>
+                            <td>
+
+                            </td>
                         </tr>
-
-
-
-
-
-
-                        <!--4. present address
-5. permanent address-->
-                        <tr>
+                        <tr rowspan="12">
                             <th>Present Address</th>
-                            <td></td>
+                            <td style="height:180px;">
+                                <!--give 5 rows space-->
+
+
+                            </td>
                         </tr>
-                        <tr></tr>
+                        <tr rowspan="12">
                         <th>Permanent Address</th>
-                        <td></td>
+                        <!--give 5 rows space-->
+                        <td style="height:180px;">
+
+                        </td>
                         </tr>
                         <tr>
                             <th>Grade</th>
@@ -143,7 +149,7 @@
         </section>
 
         <section class="content">
-            <table class="table table-bordered table-hover pb-2">
+            <table class="table table-bordered table-hover pb-2 pt-2">
                 <thead>
                     <tr>
                         <th scope="col">#</th>
@@ -188,7 +194,7 @@
 
         </section>
         <!-- hr section -->
-        <section class="content pt-2">
+        <section class="content pb-2 pt-2">
 
 
             <div class="row pb-1 pt-3">

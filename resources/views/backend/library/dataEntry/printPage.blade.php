@@ -52,26 +52,26 @@
 <body>
 
     <section class="container pb-2 pt-2" id="printableArea">
-         
-            <!-- card  1 start -->
-            <div class="card mt-1">
-                <div class="card-body">
-                    <div class="row">
 
-                        <div class="col-sm-4 text-right">
-                            <img src="{{ asset('images/assets/logo.png') }}" class="rounded-circle" width="150"
-                                alt="{{ $workerEntry->name }}">
-                        </div>
-                        <div class="col-sm-8 text-left">
-                            <h1 class="text-dark text-bold">Fashion Asia Limited (FAL)</h1><br>
-                            <h6 style="font-size:0.7rem;">Holding No 4/2 A, Plot 49 &
-                                57
-                                135 Gopalpur Munnu Nagar, Tongi, Gazipur Bangladesh</h6>
-                        </div>
+        <!-- card  1 start -->
+        <div class="card mt-1">
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-sm-4 text-right">
+                        <img src="{{ asset('images/assets/logo.png') }}" class="rounded-circle" width="150"
+                            alt="{{ $workerEntry->name }}">
+                    </div>
+                    <div class="col-sm-8 text-left">
+                        <h1 class="text-dark text-bold">Fashion Asia Limited (FAL)</h1><br>
+                        <h6 style="font-size:0.7rem;">Holding No 4/2 A, Plot 49 &
+                            57
+                            135 Gopalpur Munnu Nagar, Tongi, Gazipur Bangladesh</h6>
                     </div>
                 </div>
             </div>
-         
+        </div>
+
         <h5 class="text-center text-bold">Operator Assessment Sheet</h5>
 
         <section class="content pb-2 pt-2">
@@ -104,12 +104,19 @@
                             <th>Line</th>
                             <td>{{ $workerEntry->line ?? 'No Data Found' }}</td>
                         </tr>
+                        <tr>
+                            <th>Designation</th>
+                            <td>{{ $workerEntry->designation_name ?? ' ' }}</td>
+                            <th>Mobile</th>
+                            <td>{{ $workerEntry->mobile ?? ' ' }}</td>
+                        </tr>
+
                         <tr rowspan="6">
                             <th>Father Name</th>
-                            <td> 
+                            <td>
 
                             </td>
-                            
+
                         </tr>
                         <tr rowspan="6">
                             <th>Husband Name</th>
@@ -126,11 +133,11 @@
                             </td>
                         </tr>
                         <tr rowspan="12">
-                        <th>Permanent Address</th>
-                        <!--give 5 rows space-->
-                        <td style="height:180px;">
+                            <th>Permanent Address</th>
+                            <!--give 5 rows space-->
+                            <td style="height:180px;">
 
-                        </td>
+                            </td>
                         </tr>
                         <tr>
                             <th>Grade</th>

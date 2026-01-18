@@ -430,7 +430,7 @@
                                     <label class="form-check-label" for="type_Special_Case_salary">Special Case
                                         Salary</label>
                                 </div>
-                                 <!-- Disagree Case for no approval need and Promote to Worker Button not show, shows red dissagree with max salary badge  -->
+                                <!-- Disagree Case for no approval need and Promote to Worker Button not show, shows red dissagree with max salary badge  -->
                             </div>
                         </div>
 
@@ -471,7 +471,8 @@
                             <label for="Special_Case_salary" class="form-label">Special Case Salary (TK)</label>
                             <input type="number" step="0.01" class="form-control" name="Special_Case_salary"
                                 id="Special_Case_salary" placeholder="Enter Special Case salary">
-                            <label for="Special_Case_reason" class="form-label mt-2">Reason for Special Case Salary</label>
+                            <label for="Special_Case_reason" class="form-label mt-2">Reason for Special Case
+                                Salary</label>
                             <input type="text" class="form-control mt-2" name="Special_Case_reason"
                                 id="Special_Case_reason" placeholder="Enter reason for Special Case salary">
                         </div>
@@ -498,7 +499,7 @@
             const specialCase = document.getElementById('type_Special_Case_salary');
             const specialCaseWrapper = document.getElementById('Special_Case_input_wrapper');
             const specialCaseInput = document.getElementById('Special_Case_salary');
-            
+
 
             function toggle() {
                 if (neg.checked) {

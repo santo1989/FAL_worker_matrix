@@ -192,7 +192,9 @@
                                                     class="btn btn-sm btn-secondary">Show</a>
                                                 <span class="badge bg-danger ms-2">Disagreed
                                                     @php
-                                                        $maxSalary = $approval->requested_salary ?? $approval->recommended_salary ?? 'N/A';
+                                                        $maxSalary =
+                                                            $approval->requested_salary ??
+                                                            ($approval->recommended_salary ?? 'N/A');
                                                     @endphp
                                                     (Max Salary: {{ $maxSalary }} TK)</span>
                                             @elseif (!$cand->exam_passed)
@@ -238,8 +240,7 @@
                                                                 <h5 class="modal-title" id="promoteModalLabel">Promote
                                                                     {{ $cand->name }} to Worker</h5>
                                                                 <button type="button" class="btn-close"
-                                                                    data-bs-dismiss="modal"
-                                                                    aria-label="Close"></button>
+                                                                    data-bs-dismiss="modal" aria-label="Close"></button>
                                                             </div>
                                                             <form method="POST"
                                                                 action="{{ route('exam.request_add_to_worker', $cand->id) }}">
@@ -296,31 +297,49 @@
                                                                         {{ $cand->result_data['grade'] }}</p>
                                                                     <p><strong>Recommended Salary:</strong>
                                                                         {{ $modalRecDisplay }} TK</p>
-                                                                   
-                                                                       <div class="form-group col-md-6 col-sm-12">
-                        <label for="floor_{{ $cand->id }}">Floor</label>
-                        @php
-                            $selectedFloor = optional($worker)->floor;
-                        @endphp
-                        <select name="floor" id="floor_{{ $cand->id }}" class="form-control" required>
-                            <option value="">Select Floor</option>
-                            <option value="1st Floor" {{ $selectedFloor === '1st Floor' ? 'selected' : '' }}>1st Floor</option>
-                            <option value="2nd Floor" {{ $selectedFloor === '2nd Floor' ? 'selected' : '' }}>2nd Floor</option>
-                            <option value="3rd Floor" {{ $selectedFloor === '3rd Floor' ? 'selected' : '' }}>3rd Floor</option>
-                            <option value="4th Floor" {{ $selectedFloor === '4th Floor' ? 'selected' : '' }}>4th Floor</option>
-                            <option value="5th Floor" {{ $selectedFloor === '5th Floor' ? 'selected' : '' }}>5th Floor</option>
-                        </select>
 
-                    </div>
-                    <br>
-                    <!-- line -->
-                    <div class="form-group col-md-6 col-sm-12">
-                        <label for="line_{{ $cand->id }}">Line</label>
-                        <input type="text" name="line" id="line_{{ $cand->id }}" class="form-control" required
-                            placeholder="Enter Line" value="{{ optional($worker)->line ?? '' }}">
-                    </div>
-                    <br>
-                                                                    
+                                                                    <div class="form-group col-md-6 col-sm-12">
+                                                                        <label
+                                                                            for="floor_{{ $cand->id }}">Floor</label>
+                                                                        @php
+                                                                            $selectedFloor = optional($worker)->floor;
+                                                                        @endphp
+                                                                        <select name="floor"
+                                                                            id="floor_{{ $cand->id }}"
+                                                                            class="form-control" required>
+                                                                            <option value="">Select Floor
+                                                                            </option>
+                                                                            <option value="1st Floor"
+                                                                                {{ $selectedFloor === '1st Floor' ? 'selected' : '' }}>
+                                                                                1st Floor</option>
+                                                                            <option value="2nd Floor"
+                                                                                {{ $selectedFloor === '2nd Floor' ? 'selected' : '' }}>
+                                                                                2nd Floor</option>
+                                                                            <option value="3rd Floor"
+                                                                                {{ $selectedFloor === '3rd Floor' ? 'selected' : '' }}>
+                                                                                3rd Floor</option>
+                                                                            <option value="4th Floor"
+                                                                                {{ $selectedFloor === '4th Floor' ? 'selected' : '' }}>
+                                                                                4th Floor</option>
+                                                                            <option value="5th Floor"
+                                                                                {{ $selectedFloor === '5th Floor' ? 'selected' : '' }}>
+                                                                                5th Floor</option>
+                                                                        </select>
+
+                                                                    </div>
+                                                                    <br>
+                                                                    <!-- line -->
+                                                                    <div class="form-group col-md-6 col-sm-12">
+                                                                        <label
+                                                                            for="line_{{ $cand->id }}">Line</label>
+                                                                        <input type="text" name="line"
+                                                                            id="line_{{ $cand->id }}"
+                                                                            class="form-control" required
+                                                                            placeholder="Enter Line"
+                                                                            value="{{ optional($worker)->line ?? '' }}">
+                                                                    </div>
+                                                                    <br>
+
 
                                                                     <div class="mb-3">
                                                                         <label class="form-label">Choose action</label>

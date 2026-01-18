@@ -38,7 +38,8 @@
                 </div>
                 <div class="col-auto">
                     <button type="submit" class="btn btn-sm btn-outline-primary">Filter</button>
-                    <a href="{{ route('exam.approvals.index') }}" class="btn btn-sm btn-outline-secondary ms-1">Reset</a>
+                    <a href="{{ route('exam.approvals.index') }}"
+                        class="btn btn-sm btn-outline-secondary ms-1">Reset</a>
                 </div>
             </form>
 
@@ -104,7 +105,8 @@
                                             if ($salaryRecommended === null) {
                                                 $resultData = $a->candidate->result_data ?? null;
                                                 $salaryCandidate =
-                                                    is_array($resultData) && array_key_exists('salary_range', $resultData)
+                                                    is_array($resultData) &&
+                                                    array_key_exists('salary_range', $resultData)
                                                         ? $resultData['salary_range']
                                                         : null;
                                                 $salaryRecommended = $salaryCandidate;
@@ -197,7 +199,10 @@
                                     <td>
                                         @php
                                             $approvedAt = $a->approved_at;
-                                            if (is_object($approvedAt) && method_exists($approvedAt, 'toDateTimeString')) {
+                                            if (
+                                                is_object($approvedAt) &&
+                                                method_exists($approvedAt, 'toDateTimeString')
+                                            ) {
                                                 $approvedAt = $approvedAt->toDateTimeString();
                                             } elseif (is_array($approvedAt)) {
                                                 $approvedAt = json_encode($approvedAt);

@@ -27,8 +27,18 @@
                         </option>
                     </select>
                 </div>
+                <!--date range filter-->
                 <div class="col-auto">
-                    <button class="btn btn-sm btn-outline-primary">Filter</button>
+                    <input type="date" name="from_date" class="form-control form-control-sm"
+                        value="{{ request('from_date') }}" placeholder="From Date">
+                </div>
+                <div class="col-auto">
+                    <input type="date" name="to_date" class="form-control form-control-sm"
+                        value="{{ request('to_date') }}" placeholder="To Date">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-sm btn-outline-primary">Filter</button>
+                    <a href="{{ route('exam.approvals.index') }}" class="btn btn-sm btn-outline-secondary ms-1">Reset</a>
                 </div>
             </form>
 
@@ -59,6 +69,7 @@
                                 <th>#</th>
                                 <th>Candidate</th>
                                 <th>Type</th>
+                                <th>Recommended Salary</th>
                                 <th>Requested Salary</th>
                                 <th>Status</th>
                                 <th>Requested By</th>
@@ -87,6 +98,36 @@
                                             - {{ $a->candidate->name ?? 'N/A' }}</a>
                                     </td>
                                     <td>{{ ucfirst($a->type) }}</td>
+                                    <td>
+                                        @php
+                                            $salaryRecommended = $a->recommended_salary ?? null;
+                                            if ($salaryRecommended === null) {
+                                                $resultData = $a->candidate->result_data ?? null;
+                                                $salaryCandidate =
+                                                    is_array($resultData) && array_key_exists('salary_range', $resultData)
+                                                        ? $resultData['salary_range']
+                                                        : null;
+                                                $salaryRecommended = $salaryCandidate;
+                                            }
+
+                                            if (is_array($salaryRecommended)) {
+                                                $nums = array_values(array_filter($salaryRecommended, 'is_numeric'));
+                                                if (count($nums) === 2) {
+                                                    $salaryRecommended = $nums[0] . ' - ' . $nums[1];
+                                                } elseif (count($nums) > 0) {
+                                                    $salaryRecommended = round(array_sum($nums) / count($nums), 2);
+                                                } else {
+                                                    $salaryRecommended = json_encode($salaryRecommended);
+                                                }
+                                            }
+
+                                            // make sure it's a string for safe echo
+                                            if (is_array($salaryRecommended) || is_object($salaryRecommended)) {
+                                                $salaryRecommended = json_encode($salaryRecommended);
+                                            }
+                                        @endphp
+                                        {{ $salaryRecommended ?? 'N/A' }}
+                                    </td>
                                     @php
                                         $salarySource = $a->requested_salary ?? null;
                                         if ($salarySource === null) {

@@ -166,7 +166,8 @@
                                                     ->latest()
                                                     ->first();
                                                 $isPromoted = $approval && $approval->status === 'approved';
-                                                $canPromote = $cand->exam_passed && !$isPromoted;
+                                                $isDisagreed = $approval && $approval->type === 'disagree';
+                                                $canPromote = $cand->exam_passed && !$isPromoted && !$isDisagreed;
 
                                                 // find worker entry if already promoted (match by id_card_no -> nid)
                                                 $worker = null;
@@ -186,6 +187,14 @@
                                                 @else
                                                     <span class="badge bg-success ms-2">Promoted</span>
                                                 @endif
+                                            @elseif ($isDisagreed)
+                                                <a href="{{ route('exam.show', $cand->id) }}"
+                                                    class="btn btn-sm btn-secondary">Show</a>
+                                                <span class="badge bg-danger ms-2">Disagreed
+                                                    @php
+                                                        $maxSalary = $approval->requested_salary ?? $approval->recommended_salary ?? 'N/A';
+                                                    @endphp
+                                                    (Max Salary: {{ $maxSalary }} TK)</span>
                                             @elseif (!$cand->exam_passed)
                                                 <a href="{{ route('exam.show', $cand->id) }}"
                                                     class="btn btn-sm btn-secondary">Show</a>
@@ -345,6 +354,15 @@
                                                                                 <label class="form-check-label"
                                                                                     for="type_Special_Case_salary_{{ $cand->id }}">Special
                                                                                     Case Salary</label>
+                                                                            </div>
+                                                                            <!-- Disagree Case for no approval need and Promote to Worker Button not show, shows red dissagree with max salary badge  -->
+                                                                            <div class="form-check form-check-inline">
+                                                                                <input class="form-check-input"
+                                                                                    type="radio" name="type"
+                                                                                    id="type_disagree_{{ $cand->id }}"
+                                                                                    value="disagree">
+                                                                                <label class="form-check-label"
+                                                                                    for="type_disagree_{{ $cand->id }}">Disagree</label>
                                                                             </div>
 
                                                                         </div>

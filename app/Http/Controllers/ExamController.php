@@ -571,7 +571,7 @@ class ExamController extends Controller
 
         // Fix validation rules
         $validationRules = [
-            'type' => 'required|in:agreed,negotiation,Special_Case_salary',
+            'type' => 'required|in:agreed,negotiation,Special_Case_salary,disagree',
             'floor' => 'required|string|max:191',
             'line' => 'required|string|max:191',
         ];
@@ -585,6 +585,8 @@ class ExamController extends Controller
         } elseif ($request->type === 'Special_Case_salary') {
             $validationRules['Special_Case_salary'] = 'required|numeric|min:0';
             $validationRules['Special_Case_reason'] = 'required|string|max:255';
+        } elseif ($request->type === 'disagree') {
+            // Disagree case: no additional validation needed
         } else {
             $validationRules['hidden_requested_salary'] = 'required|numeric|min:0';
         }
@@ -598,6 +600,9 @@ class ExamController extends Controller
             $requestedSalary = $request->hidden_requested_salary;
         } elseif ($request->type === 'negotiation') {
             $requestedSalary = $request->requested_salary;
+        } elseif ($request->type === 'disagree') {
+            // For disagree, use the max negotiated salary or recommended salary
+            $requestedSalary = $maxNegotiated ?? $recommendedNumeric ?? 0;
         } else {
             $requestedSalary = $request->Special_Case_salary;
         }
@@ -626,6 +631,23 @@ class ExamController extends Controller
             return redirect()->back()->with('error', 'There is already a pending approval for this candidate.');
         }
 
+        // For disagree type, create a rejected approval record without notification
+        if ($request->type === 'disagree') {
+            $approval = ExamApproval::create([
+                'exam_candidate_id' => $candidate->id,
+                'requested_by' => Auth::id(),
+                'requested_salary' => $requestedSalary,
+                'type' => $request->type,
+                'status' => 'rejected',
+                'floor' => $request->floor,
+                'line' => $request->line,
+                'approved_by' => Auth::id(),
+                'approved_at' => now(),
+            ]);
+
+            return redirect()->back()->with('success', 'Candidate marked as disagreed.');
+        }
+
         $approval = ExamApproval::create([
             'exam_candidate_id' => $candidate->id,
             'requested_by' => Auth::id(),
@@ -648,9 +670,9 @@ class ExamController extends Controller
             $query->where(function ($q) {
                 // HR role (role_id == 4), Admin, or GM
                 $q->where('role_id', 4)
-                  ->orWhereHas('role', function ($r) {
-                      $r->whereRaw('LOWER(name) IN (?, ?)', ['gm', 'admin']);
-                  });
+                    ->orWhereHas('role', function ($r) {
+                        $r->whereRaw('LOWER(name) IN (?, ?)', ['gm', 'admin']);
+                    });
             });
         } else {
             $query = \App\Models\User::query();
@@ -745,6 +767,14 @@ class ExamController extends Controller
 
         if ($status = $request->input('status')) {
             $q->where('status', $status);
+        }
+
+        if ($fromDate = $request->input('from_date')) {
+            $q->whereDate('created_at', '>=', $fromDate);
+        }
+
+        if ($toDate = $request->input('to_date')) {
+            $q->whereDate('created_at', '<=', $toDate);
         }
 
         $approvals = $q->paginate(50)->appends($request->query());

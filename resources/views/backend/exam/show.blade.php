@@ -430,6 +430,7 @@
                                     <label class="form-check-label" for="type_Special_Case_salary">Special Case
                                         Salary</label>
                                 </div>
+                                 <!-- Disagree Case for no approval need and Promote to Worker Button not show, shows red dissagree with max salary badge  -->
                             </div>
                         </div>
 

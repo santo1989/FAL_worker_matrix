@@ -834,8 +834,15 @@ class ExamController extends Controller
                     'approved_at' => now(),
                 ]);
 
-                // notify requester
-                $approval->requester && $approval->requester->notify(new \App\Notifications\ApprovalProcessedNotification($approval));
+                // notify requester (defensive: don't let notification errors break the batch)
+                try {
+                    if ($approval->requester) {
+                        $approval->requester->notify(new \App\Notifications\ApprovalProcessedNotification($approval));
+                    }
+                } catch (\Throwable $e) {
+                    // log and continue
+                    Log::warning('ApprovalProcessedNotification failed: ' . $e->getMessage(), ['approval_id' => $approval->id]);
+                }
             }
         });
 

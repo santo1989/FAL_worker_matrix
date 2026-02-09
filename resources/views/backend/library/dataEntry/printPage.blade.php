@@ -81,7 +81,7 @@
                         <tr>
                             <th>Assessment Date</th>
                             <td>
-                                {{ \Carbon\Carbon::parse($workerEntry->examination_date)->format('d-M-Y') ?? 'No Data Found' }}
+                                {{ \Carbon\Carbon::parse($workerEntry->examination_date)->format('d-M-Y') ?? ' ' }}
                             </td>
                             <th>Joining Date</th>
                             <td>
@@ -91,18 +91,23 @@
 
                         <tr>
                             <th>Operator Name</th>
-                            <td>{{ $workerEntry->employee_name_english ?? 'No Data Found' }}</td>
+                            <td>{{ $workerEntry->employee_name_english ?? ' ' }}</td>
                             <th>ID No / NID / Birth Reg No</th>
-                            <td>{{ $workerEntry->id_card_no ?? 'No Data Found' }}</td>
+                            <td>
+                                {{ $workerEntry->id_card_no ?? ' ' }}
+                                @if(!empty($workerEntry->nid))
+                                    / {{ $workerEntry->nid }}
+                                @endif
+                            </td>
 
                         </tr>
                         <tr>
                             <th>Floor</th>
                             <td>
-                                {{ $workerEntry->floor ?? 'No Data Found' }}
+                                {{ $workerEntry->floor ?? ' ' }}
                             </td>
                             <th>Line</th>
-                            <td>{{ $workerEntry->line ?? 'No Data Found' }}</td>
+                            <td>{{ $workerEntry->line ?? ' ' }}</td>
                         </tr>
                         <tr>
                             <th>Designation</th>
@@ -114,29 +119,26 @@
                         <tr rowspan="6">
                             <th>Father Name</th>
                             <td>
-
+                                <span id="print_father_name">{{ $workerEntry->father_name ?? ' ' }}</span>
                             </td>
 
                         </tr>
                         <tr rowspan="6">
                             <th>Husband Name</th>
                             <td>
-
+                                <span id="print_husband_name">{{ $workerEntry->husband_name ?? ' ' }}</span>
                             </td>
                         </tr>
-                        <tr rowspan="12">
+                        <tr>
                             <th>Present Address</th>
-                            <td style="height:180px;">
-                                <!--give 5 rows space-->
-
-
+                            <td colspan="3">
+                                <span id="print_present_address">{{ $workerEntry->present_address ?? ' ' }}</span>
                             </td>
                         </tr>
-                        <tr rowspan="12">
+                        <tr>
                             <th>Permanent Address</th>
-                            <!--give 5 rows space-->
-                            <td style="height:180px;">
-
+                            <td colspan="3">
+                                <span id="print_permanent_address">{{ $workerEntry->permanent_address ?? ' ' }}</span>
                             </td>
                         </tr>
                         <tr>
@@ -174,24 +176,24 @@
                         <tr>
                             <td>{{ ++$i }}</td>
                             <td>
-                                {{ ucwords($sewingProcessEntry->sewing_process_type) ?? 'No Data Found' }} :
-                                {{ ucwords($sewingProcessEntry->sewing_process_name) ?? 'No Data Found' }}
+                                {{ ucwords($sewingProcessEntry->sewing_process_type) ?? ' ' }} :
+                                {{ ucwords($sewingProcessEntry->sewing_process_name) ?? ' ' }}
                             </td>
                             <td>
-                                {{ isset($sewingProcessEntry->smv) ? number_format($sewingProcessEntry->smv, 2) : 'No Data Found' }}
+                                {{ isset($sewingProcessEntry->smv) ? number_format($sewingProcessEntry->smv, 2) : ' ' }}
                             </td>
                             <td>
-                                {{ number_format($sewingProcessEntry->target, 0) ?? 'No Data Found' }}
+                                {{ number_format($sewingProcessEntry->target, 0) ?? ' ' }}
                             </td>
 
                             <td>
-                                {{ isset($sewingProcessEntry->sewing_process_avg_cycles) ? number_format($sewingProcessEntry->sewing_process_avg_cycles, 2) : 'No Data Found' }}
+                                {{ isset($sewingProcessEntry->sewing_process_avg_cycles) ? number_format($sewingProcessEntry->sewing_process_avg_cycles, 2) : ' ' }}
                             </td>
                             <td>
-                                {{ number_format($sewingProcessEntry->capacity, 0) ?? 'No Data Found' }}
+                                {{ number_format($sewingProcessEntry->capacity, 0) ?? ' ' }}
                             </td>
                             <td>
-                                {{ isset($sewingProcessEntry->efficiency) ? number_format($sewingProcessEntry->efficiency, 2) : 'No Data Found' }}
+                                {{ isset($sewingProcessEntry->efficiency) ? number_format($sewingProcessEntry->efficiency, 2) : ' ' }}
                                 %
                             </td>
                         </tr>
@@ -249,10 +251,66 @@
     <section class="content pt-4 pb-3">
         <div class="text-center">
             <a href="{{ route('workerEntries.index') }}" class="btn btn-outline-secondary btn-sm">Back</a>
+            @if (Auth::user()->role && (Auth::user()->role->name == 'HR' || Auth::user()->role->name == 'Admin'))
+                <button type="button" class="btn btn-outline-primary btn-sm no-print" data-toggle="modal"
+                    data-target="#personalInfoModal">
+                    Update Personal Info
+                </button>
+            @endif
             <input class="btn btn-outline-secondary btn-sm" type="button" onclick="printDiv('printableArea')"
                 value="Print" />
         </div>
     </section>
+
+    @if (Auth::user()->role && (Auth::user()->role->name == 'HR' || Auth::user()->role->name == 'Admin'))
+        <div class="modal fade" id="personalInfoModal" tabindex="-1" role="dialog"
+            aria-labelledby="personalInfoModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <form id="personalInfoForm">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="personalInfoModalLabel">Update Personal Information</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-row">
+                                <div class="form-group col-md-6 col-sm-12">
+                                    <label for="modal_father_name">Father Name</label>
+                                    <input type="text" name="father_name" id="modal_father_name" class="form-control"
+                                        placeholder="Enter Father Name">
+                                </div>
+
+                                <div class="form-group col-md-6 col-sm-12">
+                                    <label for="modal_husband_name">Husband Name</label>
+                                    <input type="text" name="husband_name" id="modal_husband_name" class="form-control"
+                                        placeholder="Enter Husband Name">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="modal_present_address">Present Address</label>
+                                <textarea name="present_address" id="modal_present_address" class="form-control" rows="3"
+                                    placeholder="Enter Present Address"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="modal_permanent_address">Permanent Address</label>
+                                <textarea name="permanent_address" id="modal_permanent_address" class="form-control" rows="3"
+                                    placeholder="Enter Permanent Address"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Core theme JS-->
     <script src="{{ asset('ui/backend/js/scripts.js') }}"></script>
 
@@ -288,10 +346,60 @@
             opacity: 0.5;
             font-size: 0.5rem;
         }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+        }
     </style>
 
 </body>
 <script>
+    @if (Auth::user()->role && (Auth::user()->role->name == 'HR' || Auth::user()->role->name == 'Admin'))
+        $('#personalInfoModal').on('show.bs.modal', function() {
+            $('#modal_father_name').val($('#print_father_name').text().trim());
+            $('#modal_husband_name').val($('#print_husband_name').text().trim());
+            $('#modal_present_address').val($('#print_present_address').text().trim());
+            $('#modal_permanent_address').val($('#print_permanent_address').text().trim());
+        });
+
+        $('#personalInfoForm').on('submit', function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: "{{ route('workerEntries.update', ['workerEntry' => $workerEntry->id]) }}",
+                type: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    _method: 'PUT',
+                    father_name: $('#modal_father_name').val(),
+                    husband_name: $('#modal_husband_name').val(),
+                    present_address: $('#modal_present_address').val(),
+                    permanent_address: $('#modal_permanent_address').val()
+                },
+                success: function(response) {
+                    if (response && response.data) {
+                        $('#print_father_name').text(response.data.father_name || ' ');
+                        $('#print_husband_name').text(response.data.husband_name || ' ');
+                        $('#print_present_address').text(response.data.present_address || ' ');
+                        $('#print_permanent_address').text(response.data.permanent_address || ' ');
+                    }
+                    $('#personalInfoModal').modal('hide');
+                    if (window.Swal) {
+                        Swal.fire('Saved', 'Personal information updated.', 'success');
+                    }
+                },
+                error: function(xhr) {
+                    if (window.Swal) {
+                        const message = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Update failed.';
+                        Swal.fire('Error', message, 'error');
+                    }
+                }
+            });
+        });
+    @endif
+
     function printDiv(divName) {
         // Add an event listener for when the page is printed
         window.addEventListener("beforeprint", function() {

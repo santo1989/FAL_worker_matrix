@@ -52,6 +52,19 @@
 
 </head>
 
+<style>
+    .index-page .table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .index-page .table th,
+    .index-page .table td {
+        white-space: nowrap;
+    }
+</style>
+
 <body class="sb-nav-fixed">
 
     <x-backend.layouts.partials.top_bar />
@@ -62,7 +75,7 @@
 
         <div id="layoutSidenav_content">
             <main>
-                <div class="container-fluid px-4">
+                <div class="container-fluid px-4 {{ request()->routeIs('*.index') ? 'index-page' : '' }}">
 
                     {{ $breadCrumb ?? ' ' }}
 

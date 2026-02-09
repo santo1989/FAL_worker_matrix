@@ -439,9 +439,9 @@ class WorkerEntryController extends Controller
         return view('backend.library.dataEntry.old_index', compact('workerEntries', 'search_worker'));
     }
 
-   
 
-     public function create()
+
+    public function create()
     {
         return view('backend.library.dataEntry.create', [
             'worker' => new WorkerEntry(),
@@ -498,6 +498,10 @@ class WorkerEntryController extends Controller
             'salary' => $request->salary,
             'floor' => $request->floor,
             'line' => $request->line,
+            'father_name' => $request->father_name,
+            'husband_name' => $request->husband_name,
+            'present_address' => $request->present_address,
+            'permanent_address' => $request->permanent_address,
         ]);
         return redirect()->route('workerEntrys_process_entry_form', $workerEntry->id);
     }
@@ -770,6 +774,19 @@ class WorkerEntryController extends Controller
             $designation_id = 5;
         }
 
+        $canEditPersonalInfo = Auth::user()->role && in_array(Auth::user()->role->name, ['HR', 'Admin'], true);
+
+        if ($request->ajax() && !$canEditPersonalInfo) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $personalInfoUpdates = $canEditPersonalInfo ? [
+            'father_name' => $request->father_name ?? $workerEntry->father_name,
+            'husband_name' => $request->husband_name ?? $workerEntry->husband_name,
+            'present_address' => $request->present_address ?? $workerEntry->present_address,
+            'permanent_address' => $request->permanent_address ?? $workerEntry->permanent_address,
+        ] : [];
+
         // data Entry by id card
         $workerEntry->update([
             'employee_name_english' => $request->employee_name_english ?? $workerEntry->employee_name_english,
@@ -782,9 +799,20 @@ class WorkerEntryController extends Controller
             'salary' => $request->salary ?? $workerEntry->salary,
             'line' => $request->line ?? $workerEntry->line,
             'floor' => $request->floor ?? $workerEntry->floor,
-            
             'id_card_no' => $request->id_card_no ?? $workerEntry->id_card_no,
-        ]);
+        ] + $personalInfoUpdates);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'father_name' => $workerEntry->father_name,
+                    'husband_name' => $workerEntry->husband_name,
+                    'present_address' => $workerEntry->present_address,
+                    'permanent_address' => $workerEntry->permanent_address,
+                ],
+            ]);
+        }
         return redirect()->route('workerEntrys_process_entry_form', $workerEntry->id);
     }
 
@@ -822,7 +850,7 @@ class WorkerEntryController extends Controller
         return view('backend.library.dataEntry.edit', compact('workerEntry', 'sewingProcessEntries', 'cycleListLogs'));
     }
 
-   
+
 
     public function workerEntrys_process_type_search(Request $request)
     {
@@ -840,7 +868,7 @@ class WorkerEntryController extends Controller
         return view('backend.library.dataEntry.process_entry', compact('workerEntry', 'groupedProcesses'));
     }
 
-  
+
 
     public function calculate_grade($worker_id)
     {
@@ -1340,7 +1368,7 @@ class WorkerEntryController extends Controller
         return view('backend.library.dataEntry.update_grade_list', compact('workerEntries', 'search_worker'));
     }
 
-    
+
 
     private $allowedFields = [
         'worker_entries' => [

@@ -38,11 +38,16 @@
                     <label for="floor">Floor</label>
                     <select name="floor" id="floor" class="form-control" required>
                         <option value="">Select Floor</option>
-                        <option value="1st Floor" {{ $worker->floor == '1st Floor' ? 'selected' : ''}}>1st Floor</option>
-                        <option value="2nd Floor" {{ $worker->floor == '2nd Floor' ? 'selected' : '' }}>2nd Floor</option>
-                        <option value="3rd Floor" {{ $worker->floor == '3rd Floor' ? 'selected' : '' }}>3rd Floor</option>
-                        <option value="4th Floor" {{ $worker->floor == '4th Floor' ? 'selected' : '' }}>4th Floor</option>
-                        <option value="5th Floor" {{ $worker->floor == '5th Floor' ? 'selected' : '' }}>5th Floor</option>
+                        <option value="1st Floor" {{ $worker->floor == '1st Floor' ? 'selected' : '' }}>1st Floor
+                        </option>
+                        <option value="2nd Floor" {{ $worker->floor == '2nd Floor' ? 'selected' : '' }}>2nd Floor
+                        </option>
+                        <option value="3rd Floor" {{ $worker->floor == '3rd Floor' ? 'selected' : '' }}>3rd Floor
+                        </option>
+                        <option value="4th Floor" {{ $worker->floor == '4th Floor' ? 'selected' : '' }}>4th Floor
+                        </option>
+                        <option value="5th Floor" {{ $worker->floor == '5th Floor' ? 'selected' : '' }}>5th Floor
+                        </option>
                     </select>
 
                 </div>
@@ -84,7 +89,7 @@
                     <label for="present_grade">Present Grade</label>
                     <select name="present_grade" id="present_grade" class="form-control" required>
                         <option value="">Select Grade</option>
-                        <option value="D" {{ $worker->present_grade == 'D' ? 'selected' : '' }}>D</option> 
+                        <option value="D" {{ $worker->present_grade == 'D' ? 'selected' : '' }}>D</option>
                         <option value="C" {{ $worker->present_grade == 'C' ? 'selected' : '' }}>C</option>
                         <option value="C+" {{ $worker->present_grade == 'C+' ? 'selected' : '' }}>C+</option>
                         <option value="C++" {{ $worker->present_grade == 'C++' ? 'selected' : '' }}>C++</option>
@@ -100,11 +105,15 @@
                     <label for="designation_name">Designation</label>
                     <select name="designation_name" id="designation_name" class="form-control" required>
                         <option value="">Select Designation</option>
-                        <option value="Line Leader" {{ $worker->designation_name == 'Line Leader' ? 'selected' : '' }}>Line Leader</option>
-                        <option value="JSMO" {{ $worker->designation_name == 'JSMO' ? 'selected' : '' }}>JSMO</option>
-                        <option value="OSMO" {{ $worker->designation_name == 'OSMO' ? 'selected' : '' }}>OSMO</option>
+                        <option value="Line Leader" {{ $worker->designation_name == 'Line Leader' ? 'selected' : '' }}>
+                            Line Leader</option>
+                        <option value="JSMO" {{ $worker->designation_name == 'JSMO' ? 'selected' : '' }}>JSMO
+                        </option>
+                        <option value="OSMO" {{ $worker->designation_name == 'OSMO' ? 'selected' : '' }}>OSMO
+                        </option>
                         <option value="SMO" {{ $worker->designation_name == 'SMO' ? 'selected' : '' }}>SMO</option>
-                        <option value="SSMO" {{ $worker->designation_name == 'SSMO' ? 'selected' : '' }}>SSMO</option>
+                        <option value="SSMO" {{ $worker->designation_name == 'SSMO' ? 'selected' : '' }}>SSMO
+                        </option>
                     </select>
 
                 </div>
@@ -123,6 +132,40 @@
                         placeholder="Enter Salary" value="{{ $worker->salary ?? '' }}">
                 </div>
                 <br>
+
+                @if (Auth::user()->role && (Auth::user()->role->name == 'HR' || Auth::user()->role->name == 'Admin'))
+                    <!-- Father Name -->
+                    <div class="form-group col-md-6 col-sm-12">
+                        <label for="father_name">Father Name</label>
+                        <input type="text" name="father_name" id="father_name" class="form-control"
+                            placeholder="Enter Father Name" value="{{ $worker->father_name ?? '' }}">
+                    </div>
+                    <br>
+
+                    <!-- Husband Name -->
+                    <div class="form-group col-md-6 col-sm-12">
+                        <label for="husband_name">Husband Name</label>
+                        <input type="text" name="husband_name" id="husband_name" class="form-control"
+                            placeholder="Enter Husband Name" value="{{ $worker->husband_name ?? '' }}">
+                    </div>
+                    <br>
+
+                    <!-- Present Address -->
+                    <div class="form-group col-md-12 col-sm-12">
+                        <label for="present_address">Present Address</label>
+                        <textarea name="present_address" id="present_address" class="form-control" rows="3"
+                            placeholder="Enter Present Address">{{ $worker->present_address ?? '' }}</textarea>
+                    </div>
+                    <br>
+
+                    <!-- Permanent Address -->
+                    <div class="form-group col-md-12 col-sm-12">
+                        <label for="permanent_address">Permanent Address</label>
+                        <textarea name="permanent_address" id="permanent_address" class="form-control" rows="3"
+                            placeholder="Enter Permanent Address">{{ $worker->permanent_address ?? '' }}</textarea>
+                    </div>
+                    <br>
+                @endif
 
 
             </div>
@@ -170,62 +213,62 @@
         }
     </script> --}}
 
-   <script>
-    // Function to calculate and display experience
-    function calculateExperience() {
-        // Get the input elements
-        var joiningDateInput = document.getElementById("joining_date");
-        var experienceInput = document.getElementById("experience");
+    <script>
+        // Function to calculate and display experience
+        function calculateExperience() {
+            // Get the input elements
+            var joiningDateInput = document.getElementById("joining_date");
+            var experienceInput = document.getElementById("experience");
 
-        // Ensure input elements exist
-        if (!joiningDateInput || !experienceInput) return;
+            // Ensure input elements exist
+            if (!joiningDateInput || !experienceInput) return;
 
-        // Get the value of the joining date input field
-        var joiningDateValue = joiningDateInput.value;
+            // Get the value of the joining date input field
+            var joiningDateValue = joiningDateInput.value;
 
-        if (!joiningDateValue) {
-            experienceInput.value = "0 years, 0 months, 0 days";
-            return;
+            if (!joiningDateValue) {
+                experienceInput.value = "0 years, 0 months, 0 days";
+                return;
+            }
+
+            // Convert to Date object
+            var joiningDate = new Date(joiningDateValue);
+            var currentDate = new Date();
+
+            if (isNaN(joiningDate.getTime())) {
+                experienceInput.value = "Invalid date";
+                return;
+            }
+
+            // Calculate the difference in milliseconds
+            var diff = currentDate - joiningDate;
+
+            // Calculate years, months, and days
+            var years = Math.floor(diff / (365.25 * 24 * 60 * 60 * 1000));
+            var months = Math.floor((diff % (365.25 * 24 * 60 * 60 * 1000)) / (30.44 * 24 * 60 * 60 * 1000));
+            var days = Math.floor((diff % (30.44 * 24 * 60 * 60 * 1000)) / (24 * 60 * 60 * 1000));
+
+            if (days < 0) {
+                experienceInput.value = "0 years, 0 months, 0 days";
+                return;
+            }
+
+            // Set the experience input value
+            experienceInput.value = years + " years, " + months + " months, " + days + " days";
         }
 
-        // Convert to Date object
-        var joiningDate = new Date(joiningDateValue);
-        var currentDate = new Date();
+        // Attach event listener on DOM load
+        document.addEventListener("DOMContentLoaded", function() {
+            var joiningDateInput = document.getElementById("joining_date");
 
-        if (isNaN(joiningDate.getTime())) {
-            experienceInput.value = "Invalid date";
-            return;
-        }
+            if (joiningDateInput) {
+                // Calculate experience on input change
+                joiningDateInput.addEventListener("input", calculateExperience);
 
-        // Calculate the difference in milliseconds
-        var diff = currentDate - joiningDate;
-
-        // Calculate years, months, and days
-        var years = Math.floor(diff / (365.25 * 24 * 60 * 60 * 1000));
-        var months = Math.floor((diff % (365.25 * 24 * 60 * 60 * 1000)) / (30.44 * 24 * 60 * 60 * 1000));
-        var days = Math.floor((diff % (30.44 * 24 * 60 * 60 * 1000)) / (24 * 60 * 60 * 1000));
-
-        if (days < 0) {
-            experienceInput.value = "0 years, 0 months, 0 days";
-            return;
-        }
-
-        // Set the experience input value
-        experienceInput.value = years + " years, " + months + " months, " + days + " days";
-    }
-
-    // Attach event listener on DOM load
-    document.addEventListener("DOMContentLoaded", function () {
-        var joiningDateInput = document.getElementById("joining_date");
-
-        if (joiningDateInput) {
-            // Calculate experience on input change
-            joiningDateInput.addEventListener("input", calculateExperience);
-
-            // Calculate experience if a value is already present
-            calculateExperience();
-        }
-    });
-</script>
+                // Calculate experience if a value is already present
+                calculateExperience();
+            }
+        });
+    </script>
 
 </x-backend.layouts.master>

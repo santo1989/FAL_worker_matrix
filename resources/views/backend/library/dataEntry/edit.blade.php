@@ -32,7 +32,7 @@
                 <div class="form-group col-md-6 col-sm-12">
                     <label for="id_card_no">Card No</label>
                     <input type="number" name="id_card_no" id="id_card_no" class="form-control" required
-                        placeholder="Enter Card No" value="{{ $workerEntry->id_card_no ?? '' }}" >
+                        placeholder="Enter Card No" value="{{ $workerEntry->id_card_no ?? '' }}">
                 </div>
                 <br>
                 <div class="form-group col-md-6 col-sm-12">
@@ -61,12 +61,17 @@
                     <label for="designation_name">Designation</label>
                     <select name="designation_name" id="designation_name" class="form-control" required>
                         <option value="">Select Designation</option>
-                        <option value="Line Leader" {{ $workerEntry->designation_name == 'Line Leader' ? 'selected' : '' }}>
+                        <option value="Line Leader"
+                            {{ $workerEntry->designation_name == 'Line Leader' ? 'selected' : '' }}>
                             Line Leader</option>
-                        <option value="JSMO" {{ $workerEntry->designation_name == 'JSMO' ? 'selected' : '' }}>JSMO </option>
-                        <option value="OSMO" {{ $workerEntry->designation_name == 'OSMO' ? 'selected' : '' }}>OSMO</option>
-                        <option value="SMO" {{ $workerEntry->designation_name == 'SMO' ? 'selected' : '' }}>SMO </option>
-                        <option value="SSMO" {{ $workerEntry->designation_name == 'SSMO' ? 'selected' : '' }}>SSMO</option>
+                        <option value="JSMO" {{ $workerEntry->designation_name == 'JSMO' ? 'selected' : '' }}>JSMO
+                        </option>
+                        <option value="OSMO" {{ $workerEntry->designation_name == 'OSMO' ? 'selected' : '' }}>OSMO
+                        </option>
+                        <option value="SMO" {{ $workerEntry->designation_name == 'SMO' ? 'selected' : '' }}>SMO
+                        </option>
+                        <option value="SSMO" {{ $workerEntry->designation_name == 'SSMO' ? 'selected' : '' }}>SSMO
+                        </option>
                     </select>
 
                 </div>
@@ -74,8 +79,8 @@
                 <br>
                 <div class="form-group col-md-6 col-sm-12">
                     <label for="salary">Salary</label>
-                    <input type="text" name="salary" id="salary" class="form-control" 
-                        placeholder="Enter Salary" value="{{ $workerEntry->salary ?? '' }}">
+                    <input type="text" name="salary" id="salary" class="form-control" placeholder="Enter Salary"
+                        value="{{ $workerEntry->salary ?? '' }}">
                 </div>
                 <br>
                 <!-- line -->
@@ -86,15 +91,20 @@
                 </div>
                 <br>
                 <!--floor -->
-               <div class="form-group col-md-6 col-sm-12">
+                <div class="form-group col-md-6 col-sm-12">
                     <label for="floor">Floor</label>
                     <select name="floor" id="floor" class="form-control" required>
                         <option value="">Select Floor</option>
-                        <option value="1st Floor" {{ $workerEntry->floor == '1st Floor' ? 'selected' : ''}}>1st Floor</option>
-                        <option value="2nd Floor" {{ $workerEntry->floor == '2nd Floor' ? 'selected' : '' }}>2nd Floor</option>
-                        <option value="3rd Floor" {{ $workerEntry->floor == '3rd Floor' ? 'selected' : '' }}>3rd Floor</option>
-                        <option value="4th Floor" {{ $workerEntry->floor == '4th Floor' ? 'selected' : '' }}>4th Floor</option>
-                        <option value="5th Floor" {{ $workerEntry->floor == '5th Floor' ? 'selected' : '' }}>5th Floor</option>
+                        <option value="1st Floor" {{ $workerEntry->floor == '1st Floor' ? 'selected' : '' }}>1st Floor
+                        </option>
+                        <option value="2nd Floor" {{ $workerEntry->floor == '2nd Floor' ? 'selected' : '' }}>2nd Floor
+                        </option>
+                        <option value="3rd Floor" {{ $workerEntry->floor == '3rd Floor' ? 'selected' : '' }}>3rd Floor
+                        </option>
+                        <option value="4th Floor" {{ $workerEntry->floor == '4th Floor' ? 'selected' : '' }}>4th Floor
+                        </option>
+                        <option value="5th Floor" {{ $workerEntry->floor == '5th Floor' ? 'selected' : '' }}>5th Floor
+                        </option>
                     </select>
 
                 </div>
@@ -103,12 +113,49 @@
 
 
             </div>
+
+            @if (Auth::user()->role && (Auth::user()->role->name == 'HR' || Auth::user()->role->name == 'Admin'))
+                <div class="row pb-3">
+                    <!-- Father Name -->
+                    <div class="form-group col-md-6 col-sm-12">
+                        <label for="father_name">Father Name</label>
+                        <input type="text" name="father_name" id="father_name" class="form-control"
+                            placeholder="Enter Father Name" value="{{ $workerEntry->father_name ?? '' }}">
+                    </div>
+                    <br>
+
+                    <!-- Husband Name -->
+                    <div class="form-group col-md-6 col-sm-12">
+                        <label for="husband_name">Husband Name</label>
+                        <input type="text" name="husband_name" id="husband_name" class="form-control"
+                            placeholder="Enter Husband Name" value="{{ $workerEntry->husband_name ?? '' }}">
+                    </div>
+                    <br>
+
+                    <!-- Present Address -->
+                    <div class="form-group col-md-12 col-sm-12">
+                        <label for="present_address">Present Address</label>
+                        <textarea name="present_address" id="present_address" class="form-control" rows="3"
+                            placeholder="Enter Present Address">{{ $workerEntry->present_address ?? '' }}</textarea>
+                    </div>
+                    <br>
+
+                    <!-- Permanent Address -->
+                    <div class="form-group col-md-12 col-sm-12">
+                        <label for="permanent_address">Permanent Address</label>
+                        <textarea name="permanent_address" id="permanent_address" class="form-control" rows="3"
+                            placeholder="Enter Permanent Address">{{ $workerEntry->permanent_address ?? '' }}</textarea>
+                    </div>
+                    <br>
+                </div>
+            @endif
+
             <br>
             <a type="button" class="btn btn-lg btn-outline-info"
                 href="{{ route('workerEntries.index') }}">Cancel</a>
             <x-backend.form.saveButton>Save</x-backend.form.saveButton>
         </div>
     </form>
-{{-- <hr> --}}
+    {{-- <hr> --}}
 
 </x-backend.layouts.master>

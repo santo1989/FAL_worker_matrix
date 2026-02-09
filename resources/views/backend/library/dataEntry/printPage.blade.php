@@ -140,8 +140,10 @@
                                     @if ($presentIsJson)
                                         Division: {{ $presentAddressData['division'] ?? '-' }},
                                         District: {{ $presentAddressData['district'] ?? '-' }},
-                                        Upazila/Thana: {{ $presentAddressData['upazila'] ?? ($presentAddressData['thana'] ?? '-') }},
-                                        Post Office / Village / Road: {{ $presentAddressData['address'] ?? ($presentAddressData['post_office'] ?? '-') }}
+                                        Upazila/Thana:
+                                        {{ $presentAddressData['upazila'] ?? ($presentAddressData['thana'] ?? '-') }},
+                                        Post Office / Village / Road:
+                                        {{ $presentAddressData['address'] ?? ($presentAddressData['post_office'] ?? '-') }}
                                     @else
                                         {{ $workerEntry->present_address ?? ' ' }}
                                     @endif
@@ -159,8 +161,10 @@
                                     @if ($permanentIsJson)
                                         Division: {{ $permanentAddressData['division'] ?? '-' }},
                                         District: {{ $permanentAddressData['district'] ?? '-' }},
-                                        Upazila/Thana: {{ $permanentAddressData['upazila'] ?? ($permanentAddressData['thana'] ?? '-') }},
-                                        Post Office / Village / Road: {{ $permanentAddressData['address'] ?? ($permanentAddressData['post_office'] ?? '-') }}
+                                        Upazila/Thana:
+                                        {{ $permanentAddressData['upazila'] ?? ($permanentAddressData['thana'] ?? '-') }},
+                                        Post Office / Village / Road:
+                                        {{ $permanentAddressData['address'] ?? ($permanentAddressData['post_office'] ?? '-') }}
                                     @else
                                         {{ $workerEntry->permanent_address ?? ' ' }}
                                     @endif
@@ -397,34 +401,41 @@
 
                             <div class="form-group">
                                 <label><strong>Present Address</strong></label>
-                                <div class="alert alert-info mb-3" id="present_address_display" style="display:none;">
+                                <div class="alert alert-info mb-3" id="present_address_display"
+                                    style="display:none;">
                                     <strong>Current Address:</strong><br>
                                     <span id="present_address_display_text"></span>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-4 col-sm-12">
                                         <label for="present_division" class="form-label">Division:</label>
-                                        <select id="present_division" name="present_division" class="form-control" onchange="populatePresentDistricts()">
+                                        <select id="present_division" name="present_division" class="form-control"
+                                            onchange="populatePresentDistricts()">
                                             <option value="">-- Select Division --</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4 col-sm-12">
                                         <label for="present_district" class="form-label">District:</label>
-                                        <select id="present_district" name="present_district" class="form-control" onchange="populatePresentUpazilas()" disabled>
+                                        <select id="present_district" name="present_district" class="form-control"
+                                            onchange="populatePresentUpazilas()" disabled>
                                             <option value="">-- Select District --</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4 col-sm-12">
                                         <label for="present_upazila" class="form-label">Upazila/Thana:</label>
-                                        <select id="present_upazila" name="present_upazila" class="form-control" disabled>
+                                        <select id="present_upazila" name="present_upazila" class="form-control"
+                                            disabled>
                                             <option value="">-- Select Upazila/Thana --</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="row mt-2">
                                     <div class="col-md-6 col-sm-12">
-                                        <label for="present_address_text" class="form-label">Post Office / Village / Road:</label>
-                                        <input type="text" id="present_address_text" name="present_address_text" class="form-control" placeholder="Enter Post Office, Village, Road/Street">
+                                        <label for="present_address_text" class="form-label">Post Office / Village /
+                                            Road:</label>
+                                        <input type="text" id="present_address_text" name="present_address_text"
+                                            class="form-control"
+                                            placeholder="Enter Post Office, Village, Road/Street">
                                     </div>
                                 </div>
                             </div>
@@ -437,34 +448,41 @@
                                         Same as Present Address
                                     </label>
                                 </div>
-                                <div class="alert alert-info mb-3" id="permanent_address_display" style="display:none;">
+                                <div class="alert alert-info mb-3" id="permanent_address_display"
+                                    style="display:none;">
                                     <strong>Current Address:</strong><br>
                                     <span id="permanent_address_display_text"></span>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-4 col-sm-12">
                                         <label for="permanent_division" class="form-label">Division:</label>
-                                        <select id="permanent_division" name="permanent_division" class="form-control" onchange="populatePermanentDistricts()">
+                                        <select id="permanent_division" name="permanent_division"
+                                            class="form-control" onchange="populatePermanentDistricts()">
                                             <option value="">-- Select Division --</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4 col-sm-12">
                                         <label for="permanent_district" class="form-label">District:</label>
-                                        <select id="permanent_district" name="permanent_district" class="form-control" onchange="populatePermanentUpazilas()" disabled>
+                                        <select id="permanent_district" name="permanent_district"
+                                            class="form-control" onchange="populatePermanentUpazilas()" disabled>
                                             <option value="">-- Select District --</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4 col-sm-12">
                                         <label for="permanent_upazila" class="form-label">Upazila/Thana:</label>
-                                        <select id="permanent_upazila" name="permanent_upazila" class="form-control" disabled>
+                                        <select id="permanent_upazila" name="permanent_upazila" class="form-control"
+                                            disabled>
                                             <option value="">-- Select Upazila/Thana --</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="row mt-2">
                                     <div class="col-md-6 col-sm-12">
-                                        <label for="permanent_address_text" class="form-label">Post Office / Village / Road:</label>
-                                        <input type="text" id="permanent_address_text" name="permanent_address_text" class="form-control" placeholder="Enter Post Office, Village, Road/Street">
+                                        <label for="permanent_address_text" class="form-label">Post Office / Village /
+                                            Road:</label>
+                                        <input type="text" id="permanent_address_text"
+                                            name="permanent_address_text" class="form-control"
+                                            placeholder="Enter Post Office, Village, Road/Street">
                                     </div>
                                 </div>
                             </div>
@@ -554,198 +572,346 @@
 </body>
 <script>
     @if (Auth::user()->role && (Auth::user()->role->name == 'HR' || Auth::user()->role->name == 'Admin'))
-    // Bangladesh Location Data
-    const locationData = {
-        "Dhaka Division": {
-            "Narsingdi": ["Sadar Upazila", "Monohardi Upazila", "Shibpur Upazila", "Palash Upazila", "Belabo Upazila", "Raipura Upazila"],
-            "Narayanganj": ["Sadar Upazila", "Bandar Upazila", "Sonargaon Upazila", "Araihazar Upazila", "Rupganj Upazila"],
-            "Munshiganj": ["Sadar Upazila", "Tongibari Upazila", "Louhajang Upazila", "Sreenagar Upazila", "Sirajdikhan Upazila", "Gazaria Upazila"],
-            "Gazipur": ["Sadar Upazila", "Tongi Upazila", "Kaliganj Upazila", "Kaliakair Upazila", "Kapasia Upazila", "Sreepur Upazila"],
-            "Manikganj": ["Sadar Upazila", "Singair Upazila", "Daulatpur Upazila", "Harirampur Upazila", "Ghior Upazila", "Shibalaya Upazila", "Saturia Upazila"],
-            "Dhaka": ["Kotwali Thana", "Mohammadpur Thana", "Lalbagh Thana", "Sutrapur Thana", "Motijheel Thana", "Demra Thana", "Sabujbag Thana", "Mirpur Thana", "Gulshan Thana", "Uttara Thana", "Pallabi Thana", "Cantonment Thana", "Dhanmondi Thana", "Tejgaon Thana", "Ramna Thana", "Keraniganj Upazila", "Dohar Upazila", "Nawabganj Upazila", "Savar Upazila", "Dhamrai Upazila"],
-            "Faridpur": ["Sadar Upazila", "Boalmari Upazila", "Sadarpur Upazila", "Char Bhadrasan Upazila", "Bhanga Upazila", "Nagarkanda Upazila", "Madhukhali Upazila", "Alfadanga Upazila", "Saltha Upazila"],
-            "Rajbari": ["Sadar Upazila", "Pangsha Upazila", "Goalanda Upazila", "Kalukhali Upazila", "Baliakandi Upazila"],
-            "Gopalganj": ["Sadar Upazila", "Kashiani Upazila", "Tungipara Upazila", "Muksudpur Upazila", "Kotalipara Upazila"],
-            "Madaripur": ["Sadar Upazila", "Kalkini Upazila", "Rajoir Upazila", "Shibchar Upazila"],
-            "Shariatpur": ["Sadar Upazila", "Damudya Upazila", "Naria Upazila", "Zajira Upazila", "Bhedarganj Upazila", "Gosairhat Upazila"]
-        },
-        "Barisal Division": {
-            "Barguna": ["Sadar Upazila", "Amtali Upazila", "Betagi Upazila", "Taltali Upazila", "Patharghata Upazila", "Bamna Upazila"],
-            "Bhola": ["Sadar Upazila", "Daulatkhan Upazila", "Lalmohan Upazila", "Monpura Upazila", "Charfasson Upazila", "Tazumuddin Upazila", "Borhanuddin Upazila"],
-            "Jhalokati": ["Sadar Upazila", "Nalchity Upazila", "Rajapur Upazila", "Kathalia Upazila"],
-            "Barisal": ["Sadar Upazila", "Muladi Upazila", "Gournadi Upazila", "Agailjhara Upazila", "Hijla Upazila", "Uzirpur Upazila", "Mehendiganj Upazila", "Babuganj Upazila", "Bakerganj Upazila", "Banaripara Upazila"],
-            "Patuakhali": ["Sadar Upazila", "Galachipa Upazila", "Kalapara Upazila", "Dashmina Upazila", "Bauphal Upazila", "Rangabali Upazila", "Dumki Upazila", "Mirzaganj Upazila"],
-            "Pirojpur": ["Sadar Upazila", "Mathbaria Upazila", "Nazirpur Upazila", "Nesarabad Upazila", "Zianagar Upazila", "Kawkhali Upazila", "Bhandaria Upazila"]
-        },
-        "Khulna Division": {
-            "Khulna": ["Sadar Thana", "Sonadanga Thana", "Daulatpur Thana", "Phultala Upazila", "Dumuria Upazila", "Terokhada Upazila", "Dighalia Upazila", "Rupsha Upazila", "Batiaghata Upazila", "Dacope Upazila", "Koyra Upazila"],
-            "Narail": ["Sadar Upazila", "Kalia Upazila", "Lohagara Upazila"],
-            "Magura": ["Sadar Upazila", "Sreepur Upazila", "Shalikha Upazila", "Mohammadpur Upazila"],
-            "Satkhira": ["Sadar Upazila", "Shyamnagar Upazila", "Assasuni Upazila", "Tala Upazila", "Kaliganj Upazila", "Kalaroa Upazila", "Debhatta Upazila"],
-            "Bagerhat": ["Sadar Upazila", "Kachua Upazila", "Rampal Upazila", "Sarankhola Upazila", "Morelganj Upazila", "Mollahat Upazila", "Chitalmari Upazila", "Fakirhat Upazila", "Mongla Upazila"],
-            "Jhenaidah": ["Sadar Upazila", "Kaliganj Upazila", "KotChandpur Upazila", "Harinakunda Upazila", "Shailkupa Upazila", "Maheshpur Upazila"],
-            "Jashore": ["Sadar Upazila", "Keshabpur Upazila", "Jhikargachha Upazila", "Manirampur Upazila", "Bagherpara Upazila", "Chaugachha Upazila", "Sharsha Upazila", "Abhaynagar Upazila"],
-            "Meherpur": ["Sadar Upazila", "Gangni Upazila", "Mujibnagar Upazila"],
-            "Chuadanga": ["Sadar Upazila", "Jibannagar Upazila", "Damurhuda Upazila", "Alamdanga Upazila"],
-            "Kushtia": ["Sadar Upazila", "Kumarkhali Upazila", "Daulatpur Upazila", "Bheramara Upazila", "Khoksa Upazila", "Mirpur Upazila"]
-        },
-        "Sylhet Division": {
-            "Sylhet": ["Sadar Upazila", "Gopalganj Upazila", "Beanibazar Upazila", "Zakiganj Upazila", "Companiganj Upazila", "Jaintiapur Upazila", "Dakshin Surma Upazila", "Fenchuganj Upazila", "Bishwanath Upazila", "Balaganj Upazila", "Gowainghat Upazila", "Kanaighat Upazila"],
-            "Sunamganj": ["Sadar Upazila", "Jamalganj Upazila", "Jagannathpur Upazila", "Sulla Upazila", "Dharampasha Upazila", "Bishwamvarpur Upazila", "South Sunamganj Upazila", "Chatak Upazila", "Dowarabazar Upazila", "Derai Upazila", "Tahirpurr Upazila"],
-            "Moulvibazar": ["Sadar Upazila", "Rajnagar Upazila", "Kulaura Upazila", "Juri Upazila", "Barlekha Upazila", "Kamalganj Upazila", "Sreemangal Upazila"],
-            "Habiganj": ["Sadar Upazila", "Bahubal Upazila", "Lakhai Upazila", "Nabiganj Upazila", "Chunarughat Upazila", "Madhabpur Upazila", "Baniachong Upazila", "Ajmiriganj Upazila"]
-        },
-        "Mymensingh Division": {
-            "Tangail": ["Sadar Upazila", "Delduar Upazila", "Mirzapur Upazila", "Bhuapur Upazila", "Ghatail Upazila", "Basail Upazila", "Nagarpur Upazila", "Kalihati Upazila", "Sakhipur Upazila", "Gopalpur Upazila", "Dhanbari Upazila", "Madhupur Upazila"],
-            "Kishoreganj": ["Sadar Upazila", "Hossainpur Upazila", "Karimganj Upazila", "Pakundia Upazila", "Nikli Upazila", "Bajitpur Upazila", "Kuliarchar Upazila", "Bhairab Upazila", "Mithamain Upazila", "Itna Upazila", "Katiadi Upazila", "Austagram Upazila", "Tarail Upazila"],
-            "Netrokona": ["Sadar Upazila", "Atpara Upazila", "Barhatta Upazila", "Mohanganj Upazila", "Kalmakanda Upazila", "Durgapur Upazila", "Madan Upazila", "Kendua Upazila", "Purbadhala Upazila", "Khaliajuri Upazila"],
-            "Jamalpur": ["Sadar Upazila", "Islampur Upazila", "Dewanganj Upazila", "Sarishabari Upazila", "Madarganj Upazila", "Bokshiganj Upazila", "Melandaha Upazila"],
-            "Sherpur": ["Sadar Upazila", "Nakla Upazila", "Nalitabari Upazila", "Jhenaigati Upazila", "Sreebardi Upazila"],
-            "Mymensingh": ["Sadar Upazila", "Muktagachha Upazila", "Phulbaria Upazila", "Bhaluka Upazila", "Trishal Upazila", "Gaffargaon Upazila", "Nandail Upazila", "Ishwarganj Upazila", "Dhobaura Upazila", "Gauripur Upazila", "Phulpur Upazila", "Haluaghat Upazila", "Tarakanda Upazila"]
-        },
-        "Chattogram Division": {
-            "Noakhali": ["Sadar Upazila", "Begumganj Upazila", "Companiganj Upazila", "Subarnachar Upazila", "Sonaimuri Upazila", "Chatkhil Upazila", "Senbagh Upazila", "Kabirhat Upazila", "Hatiya Upazila"],
-            "Feni": ["Sadar Upazila", "Daganbhuiyan Upazila", "Fulgazi Upazila", "Parshuram Upazila", "Chhagalnaiya Upazila", "Sonagazi Upazila"],
-            "Lakshmipur": ["Sadar Upazila", "Raipur Upazila", "Ramgati Upazila", "Ramganj Upazila", "Kamalnagar Upazila"],
-            "Chandpur": ["Sadar Upazila", "Matlab South Upazila", "Faridganj Upazila", "Hajiganj Upazila", "Haimchar Upazila", "Matlab North Upazila", "Kachua Upazila", "Shahrasti Upazila"],
-            "Brahmanbaria": ["Sadar Upazila", "Sarail Upazila", "Kasba Upazila", "Bancharampur Upazila", "Nabinagar Upazila", "Bijoynagar Upazila", "Ashuganj Upazila", "Akhaura Upazila", "Nasirnagar Upazila"],
-            "Cumilla": ["Sadar Adarsha Upazila", "Sadar South Upazila", "Brahmanpara Upazila", "Daudkandi Upazila", "Burichang Upazila", "Chauddagram Upazila", "Laksam Upazila", "Monoharganj Upazila", "Meghna Upazila", "Homna Upazila", "Titas Upazila", "Nangalkot Upazila", "Muradnagar Upazila", "Barura Upazila", "Chandina Upazila", "Debidwar Upazila"],
-            "Chattogram": ["Kotwali Thana", "Panchlaish Thana", "Chandgaon Thana", "Bandar Thana", "Pahartali Thana", "Double Mooring Thana", "Anwara Upazila", "Patiya Upazila", "Boalkhali Upazila", "Satkania Upazila", "Chandanaish Upazila", "Banshkhali Upazila", "Lohagara Upazila", "Sandwip Upazila", "Hathazari Upazila", "Mirsharai Upazila", "Fatikchhari Upazila", "Rangunia Upazila", "Sitakunda Upazila", "Raozan Upazila"],
-            "Cox's Bazar": ["Sadar Upazila", "Maheshkhali Upazila", "Kutubdia Upazila", "Teknaf Upazila", "Ramu Upazila", "Ukhiya Upazila", "Chakaria Upazila", "Pekua Upazila"],
-            "Khagrachhari": ["Sadar Upazila", "Panchhari Upazila", "Mahalchhari Upazila", "Dighinala Upazila", "Matiranga Upazila", "Lakshmichhari Upazila", "Manikchhari Upazila", "Ramgarh Upazila"],
-            "Bandarban": ["Sadar Upazila", "Thanchi Upazila", "Ruma Upazila", "Rowangchhari Upazila", "Alikadam Upazila", "Lama Upazila", "Naikhongchhari Upazila"],
-            "Rangamati": ["Sadar Upazila", "Barkal Upazila", "Langadu Upazila", "Baghaichhari Upazila", "Naniarchar Upazila", "Kawkhali Upazila", "Rajastali Upazila", "Belaichhari Upazila", "Juraichhari Upazila", "Kaptai Upazila"]
-        },
-        "Rajshahi Division": {
-            "Bogura": ["Sadar Upazila", "Shajahanpur Upazila", "Sariakandi Upazila", "Shibganj Upazila", "Gabtali Upazila", "Dhunat Upazila", "Sonatala Upazila", "Dupchanchia Upazila", "Adamdighi Upazila", "Nandigram Upazila", "Sherpur Upazila", "Kahaloo Upazila"],
-            "Pabna": ["Sadar Upazila", "Atgharia Upazila", "Ishwardi Upazila", "Bera Upazila", "Santhia Upazila", "Sujanagar Upazila", "Chatmohar Upazila", "Bhangura Upazila", "Faridpur Upazila"],
-            "Rajshahi": ["Paba Upazila", "Puthia Upazila", "Charghat Upazila", "Tanore Upazila", "Baghmara Upazila", "Bagha Upazila", "Mohanpur Upazila", "Godagari Upazila", "Durgapur Upazila", "Boalia Thana", "Rajpara Thana"],
-            "Natore": ["Sadar Upazila", "Singra Upazila", "Bagatipara Upazila", "Baraigram Upazila", "Gurudaspur Upazila", "Lalpur Upazila", "Naldanga Upazila"],
-            "Chapainawabganj": ["Sadar Upazila", "Shibganj Upazila", "Gomastapur Upazila", "Nachole Upazila", "Bholahat Upazila"],
-            "Naogaon": ["Sadar Upazila", "Raninagar Upazila", "Atrai Upazila", "Niamatpur Upazila", "Porsha Upazila", "Sapahar Upazila", "Manda Upazila", "Dhamoirhat Upazila", "Badalgachhi Upazila", "Patnitala Upazila", "Mohadevpur Upazila"],
-            "Joypurhat": ["Sadar Upazila", "Akkelpur Upazila", "Kalai Upazila", "Panchbibi Upazila", "Khetlal Upazila"],
-            "Sirajganj": ["Sadar Upazila", "Kamarkhanda Upazila", "Belkuchi Upazila", "Kazipur Upazila", "Chauhali Upazila", "Shahjadpur Upazila", "Tarash Upazila", "Ullahpara Upazila", "Raiganj Upazila"]
-        },
-        "Rangpur Division": {
-            "Nilphamari": ["Sadar Upazila", "Dimla Upazila", "Jaldhaka Upazila", "Domar Upazila", "Kishoreganj Upazila", "Saidpur Upazila"],
-            "Thakurgaon": ["Sadar Upazila", "Baliadangi Upazila", "Pirganj Upazila", "Haripur Upazila", "Ranisankail Upazila"],
-            "Gaibandha": ["Sadar Upazila", "Gobindaganj Upazila", "Phulchhari Upazila", "Saghata Upazila", "Sundarganj Upazila", "Palashbari Upazila", "Sadullapur Upazila"],
-            "Lalmonirhat": ["Sadar Upazila", "Aditmari Upazila", "Hatibandha Upazila", "Kaliganj Upazila", "Patgram Upazila"],
-            "Kurigram": ["Sadar Upazila", "Rowmari Upazila", "Rajibpur Upazila", "Chilmari Upazila", "Ulipur Upazila", "Rajarhat Upazila", "Phulbari Upazila", "Nageswari Upazila", "Bhurungamari Upazila"],
-            "Dinajpur": ["Sadar Upazila", "Parbatipur Upazila", "Phulbari Upazila", "Birampur Upazila", "Hakimpur Upazila", "Nawabganj Upazila", "Ghoraghat Upazila", "Bochaganj Upazila", "Biral Upazila", "Kaharole Upazila", "Birganj Upazila", "Khansama Upazila", "Chirirbandar Upazila"],
-            "Rangpur": ["Sadar Upazila", "Gangachara Upazila", "Badarganj Upazila", "Taraganj Upazila", "Kaunia Upazila", "Pirgachha Upazila", "Mithapukur Upazila", "Pirganj Upazila"],
-            "Panchagarh": ["Sadar Upazila", "Atwari Upazila", "Boda Upazila", "Debiganj Upazila", "Tetulia Upazila"]
-        }
-    };
+        // Bangladesh Location Data
+        const locationData = {
+            "Dhaka Division": {
+                "Narsingdi": ["Sadar Upazila", "Monohardi Upazila", "Shibpur Upazila", "Palash Upazila",
+                    "Belabo Upazila", "Raipura Upazila"
+                ],
+                "Narayanganj": ["Sadar Upazila", "Bandar Upazila", "Sonargaon Upazila", "Araihazar Upazila",
+                    "Rupganj Upazila"
+                ],
+                "Munshiganj": ["Sadar Upazila", "Tongibari Upazila", "Louhajang Upazila", "Sreenagar Upazila",
+                    "Sirajdikhan Upazila", "Gazaria Upazila"
+                ],
+                "Gazipur": ["Sadar Upazila", "Tongi Upazila", "Kaliganj Upazila", "Kaliakair Upazila",
+                    "Kapasia Upazila", "Sreepur Upazila"
+                ],
+                "Manikganj": ["Sadar Upazila", "Singair Upazila", "Daulatpur Upazila", "Harirampur Upazila",
+                    "Ghior Upazila", "Shibalaya Upazila", "Saturia Upazila"
+                ],
+                "Dhaka": ["Kotwali Thana", "Mohammadpur Thana", "Lalbagh Thana", "Sutrapur Thana",
+                    "Motijheel Thana", "Demra Thana", "Sabujbag Thana", "Mirpur Thana", "Gulshan Thana",
+                    "Uttara Thana", "Pallabi Thana", "Cantonment Thana", "Dhanmondi Thana", "Tejgaon Thana",
+                    "Ramna Thana", "Keraniganj Upazila", "Dohar Upazila", "Nawabganj Upazila", "Savar Upazila",
+                    "Dhamrai Upazila"
+                ],
+                "Faridpur": ["Sadar Upazila", "Boalmari Upazila", "Sadarpur Upazila", "Char Bhadrasan Upazila",
+                    "Bhanga Upazila", "Nagarkanda Upazila", "Madhukhali Upazila", "Alfadanga Upazila",
+                    "Saltha Upazila"
+                ],
+                "Rajbari": ["Sadar Upazila", "Pangsha Upazila", "Goalanda Upazila", "Kalukhali Upazila",
+                    "Baliakandi Upazila"
+                ],
+                "Gopalganj": ["Sadar Upazila", "Kashiani Upazila", "Tungipara Upazila", "Muksudpur Upazila",
+                    "Kotalipara Upazila"
+                ],
+                "Madaripur": ["Sadar Upazila", "Kalkini Upazila", "Rajoir Upazila", "Shibchar Upazila"],
+                "Shariatpur": ["Sadar Upazila", "Damudya Upazila", "Naria Upazila", "Zajira Upazila",
+                    "Bhedarganj Upazila", "Gosairhat Upazila"
+                ]
+            },
+            "Barisal Division": {
+                "Barguna": ["Sadar Upazila", "Amtali Upazila", "Betagi Upazila", "Taltali Upazila",
+                    "Patharghata Upazila", "Bamna Upazila"
+                ],
+                "Bhola": ["Sadar Upazila", "Daulatkhan Upazila", "Lalmohan Upazila", "Monpura Upazila",
+                    "Charfasson Upazila", "Tazumuddin Upazila", "Borhanuddin Upazila"
+                ],
+                "Jhalokati": ["Sadar Upazila", "Nalchity Upazila", "Rajapur Upazila", "Kathalia Upazila"],
+                "Barisal": ["Sadar Upazila", "Muladi Upazila", "Gournadi Upazila", "Agailjhara Upazila",
+                    "Hijla Upazila", "Uzirpur Upazila", "Mehendiganj Upazila", "Babuganj Upazila",
+                    "Bakerganj Upazila", "Banaripara Upazila"
+                ],
+                "Patuakhali": ["Sadar Upazila", "Galachipa Upazila", "Kalapara Upazila", "Dashmina Upazila",
+                    "Bauphal Upazila", "Rangabali Upazila", "Dumki Upazila", "Mirzaganj Upazila"
+                ],
+                "Pirojpur": ["Sadar Upazila", "Mathbaria Upazila", "Nazirpur Upazila", "Nesarabad Upazila",
+                    "Zianagar Upazila", "Kawkhali Upazila", "Bhandaria Upazila"
+                ]
+            },
+            "Khulna Division": {
+                "Khulna": ["Sadar Thana", "Sonadanga Thana", "Daulatpur Thana", "Phultala Upazila",
+                    "Dumuria Upazila", "Terokhada Upazila", "Dighalia Upazila", "Rupsha Upazila",
+                    "Batiaghata Upazila", "Dacope Upazila", "Koyra Upazila"
+                ],
+                "Narail": ["Sadar Upazila", "Kalia Upazila", "Lohagara Upazila"],
+                "Magura": ["Sadar Upazila", "Sreepur Upazila", "Shalikha Upazila", "Mohammadpur Upazila"],
+                "Satkhira": ["Sadar Upazila", "Shyamnagar Upazila", "Assasuni Upazila", "Tala Upazila",
+                    "Kaliganj Upazila", "Kalaroa Upazila", "Debhatta Upazila"
+                ],
+                "Bagerhat": ["Sadar Upazila", "Kachua Upazila", "Rampal Upazila", "Sarankhola Upazila",
+                    "Morelganj Upazila", "Mollahat Upazila", "Chitalmari Upazila", "Fakirhat Upazila",
+                    "Mongla Upazila"
+                ],
+                "Jhenaidah": ["Sadar Upazila", "Kaliganj Upazila", "KotChandpur Upazila", "Harinakunda Upazila",
+                    "Shailkupa Upazila", "Maheshpur Upazila"
+                ],
+                "Jashore": ["Sadar Upazila", "Keshabpur Upazila", "Jhikargachha Upazila", "Manirampur Upazila",
+                    "Bagherpara Upazila", "Chaugachha Upazila", "Sharsha Upazila", "Abhaynagar Upazila"
+                ],
+                "Meherpur": ["Sadar Upazila", "Gangni Upazila", "Mujibnagar Upazila"],
+                "Chuadanga": ["Sadar Upazila", "Jibannagar Upazila", "Damurhuda Upazila", "Alamdanga Upazila"],
+                "Kushtia": ["Sadar Upazila", "Kumarkhali Upazila", "Daulatpur Upazila", "Bheramara Upazila",
+                    "Khoksa Upazila", "Mirpur Upazila"
+                ]
+            },
+            "Sylhet Division": {
+                "Sylhet": ["Sadar Upazila", "Gopalganj Upazila", "Beanibazar Upazila", "Zakiganj Upazila",
+                    "Companiganj Upazila", "Jaintiapur Upazila", "Dakshin Surma Upazila", "Fenchuganj Upazila",
+                    "Bishwanath Upazila", "Balaganj Upazila", "Gowainghat Upazila", "Kanaighat Upazila"
+                ],
+                "Sunamganj": ["Sadar Upazila", "Jamalganj Upazila", "Jagannathpur Upazila", "Sulla Upazila",
+                    "Dharampasha Upazila", "Bishwamvarpur Upazila", "South Sunamganj Upazila", "Chatak Upazila",
+                    "Dowarabazar Upazila", "Derai Upazila", "Tahirpurr Upazila"
+                ],
+                "Moulvibazar": ["Sadar Upazila", "Rajnagar Upazila", "Kulaura Upazila", "Juri Upazila",
+                    "Barlekha Upazila", "Kamalganj Upazila", "Sreemangal Upazila"
+                ],
+                "Habiganj": ["Sadar Upazila", "Bahubal Upazila", "Lakhai Upazila", "Nabiganj Upazila",
+                    "Chunarughat Upazila", "Madhabpur Upazila", "Baniachong Upazila", "Ajmiriganj Upazila"
+                ]
+            },
+            "Mymensingh Division": {
+                "Tangail": ["Sadar Upazila", "Delduar Upazila", "Mirzapur Upazila", "Bhuapur Upazila",
+                    "Ghatail Upazila", "Basail Upazila", "Nagarpur Upazila", "Kalihati Upazila",
+                    "Sakhipur Upazila", "Gopalpur Upazila", "Dhanbari Upazila", "Madhupur Upazila"
+                ],
+                "Kishoreganj": ["Sadar Upazila", "Hossainpur Upazila", "Karimganj Upazila", "Pakundia Upazila",
+                    "Nikli Upazila", "Bajitpur Upazila", "Kuliarchar Upazila", "Bhairab Upazila",
+                    "Mithamain Upazila", "Itna Upazila", "Katiadi Upazila", "Austagram Upazila",
+                    "Tarail Upazila"
+                ],
+                "Netrokona": ["Sadar Upazila", "Atpara Upazila", "Barhatta Upazila", "Mohanganj Upazila",
+                    "Kalmakanda Upazila", "Durgapur Upazila", "Madan Upazila", "Kendua Upazila",
+                    "Purbadhala Upazila", "Khaliajuri Upazila"
+                ],
+                "Jamalpur": ["Sadar Upazila", "Islampur Upazila", "Dewanganj Upazila", "Sarishabari Upazila",
+                    "Madarganj Upazila", "Bokshiganj Upazila", "Melandaha Upazila"
+                ],
+                "Sherpur": ["Sadar Upazila", "Nakla Upazila", "Nalitabari Upazila", "Jhenaigati Upazila",
+                    "Sreebardi Upazila"
+                ],
+                "Mymensingh": ["Sadar Upazila", "Muktagachha Upazila", "Phulbaria Upazila", "Bhaluka Upazila",
+                    "Trishal Upazila", "Gaffargaon Upazila", "Nandail Upazila", "Ishwarganj Upazila",
+                    "Dhobaura Upazila", "Gauripur Upazila", "Phulpur Upazila", "Haluaghat Upazila",
+                    "Tarakanda Upazila"
+                ]
+            },
+            "Chattogram Division": {
+                "Noakhali": ["Sadar Upazila", "Begumganj Upazila", "Companiganj Upazila", "Subarnachar Upazila",
+                    "Sonaimuri Upazila", "Chatkhil Upazila", "Senbagh Upazila", "Kabirhat Upazila",
+                    "Hatiya Upazila"
+                ],
+                "Feni": ["Sadar Upazila", "Daganbhuiyan Upazila", "Fulgazi Upazila", "Parshuram Upazila",
+                    "Chhagalnaiya Upazila", "Sonagazi Upazila"
+                ],
+                "Lakshmipur": ["Sadar Upazila", "Raipur Upazila", "Ramgati Upazila", "Ramganj Upazila",
+                    "Kamalnagar Upazila"
+                ],
+                "Chandpur": ["Sadar Upazila", "Matlab South Upazila", "Faridganj Upazila", "Hajiganj Upazila",
+                    "Haimchar Upazila", "Matlab North Upazila", "Kachua Upazila", "Shahrasti Upazila"
+                ],
+                "Brahmanbaria": ["Sadar Upazila", "Sarail Upazila", "Kasba Upazila", "Bancharampur Upazila",
+                    "Nabinagar Upazila", "Bijoynagar Upazila", "Ashuganj Upazila", "Akhaura Upazila",
+                    "Nasirnagar Upazila"
+                ],
+                "Cumilla": ["Sadar Adarsha Upazila", "Sadar South Upazila", "Brahmanpara Upazila",
+                    "Daudkandi Upazila", "Burichang Upazila", "Chauddagram Upazila", "Laksam Upazila",
+                    "Monoharganj Upazila", "Meghna Upazila", "Homna Upazila", "Titas Upazila",
+                    "Nangalkot Upazila", "Muradnagar Upazila", "Barura Upazila", "Chandina Upazila",
+                    "Debidwar Upazila"
+                ],
+                "Chattogram": ["Kotwali Thana", "Panchlaish Thana", "Chandgaon Thana", "Bandar Thana",
+                    "Pahartali Thana", "Double Mooring Thana", "Anwara Upazila", "Patiya Upazila",
+                    "Boalkhali Upazila", "Satkania Upazila", "Chandanaish Upazila", "Banshkhali Upazila",
+                    "Lohagara Upazila", "Sandwip Upazila", "Hathazari Upazila", "Mirsharai Upazila",
+                    "Fatikchhari Upazila", "Rangunia Upazila", "Sitakunda Upazila", "Raozan Upazila"
+                ],
+                "Cox's Bazar": ["Sadar Upazila", "Maheshkhali Upazila", "Kutubdia Upazila", "Teknaf Upazila",
+                    "Ramu Upazila", "Ukhiya Upazila", "Chakaria Upazila", "Pekua Upazila"
+                ],
+                "Khagrachhari": ["Sadar Upazila", "Panchhari Upazila", "Mahalchhari Upazila", "Dighinala Upazila",
+                    "Matiranga Upazila", "Lakshmichhari Upazila", "Manikchhari Upazila", "Ramgarh Upazila"
+                ],
+                "Bandarban": ["Sadar Upazila", "Thanchi Upazila", "Ruma Upazila", "Rowangchhari Upazila",
+                    "Alikadam Upazila", "Lama Upazila", "Naikhongchhari Upazila"
+                ],
+                "Rangamati": ["Sadar Upazila", "Barkal Upazila", "Langadu Upazila", "Baghaichhari Upazila",
+                    "Naniarchar Upazila", "Kawkhali Upazila", "Rajastali Upazila", "Belaichhari Upazila",
+                    "Juraichhari Upazila", "Kaptai Upazila"
+                ]
+            },
+            "Rajshahi Division": {
+                "Bogura": ["Sadar Upazila", "Shajahanpur Upazila", "Sariakandi Upazila", "Shibganj Upazila",
+                    "Gabtali Upazila", "Dhunat Upazila", "Sonatala Upazila", "Dupchanchia Upazila",
+                    "Adamdighi Upazila", "Nandigram Upazila", "Sherpur Upazila", "Kahaloo Upazila"
+                ],
+                "Pabna": ["Sadar Upazila", "Atgharia Upazila", "Ishwardi Upazila", "Bera Upazila",
+                    "Santhia Upazila", "Sujanagar Upazila", "Chatmohar Upazila", "Bhangura Upazila",
+                    "Faridpur Upazila"
+                ],
+                "Rajshahi": ["Paba Upazila", "Puthia Upazila", "Charghat Upazila", "Tanore Upazila",
+                    "Baghmara Upazila", "Bagha Upazila", "Mohanpur Upazila", "Godagari Upazila",
+                    "Durgapur Upazila", "Boalia Thana", "Rajpara Thana"
+                ],
+                "Natore": ["Sadar Upazila", "Singra Upazila", "Bagatipara Upazila", "Baraigram Upazila",
+                    "Gurudaspur Upazila", "Lalpur Upazila", "Naldanga Upazila"
+                ],
+                "Chapainawabganj": ["Sadar Upazila", "Shibganj Upazila", "Gomastapur Upazila", "Nachole Upazila",
+                    "Bholahat Upazila"
+                ],
+                "Naogaon": ["Sadar Upazila", "Raninagar Upazila", "Atrai Upazila", "Niamatpur Upazila",
+                    "Porsha Upazila", "Sapahar Upazila", "Manda Upazila", "Dhamoirhat Upazila",
+                    "Badalgachhi Upazila", "Patnitala Upazila", "Mohadevpur Upazila"
+                ],
+                "Joypurhat": ["Sadar Upazila", "Akkelpur Upazila", "Kalai Upazila", "Panchbibi Upazila",
+                    "Khetlal Upazila"
+                ],
+                "Sirajganj": ["Sadar Upazila", "Kamarkhanda Upazila", "Belkuchi Upazila", "Kazipur Upazila",
+                    "Chauhali Upazila", "Shahjadpur Upazila", "Tarash Upazila", "Ullahpara Upazila",
+                    "Raiganj Upazila"
+                ]
+            },
+            "Rangpur Division": {
+                "Nilphamari": ["Sadar Upazila", "Dimla Upazila", "Jaldhaka Upazila", "Domar Upazila",
+                    "Kishoreganj Upazila", "Saidpur Upazila"
+                ],
+                "Thakurgaon": ["Sadar Upazila", "Baliadangi Upazila", "Pirganj Upazila", "Haripur Upazila",
+                    "Ranisankail Upazila"
+                ],
+                "Gaibandha": ["Sadar Upazila", "Gobindaganj Upazila", "Phulchhari Upazila", "Saghata Upazila",
+                    "Sundarganj Upazila", "Palashbari Upazila", "Sadullapur Upazila"
+                ],
+                "Lalmonirhat": ["Sadar Upazila", "Aditmari Upazila", "Hatibandha Upazila", "Kaliganj Upazila",
+                    "Patgram Upazila"
+                ],
+                "Kurigram": ["Sadar Upazila", "Rowmari Upazila", "Rajibpur Upazila", "Chilmari Upazila",
+                    "Ulipur Upazila", "Rajarhat Upazila", "Phulbari Upazila", "Nageswari Upazila",
+                    "Bhurungamari Upazila"
+                ],
+                "Dinajpur": ["Sadar Upazila", "Parbatipur Upazila", "Phulbari Upazila", "Birampur Upazila",
+                    "Hakimpur Upazila", "Nawabganj Upazila", "Ghoraghat Upazila", "Bochaganj Upazila",
+                    "Biral Upazila", "Kaharole Upazila", "Birganj Upazila", "Khansama Upazila",
+                    "Chirirbandar Upazila"
+                ],
+                "Rangpur": ["Sadar Upazila", "Gangachara Upazila", "Badarganj Upazila", "Taraganj Upazila",
+                    "Kaunia Upazila", "Pirgachha Upazila", "Mithapukur Upazila", "Pirganj Upazila"
+                ],
+                "Panchagarh": ["Sadar Upazila", "Atwari Upazila", "Boda Upazila", "Debiganj Upazila",
+                    "Tetulia Upazila"
+                ]
+            }
+        };
 
-    // Initialize divisions for both present and permanent address
-    function initializeDivisions() {
-        const presentDiv = document.getElementById('present_division');
-        const permanentDiv = document.getElementById('permanent_division');
-        
-        for (let div in locationData) {
-            const option1 = document.createElement('option');
-            option1.value = div;
-            option1.textContent = div;
-            presentDiv.appendChild(option1);
+        // Initialize divisions for both present and permanent address
+        function initializeDivisions() {
+            const presentDiv = document.getElementById('present_division');
+            const permanentDiv = document.getElementById('permanent_division');
 
-            const option2 = document.createElement('option');
-            option2.value = div;
-            option2.textContent = div;
-            permanentDiv.appendChild(option2);
-        }
-    }
+            for (let div in locationData) {
+                const option1 = document.createElement('option');
+                option1.value = div;
+                option1.textContent = div;
+                presentDiv.appendChild(option1);
 
-    // Present Address Functions
-    function populatePresentDistricts() {
-        const districtSelect = document.getElementById('present_district');
-        const upazilaSelect = document.getElementById('present_upazila');
-        districtSelect.innerHTML = '<option value="">-- Select District --</option>';
-        upazilaSelect.innerHTML = '<option value="">-- Select Upazila/Thana --</option>';
-        districtSelect.disabled = true;
-        upazilaSelect.disabled = true;
-
-        const selectedDiv = document.getElementById('present_division').value;
-        if (selectedDiv) {
-            districtSelect.disabled = false;
-            for (let dist in locationData[selectedDiv]) {
-                const option = document.createElement('option');
-                option.value = dist;
-                option.textContent = dist;
-                districtSelect.appendChild(option);
+                const option2 = document.createElement('option');
+                option2.value = div;
+                option2.textContent = div;
+                permanentDiv.appendChild(option2);
             }
         }
-    }
 
-    function populatePresentUpazilas() {
-        const upazilaSelect = document.getElementById('present_upazila');
-        upazilaSelect.innerHTML = '<option value="">-- Select Upazila/Thana --</option>';
-        upazilaSelect.disabled = true;
+        // Present Address Functions
+        function populatePresentDistricts() {
+            const districtSelect = document.getElementById('present_district');
+            const upazilaSelect = document.getElementById('present_upazila');
+            districtSelect.innerHTML = '<option value="">-- Select District --</option>';
+            upazilaSelect.innerHTML = '<option value="">-- Select Upazila/Thana --</option>';
+            districtSelect.disabled = true;
+            upazilaSelect.disabled = true;
 
-        const selectedDiv = document.getElementById('present_division').value;
-        const selectedDist = document.getElementById('present_district').value;
-        if (selectedDist) {
-            upazilaSelect.disabled = false;
-            locationData[selectedDiv][selectedDist].forEach(upazila => {
-                const option = document.createElement('option');
-                option.value = upazila;
-                option.textContent = upazila;
-                upazilaSelect.appendChild(option);
-            });
-        }
-    }
-
-    // Permanent Address Functions
-    function populatePermanentDistricts() {
-        const districtSelect = document.getElementById('permanent_district');
-        const upazilaSelect = document.getElementById('permanent_upazila');
-        districtSelect.innerHTML = '<option value="">-- Select District --</option>';
-        upazilaSelect.innerHTML = '<option value="">-- Select Upazila/Thana --</option>';
-        districtSelect.disabled = true;
-        upazilaSelect.disabled = true;
-
-        const selectedDiv = document.getElementById('permanent_division').value;
-        if (selectedDiv) {
-            districtSelect.disabled = false;
-            for (let dist in locationData[selectedDiv]) {
-                const option = document.createElement('option');
-                option.value = dist;
-                option.textContent = dist;
-                districtSelect.appendChild(option);
+            const selectedDiv = document.getElementById('present_division').value;
+            if (selectedDiv) {
+                districtSelect.disabled = false;
+                for (let dist in locationData[selectedDiv]) {
+                    const option = document.createElement('option');
+                    option.value = dist;
+                    option.textContent = dist;
+                    districtSelect.appendChild(option);
+                }
             }
         }
-    }
 
-    function populatePermanentUpazilas() {
-        const upazilaSelect = document.getElementById('permanent_upazila');
-        upazilaSelect.innerHTML = '<option value="">-- Select Upazila/Thana --</option>';
-        upazilaSelect.disabled = true;
+        function populatePresentUpazilas() {
+            const upazilaSelect = document.getElementById('present_upazila');
+            upazilaSelect.innerHTML = '<option value="">-- Select Upazila/Thana --</option>';
+            upazilaSelect.disabled = true;
 
-        const selectedDiv = document.getElementById('permanent_division').value;
-        const selectedDist = document.getElementById('permanent_district').value;
-        if (selectedDist) {
-            upazilaSelect.disabled = false;
-            locationData[selectedDiv][selectedDist].forEach(upazila => {
-                const option = document.createElement('option');
-                option.value = upazila;
-                option.textContent = upazila;
-                upazilaSelect.appendChild(option);
-            });
+            const selectedDiv = document.getElementById('present_division').value;
+            const selectedDist = document.getElementById('present_district').value;
+            if (selectedDist) {
+                upazilaSelect.disabled = false;
+                locationData[selectedDiv][selectedDist].forEach(upazila => {
+                    const option = document.createElement('option');
+                    option.value = upazila;
+                    option.textContent = upazila;
+                    upazilaSelect.appendChild(option);
+                });
+            }
         }
-    }
 
-    function copyPresentToPermanent() {
-        $('#permanent_division').val($('#present_division').val());
-        populatePermanentDistricts();
-        $('#permanent_district').val($('#present_district').val());
-        populatePermanentUpazilas();
-        $('#permanent_upazila').val($('#present_upazila').val());
-        $('#permanent_address_text').val($('#present_address_text').val());
-    }
+        // Permanent Address Functions
+        function populatePermanentDistricts() {
+            const districtSelect = document.getElementById('permanent_district');
+            const upazilaSelect = document.getElementById('permanent_upazila');
+            districtSelect.innerHTML = '<option value="">-- Select District --</option>';
+            upazilaSelect.innerHTML = '<option value="">-- Select Upazila/Thana --</option>';
+            districtSelect.disabled = true;
+            upazilaSelect.disabled = true;
 
-    // Initialize divisions when the modal is shown
-    $('#personalInfoModal').on('show.bs.modal', function() {
-        initializeDivisions();
+            const selectedDiv = document.getElementById('permanent_division').value;
+            if (selectedDiv) {
+                districtSelect.disabled = false;
+                for (let dist in locationData[selectedDiv]) {
+                    const option = document.createElement('option');
+                    option.value = dist;
+                    option.textContent = dist;
+                    districtSelect.appendChild(option);
+                }
+            }
+        }
+
+        function populatePermanentUpazilas() {
+            const upazilaSelect = document.getElementById('permanent_upazila');
+            upazilaSelect.innerHTML = '<option value="">-- Select Upazila/Thana --</option>';
+            upazilaSelect.disabled = true;
+
+            const selectedDiv = document.getElementById('permanent_division').value;
+            const selectedDist = document.getElementById('permanent_district').value;
+            if (selectedDist) {
+                upazilaSelect.disabled = false;
+                locationData[selectedDiv][selectedDist].forEach(upazila => {
+                    const option = document.createElement('option');
+                    option.value = upazila;
+                    option.textContent = upazila;
+                    upazilaSelect.appendChild(option);
+                });
+            }
+        }
+
+        function copyPresentToPermanent() {
+            $('#permanent_division').val($('#present_division').val());
+            populatePermanentDistricts();
+            $('#permanent_district').val($('#present_district').val());
+            populatePermanentUpazilas();
+            $('#permanent_upazila').val($('#present_upazila').val());
+            $('#permanent_address_text').val($('#present_address_text').val());
+        }
+
+        // Initialize divisions when the modal is shown
+        $('#personalInfoModal').on('show.bs.modal', function() {
+            initializeDivisions();
 
             // Populate all fields with current data
             $('#modal_assessment_date').val(
@@ -762,11 +928,16 @@
             $('#modal_grade').val("{{ $workerEntry->recomanded_grade ?? '' }}");
             $('#modal_salary').val("{{ $workerEntry->recomanded_salary ?? '' }}");
             $('#modal_joining_date').val("{{ $workerEntry->joining_date ?? '' }}");
-            
+
             // Parse and populate address fields (JSON format)
             function parseAddressJson(raw) {
                 if (!raw) {
-                    return { division: '', district: '', upazila: '', address: '' };
+                    return {
+                        division: '',
+                        district: '',
+                        upazila: '',
+                        address: ''
+                    };
                 }
                 if (typeof raw === 'object') {
                     return {
@@ -785,7 +956,12 @@
                         address: parsed.address || parsed.post_office || ''
                     };
                 } catch (e) {
-                    return { division: '', district: '', upazila: '', address: '' };
+                    return {
+                        division: '',
+                        district: '',
+                        upazila: '',
+                        address: ''
+                    };
                 }
             }
 
@@ -795,7 +971,8 @@
             var permanentAddressData = parseAddressJson(permanentAddressRaw);
 
             // Display current present address
-            if (presentAddressData.division || presentAddressData.district || presentAddressData.upazila || presentAddressData.address) {
+            if (presentAddressData.division || presentAddressData.district || presentAddressData.upazila ||
+                presentAddressData.address) {
                 var presentAddressDisplay =
                     'Division: ' + (presentAddressData.division || '') + ', ' +
                     'District: ' + (presentAddressData.district || '') + ', ' +
@@ -808,7 +985,8 @@
             }
 
             // Display current permanent address
-            if (permanentAddressData.division || permanentAddressData.district || permanentAddressData.upazila || permanentAddressData.address) {
+            if (permanentAddressData.division || permanentAddressData.district || permanentAddressData
+                .upazila || permanentAddressData.address) {
                 var permanentAddressDisplay =
                     'Division: ' + (permanentAddressData.division || '') + ', ' +
                     'District: ' + (permanentAddressData.district || '') + ', ' +
@@ -843,7 +1021,8 @@
             }
         });
 
-        $('#present_division, #present_district, #present_upazila, #present_address_text').on('change keyup', function() {
+        $('#present_division, #present_district, #present_upazila, #present_address_text').on('change keyup',
+    function() {
             if ($('#same_as_present_address').is(':checked')) {
                 copyPresentToPermanent();
             }

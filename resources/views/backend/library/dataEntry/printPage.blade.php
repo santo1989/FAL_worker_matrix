@@ -95,7 +95,7 @@
                             <th>ID No / NID / Birth Reg No</th>
                             <td>
                                 {{ $workerEntry->id_card_no ?? ' ' }}
-                                @if(!empty($workerEntry->nid))
+                                @if (!empty($workerEntry->nid))
                                     / {{ $workerEntry->nid }}
                                 @endif
                             </td>
@@ -278,14 +278,14 @@
                             <div class="form-row">
                                 <div class="form-group col-md-6 col-sm-12">
                                     <label for="modal_father_name">Father Name</label>
-                                    <input type="text" name="father_name" id="modal_father_name" class="form-control"
-                                        placeholder="Enter Father Name">
+                                    <input type="text" name="father_name" id="modal_father_name"
+                                        class="form-control" placeholder="Enter Father Name">
                                 </div>
 
                                 <div class="form-group col-md-6 col-sm-12">
                                     <label for="modal_husband_name">Husband Name</label>
-                                    <input type="text" name="husband_name" id="modal_husband_name" class="form-control"
-                                        placeholder="Enter Husband Name">
+                                    <input type="text" name="husband_name" id="modal_husband_name"
+                                        class="form-control" placeholder="Enter Husband Name">
                                 </div>
                             </div>
 
@@ -392,7 +392,8 @@
                 },
                 error: function(xhr) {
                     if (window.Swal) {
-                        const message = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Update failed.';
+                        const message = xhr.responseJSON && xhr.responseJSON.message ? xhr
+                            .responseJSON.message : 'Update failed.';
                         Swal.fire('Error', message, 'error');
                     }
                 }

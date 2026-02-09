@@ -124,7 +124,7 @@
 
                         </tr>
                         <tr rowspan="6">
-                            <th>Husband Name</th>
+                            <th>Husband / Wife Name</th>
                             <td>
                                 <span id="print_husband_name">{{ $workerEntry->husband_name ?? ' ' }}</span>
                             </td>
@@ -132,13 +132,39 @@
                         <tr>
                             <th>Present Address</th>
                             <td colspan="3">
-                                <span id="print_present_address">{{ $workerEntry->present_address ?? ' ' }}</span>
+                                @php
+                                    $presentAddressData = json_decode($workerEntry->present_address ?? '', true);
+                                    $presentIsJson = is_array($presentAddressData);
+                                @endphp
+                                <span id="print_present_address">
+                                    @if ($presentIsJson)
+                                        Division: {{ $presentAddressData['division'] ?? '-' }},
+                                        District: {{ $presentAddressData['district'] ?? '-' }},
+                                        Upazila/Thana: {{ $presentAddressData['upazila'] ?? ($presentAddressData['thana'] ?? '-') }},
+                                        Post Office / Village / Road: {{ $presentAddressData['address'] ?? ($presentAddressData['post_office'] ?? '-') }}
+                                    @else
+                                        {{ $workerEntry->present_address ?? ' ' }}
+                                    @endif
+                                </span>
                             </td>
                         </tr>
                         <tr>
                             <th>Permanent Address</th>
                             <td colspan="3">
-                                <span id="print_permanent_address">{{ $workerEntry->permanent_address ?? ' ' }}</span>
+                                @php
+                                    $permanentAddressData = json_decode($workerEntry->permanent_address ?? '', true);
+                                    $permanentIsJson = is_array($permanentAddressData);
+                                @endphp
+                                <span id="print_permanent_address">
+                                    @if ($permanentIsJson)
+                                        Division: {{ $permanentAddressData['division'] ?? '-' }},
+                                        District: {{ $permanentAddressData['district'] ?? '-' }},
+                                        Upazila/Thana: {{ $permanentAddressData['upazila'] ?? ($permanentAddressData['thana'] ?? '-') }},
+                                        Post Office / Village / Road: {{ $permanentAddressData['address'] ?? ($permanentAddressData['post_office'] ?? '-') }}
+                                    @else
+                                        {{ $workerEntry->permanent_address ?? ' ' }}
+                                    @endif
+                                </span>
                             </td>
                         </tr>
                         <tr>
@@ -265,7 +291,7 @@
     @if (Auth::user()->role && (Auth::user()->role->name == 'HR' || Auth::user()->role->name == 'Admin'))
         <div class="modal fade" id="personalInfoModal" tabindex="-1" role="dialog"
             aria-labelledby="personalInfoModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-dialog modal-xl" role="document">
                 <div class="modal-content">
                     <form id="personalInfoForm">
                         <div class="modal-header">
@@ -274,32 +300,176 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <div class="modal-body">
+                        <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
                             <div class="form-row">
                                 <div class="form-group col-md-6 col-sm-12">
-                                    <label for="modal_father_name">Father Name</label>
+                                    <label for="modal_assessment_date"><strong>Assessment Date</strong></label>
+                                    <input type="text" name="assessment_date" id="modal_assessment_date"
+                                        class="form-control" placeholder="Assessment Date" readonly>
+                                </div>
+                                <div class="form-group col-md-6 col-sm-12">
+                                    <label for="modal_joining_date"><strong>Joining Date</strong></label>
+                                    <input type="date" name="joining_date" id="modal_joining_date"
+                                        class="form-control" placeholder="Enter Joining Date">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-6 col-sm-12">
+                                    <label for="modal_employee_name"><strong>Operator Name</strong></label>
+                                    <input type="text" name="employee_name_english" id="modal_employee_name"
+                                        class="form-control" placeholder="Enter Operator Name">
+                                </div>
+
+                                <div class="form-group col-md-3 col-sm-12">
+                                    <label for="modal_grade"><strong>Grade</strong></label>
+                                    <input type="text" name="recomanded_grade" id="modal_grade"
+                                        class="form-control" placeholder="Enter Grade" readonly>
+                                </div>
+                                <div class="form-group col-md-3 col-sm-12">
+                                    <label for="modal_salary"><strong>Salary (TK)</strong></label>
+                                    <input type="number" name="recomanded_salary" id="modal_salary"
+                                        class="form-control" placeholder="Enter Salary" step="0.01" readonly>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-6 col-sm-12">
+                                    <label for="modal_id_card_no"><strong>ID Card No</strong></label>
+                                    <input type="text" name="id_card_no" id="modal_id_card_no"
+                                        class="form-control" placeholder="Enter ID Card No">
+                                </div>
+                                <div class="form-group col-md-6 col-sm-12">
+                                    <label for="modal_nid"><strong>NID / Birth Reg No</strong></label>
+                                    <input type="text" name="nid" id="modal_nid" class="form-control"
+                                        placeholder="Enter NID" readonly>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-3 col-sm-12">
+                                    <label for="modal_floor"><strong>Floor</strong></label>
+                                    <select name="floor" id="modal_floor" class="form-control">
+                                        <option value="">Select Floor</option>
+                                        <option value="1st Floor">1st Floor</option>
+                                        <option value="2nd Floor">2nd Floor</option>
+                                        <option value="3rd Floor">3rd Floor</option>
+                                        <option value="4th Floor">4th Floor</option>
+                                        <option value="5th Floor">5th Floor</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-3 col-sm-12">
+                                    <label for="modal_line"><strong>Line</strong></label>
+                                    <input type="text" name="line" id="modal_line" class="form-control"
+                                        placeholder="Enter Line">
+                                </div>
+                                <div class="form-group col-md-3 col-sm-12">
+                                    <label for="modal_designation"><strong>Designation</strong></label>
+                                    <select name="designation_name" id="modal_designation" class="form-control">
+                                        <option value="">Select Designation</option>
+                                        <option value="Line Leader">Line Leader</option>
+                                        <option value="JSMO">JSMO</option>
+                                        <option value="OSMO">OSMO</option>
+                                        <option value="SMO">SMO</option>
+                                        <option value="SSMO">SSMO</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-3 col-sm-12">
+                                    <label for="modal_mobile"><strong>Mobile</strong></label>
+                                    <input type="text" name="mobile" id="modal_mobile" class="form-control"
+                                        placeholder="Enter Mobile">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-6 col-sm-12">
+                                    <label for="modal_father_name"><strong>Father Name</strong></label>
                                     <input type="text" name="father_name" id="modal_father_name"
                                         class="form-control" placeholder="Enter Father Name">
                                 </div>
 
                                 <div class="form-group col-md-6 col-sm-12">
-                                    <label for="modal_husband_name">Husband Name</label>
+                                    <label for="modal_husband_name"><strong>Husband / Wife Name</strong></label>
                                     <input type="text" name="husband_name" id="modal_husband_name"
-                                        class="form-control" placeholder="Enter Husband Name">
+                                        class="form-control" placeholder="Enter Husband / Wife Name">
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label for="modal_present_address">Present Address</label>
-                                <textarea name="present_address" id="modal_present_address" class="form-control" rows="3"
-                                    placeholder="Enter Present Address"></textarea>
+                                <label><strong>Present Address</strong></label>
+                                <div class="alert alert-info mb-3" id="present_address_display" style="display:none;">
+                                    <strong>Current Address:</strong><br>
+                                    <span id="present_address_display_text"></span>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-12">
+                                        <label for="present_division" class="form-label">Division:</label>
+                                        <select id="present_division" name="present_division" class="form-control" onchange="populatePresentDistricts()">
+                                            <option value="">-- Select Division --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12">
+                                        <label for="present_district" class="form-label">District:</label>
+                                        <select id="present_district" name="present_district" class="form-control" onchange="populatePresentUpazilas()" disabled>
+                                            <option value="">-- Select District --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12">
+                                        <label for="present_upazila" class="form-label">Upazila/Thana:</label>
+                                        <select id="present_upazila" name="present_upazila" class="form-control" disabled>
+                                            <option value="">-- Select Upazila/Thana --</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-6 col-sm-12">
+                                        <label for="present_address_text" class="form-label">Post Office / Village / Road:</label>
+                                        <input type="text" id="present_address_text" name="present_address_text" class="form-control" placeholder="Enter Post Office, Village, Road/Street">
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="form-group">
-                                <label for="modal_permanent_address">Permanent Address</label>
-                                <textarea name="permanent_address" id="modal_permanent_address" class="form-control" rows="3"
-                                    placeholder="Enter Permanent Address"></textarea>
+                                <label><strong>Permanent Address</strong></label>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="same_as_present_address">
+                                    <label class="form-check-label" for="same_as_present_address">
+                                        Same as Present Address
+                                    </label>
+                                </div>
+                                <div class="alert alert-info mb-3" id="permanent_address_display" style="display:none;">
+                                    <strong>Current Address:</strong><br>
+                                    <span id="permanent_address_display_text"></span>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-12">
+                                        <label for="permanent_division" class="form-label">Division:</label>
+                                        <select id="permanent_division" name="permanent_division" class="form-control" onchange="populatePermanentDistricts()">
+                                            <option value="">-- Select Division --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12">
+                                        <label for="permanent_district" class="form-label">District:</label>
+                                        <select id="permanent_district" name="permanent_district" class="form-control" onchange="populatePermanentUpazilas()" disabled>
+                                            <option value="">-- Select District --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12">
+                                        <label for="permanent_upazila" class="form-label">Upazila/Thana:</label>
+                                        <select id="permanent_upazila" name="permanent_upazila" class="form-control" disabled>
+                                            <option value="">-- Select Upazila/Thana --</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-6 col-sm-12">
+                                        <label for="permanent_address_text" class="form-label">Post Office / Village / Road:</label>
+                                        <input type="text" id="permanent_address_text" name="permanent_address_text" class="form-control" placeholder="Enter Post Office, Village, Road/Street">
+                                    </div>
+                                </div>
                             </div>
+
+
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -347,6 +517,33 @@
             font-size: 0.5rem;
         }
 
+        /* Modal form fields styling */
+        .modal-body .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .modal-body .form-control {
+            display: block;
+            width: 100%;
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #495057;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .modal-body .form-control:focus {
+            color: #495057;
+            background-color: #fff;
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
         @media print {
             .no-print {
                 display: none !important;
@@ -357,15 +554,318 @@
 </body>
 <script>
     @if (Auth::user()->role && (Auth::user()->role->name == 'HR' || Auth::user()->role->name == 'Admin'))
-        $('#personalInfoModal').on('show.bs.modal', function() {
-            $('#modal_father_name').val($('#print_father_name').text().trim());
-            $('#modal_husband_name').val($('#print_husband_name').text().trim());
-            $('#modal_present_address').val($('#print_present_address').text().trim());
-            $('#modal_permanent_address').val($('#print_permanent_address').text().trim());
+    // Bangladesh Location Data
+    const locationData = {
+        "Dhaka Division": {
+            "Narsingdi": ["Sadar Upazila", "Monohardi Upazila", "Shibpur Upazila", "Palash Upazila", "Belabo Upazila", "Raipura Upazila"],
+            "Narayanganj": ["Sadar Upazila", "Bandar Upazila", "Sonargaon Upazila", "Araihazar Upazila", "Rupganj Upazila"],
+            "Munshiganj": ["Sadar Upazila", "Tongibari Upazila", "Louhajang Upazila", "Sreenagar Upazila", "Sirajdikhan Upazila", "Gazaria Upazila"],
+            "Gazipur": ["Sadar Upazila", "Tongi Upazila", "Kaliganj Upazila", "Kaliakair Upazila", "Kapasia Upazila", "Sreepur Upazila"],
+            "Manikganj": ["Sadar Upazila", "Singair Upazila", "Daulatpur Upazila", "Harirampur Upazila", "Ghior Upazila", "Shibalaya Upazila", "Saturia Upazila"],
+            "Dhaka": ["Kotwali Thana", "Mohammadpur Thana", "Lalbagh Thana", "Sutrapur Thana", "Motijheel Thana", "Demra Thana", "Sabujbag Thana", "Mirpur Thana", "Gulshan Thana", "Uttara Thana", "Pallabi Thana", "Cantonment Thana", "Dhanmondi Thana", "Tejgaon Thana", "Ramna Thana", "Keraniganj Upazila", "Dohar Upazila", "Nawabganj Upazila", "Savar Upazila", "Dhamrai Upazila"],
+            "Faridpur": ["Sadar Upazila", "Boalmari Upazila", "Sadarpur Upazila", "Char Bhadrasan Upazila", "Bhanga Upazila", "Nagarkanda Upazila", "Madhukhali Upazila", "Alfadanga Upazila", "Saltha Upazila"],
+            "Rajbari": ["Sadar Upazila", "Pangsha Upazila", "Goalanda Upazila", "Kalukhali Upazila", "Baliakandi Upazila"],
+            "Gopalganj": ["Sadar Upazila", "Kashiani Upazila", "Tungipara Upazila", "Muksudpur Upazila", "Kotalipara Upazila"],
+            "Madaripur": ["Sadar Upazila", "Kalkini Upazila", "Rajoir Upazila", "Shibchar Upazila"],
+            "Shariatpur": ["Sadar Upazila", "Damudya Upazila", "Naria Upazila", "Zajira Upazila", "Bhedarganj Upazila", "Gosairhat Upazila"]
+        },
+        "Barisal Division": {
+            "Barguna": ["Sadar Upazila", "Amtali Upazila", "Betagi Upazila", "Taltali Upazila", "Patharghata Upazila", "Bamna Upazila"],
+            "Bhola": ["Sadar Upazila", "Daulatkhan Upazila", "Lalmohan Upazila", "Monpura Upazila", "Charfasson Upazila", "Tazumuddin Upazila", "Borhanuddin Upazila"],
+            "Jhalokati": ["Sadar Upazila", "Nalchity Upazila", "Rajapur Upazila", "Kathalia Upazila"],
+            "Barisal": ["Sadar Upazila", "Muladi Upazila", "Gournadi Upazila", "Agailjhara Upazila", "Hijla Upazila", "Uzirpur Upazila", "Mehendiganj Upazila", "Babuganj Upazila", "Bakerganj Upazila", "Banaripara Upazila"],
+            "Patuakhali": ["Sadar Upazila", "Galachipa Upazila", "Kalapara Upazila", "Dashmina Upazila", "Bauphal Upazila", "Rangabali Upazila", "Dumki Upazila", "Mirzaganj Upazila"],
+            "Pirojpur": ["Sadar Upazila", "Mathbaria Upazila", "Nazirpur Upazila", "Nesarabad Upazila", "Zianagar Upazila", "Kawkhali Upazila", "Bhandaria Upazila"]
+        },
+        "Khulna Division": {
+            "Khulna": ["Sadar Thana", "Sonadanga Thana", "Daulatpur Thana", "Phultala Upazila", "Dumuria Upazila", "Terokhada Upazila", "Dighalia Upazila", "Rupsha Upazila", "Batiaghata Upazila", "Dacope Upazila", "Koyra Upazila"],
+            "Narail": ["Sadar Upazila", "Kalia Upazila", "Lohagara Upazila"],
+            "Magura": ["Sadar Upazila", "Sreepur Upazila", "Shalikha Upazila", "Mohammadpur Upazila"],
+            "Satkhira": ["Sadar Upazila", "Shyamnagar Upazila", "Assasuni Upazila", "Tala Upazila", "Kaliganj Upazila", "Kalaroa Upazila", "Debhatta Upazila"],
+            "Bagerhat": ["Sadar Upazila", "Kachua Upazila", "Rampal Upazila", "Sarankhola Upazila", "Morelganj Upazila", "Mollahat Upazila", "Chitalmari Upazila", "Fakirhat Upazila", "Mongla Upazila"],
+            "Jhenaidah": ["Sadar Upazila", "Kaliganj Upazila", "KotChandpur Upazila", "Harinakunda Upazila", "Shailkupa Upazila", "Maheshpur Upazila"],
+            "Jashore": ["Sadar Upazila", "Keshabpur Upazila", "Jhikargachha Upazila", "Manirampur Upazila", "Bagherpara Upazila", "Chaugachha Upazila", "Sharsha Upazila", "Abhaynagar Upazila"],
+            "Meherpur": ["Sadar Upazila", "Gangni Upazila", "Mujibnagar Upazila"],
+            "Chuadanga": ["Sadar Upazila", "Jibannagar Upazila", "Damurhuda Upazila", "Alamdanga Upazila"],
+            "Kushtia": ["Sadar Upazila", "Kumarkhali Upazila", "Daulatpur Upazila", "Bheramara Upazila", "Khoksa Upazila", "Mirpur Upazila"]
+        },
+        "Sylhet Division": {
+            "Sylhet": ["Sadar Upazila", "Gopalganj Upazila", "Beanibazar Upazila", "Zakiganj Upazila", "Companiganj Upazila", "Jaintiapur Upazila", "Dakshin Surma Upazila", "Fenchuganj Upazila", "Bishwanath Upazila", "Balaganj Upazila", "Gowainghat Upazila", "Kanaighat Upazila"],
+            "Sunamganj": ["Sadar Upazila", "Jamalganj Upazila", "Jagannathpur Upazila", "Sulla Upazila", "Dharampasha Upazila", "Bishwamvarpur Upazila", "South Sunamganj Upazila", "Chatak Upazila", "Dowarabazar Upazila", "Derai Upazila", "Tahirpurr Upazila"],
+            "Moulvibazar": ["Sadar Upazila", "Rajnagar Upazila", "Kulaura Upazila", "Juri Upazila", "Barlekha Upazila", "Kamalganj Upazila", "Sreemangal Upazila"],
+            "Habiganj": ["Sadar Upazila", "Bahubal Upazila", "Lakhai Upazila", "Nabiganj Upazila", "Chunarughat Upazila", "Madhabpur Upazila", "Baniachong Upazila", "Ajmiriganj Upazila"]
+        },
+        "Mymensingh Division": {
+            "Tangail": ["Sadar Upazila", "Delduar Upazila", "Mirzapur Upazila", "Bhuapur Upazila", "Ghatail Upazila", "Basail Upazila", "Nagarpur Upazila", "Kalihati Upazila", "Sakhipur Upazila", "Gopalpur Upazila", "Dhanbari Upazila", "Madhupur Upazila"],
+            "Kishoreganj": ["Sadar Upazila", "Hossainpur Upazila", "Karimganj Upazila", "Pakundia Upazila", "Nikli Upazila", "Bajitpur Upazila", "Kuliarchar Upazila", "Bhairab Upazila", "Mithamain Upazila", "Itna Upazila", "Katiadi Upazila", "Austagram Upazila", "Tarail Upazila"],
+            "Netrokona": ["Sadar Upazila", "Atpara Upazila", "Barhatta Upazila", "Mohanganj Upazila", "Kalmakanda Upazila", "Durgapur Upazila", "Madan Upazila", "Kendua Upazila", "Purbadhala Upazila", "Khaliajuri Upazila"],
+            "Jamalpur": ["Sadar Upazila", "Islampur Upazila", "Dewanganj Upazila", "Sarishabari Upazila", "Madarganj Upazila", "Bokshiganj Upazila", "Melandaha Upazila"],
+            "Sherpur": ["Sadar Upazila", "Nakla Upazila", "Nalitabari Upazila", "Jhenaigati Upazila", "Sreebardi Upazila"],
+            "Mymensingh": ["Sadar Upazila", "Muktagachha Upazila", "Phulbaria Upazila", "Bhaluka Upazila", "Trishal Upazila", "Gaffargaon Upazila", "Nandail Upazila", "Ishwarganj Upazila", "Dhobaura Upazila", "Gauripur Upazila", "Phulpur Upazila", "Haluaghat Upazila", "Tarakanda Upazila"]
+        },
+        "Chattogram Division": {
+            "Noakhali": ["Sadar Upazila", "Begumganj Upazila", "Companiganj Upazila", "Subarnachar Upazila", "Sonaimuri Upazila", "Chatkhil Upazila", "Senbagh Upazila", "Kabirhat Upazila", "Hatiya Upazila"],
+            "Feni": ["Sadar Upazila", "Daganbhuiyan Upazila", "Fulgazi Upazila", "Parshuram Upazila", "Chhagalnaiya Upazila", "Sonagazi Upazila"],
+            "Lakshmipur": ["Sadar Upazila", "Raipur Upazila", "Ramgati Upazila", "Ramganj Upazila", "Kamalnagar Upazila"],
+            "Chandpur": ["Sadar Upazila", "Matlab South Upazila", "Faridganj Upazila", "Hajiganj Upazila", "Haimchar Upazila", "Matlab North Upazila", "Kachua Upazila", "Shahrasti Upazila"],
+            "Brahmanbaria": ["Sadar Upazila", "Sarail Upazila", "Kasba Upazila", "Bancharampur Upazila", "Nabinagar Upazila", "Bijoynagar Upazila", "Ashuganj Upazila", "Akhaura Upazila", "Nasirnagar Upazila"],
+            "Cumilla": ["Sadar Adarsha Upazila", "Sadar South Upazila", "Brahmanpara Upazila", "Daudkandi Upazila", "Burichang Upazila", "Chauddagram Upazila", "Laksam Upazila", "Monoharganj Upazila", "Meghna Upazila", "Homna Upazila", "Titas Upazila", "Nangalkot Upazila", "Muradnagar Upazila", "Barura Upazila", "Chandina Upazila", "Debidwar Upazila"],
+            "Chattogram": ["Kotwali Thana", "Panchlaish Thana", "Chandgaon Thana", "Bandar Thana", "Pahartali Thana", "Double Mooring Thana", "Anwara Upazila", "Patiya Upazila", "Boalkhali Upazila", "Satkania Upazila", "Chandanaish Upazila", "Banshkhali Upazila", "Lohagara Upazila", "Sandwip Upazila", "Hathazari Upazila", "Mirsharai Upazila", "Fatikchhari Upazila", "Rangunia Upazila", "Sitakunda Upazila", "Raozan Upazila"],
+            "Cox's Bazar": ["Sadar Upazila", "Maheshkhali Upazila", "Kutubdia Upazila", "Teknaf Upazila", "Ramu Upazila", "Ukhiya Upazila", "Chakaria Upazila", "Pekua Upazila"],
+            "Khagrachhari": ["Sadar Upazila", "Panchhari Upazila", "Mahalchhari Upazila", "Dighinala Upazila", "Matiranga Upazila", "Lakshmichhari Upazila", "Manikchhari Upazila", "Ramgarh Upazila"],
+            "Bandarban": ["Sadar Upazila", "Thanchi Upazila", "Ruma Upazila", "Rowangchhari Upazila", "Alikadam Upazila", "Lama Upazila", "Naikhongchhari Upazila"],
+            "Rangamati": ["Sadar Upazila", "Barkal Upazila", "Langadu Upazila", "Baghaichhari Upazila", "Naniarchar Upazila", "Kawkhali Upazila", "Rajastali Upazila", "Belaichhari Upazila", "Juraichhari Upazila", "Kaptai Upazila"]
+        },
+        "Rajshahi Division": {
+            "Bogura": ["Sadar Upazila", "Shajahanpur Upazila", "Sariakandi Upazila", "Shibganj Upazila", "Gabtali Upazila", "Dhunat Upazila", "Sonatala Upazila", "Dupchanchia Upazila", "Adamdighi Upazila", "Nandigram Upazila", "Sherpur Upazila", "Kahaloo Upazila"],
+            "Pabna": ["Sadar Upazila", "Atgharia Upazila", "Ishwardi Upazila", "Bera Upazila", "Santhia Upazila", "Sujanagar Upazila", "Chatmohar Upazila", "Bhangura Upazila", "Faridpur Upazila"],
+            "Rajshahi": ["Paba Upazila", "Puthia Upazila", "Charghat Upazila", "Tanore Upazila", "Baghmara Upazila", "Bagha Upazila", "Mohanpur Upazila", "Godagari Upazila", "Durgapur Upazila", "Boalia Thana", "Rajpara Thana"],
+            "Natore": ["Sadar Upazila", "Singra Upazila", "Bagatipara Upazila", "Baraigram Upazila", "Gurudaspur Upazila", "Lalpur Upazila", "Naldanga Upazila"],
+            "Chapainawabganj": ["Sadar Upazila", "Shibganj Upazila", "Gomastapur Upazila", "Nachole Upazila", "Bholahat Upazila"],
+            "Naogaon": ["Sadar Upazila", "Raninagar Upazila", "Atrai Upazila", "Niamatpur Upazila", "Porsha Upazila", "Sapahar Upazila", "Manda Upazila", "Dhamoirhat Upazila", "Badalgachhi Upazila", "Patnitala Upazila", "Mohadevpur Upazila"],
+            "Joypurhat": ["Sadar Upazila", "Akkelpur Upazila", "Kalai Upazila", "Panchbibi Upazila", "Khetlal Upazila"],
+            "Sirajganj": ["Sadar Upazila", "Kamarkhanda Upazila", "Belkuchi Upazila", "Kazipur Upazila", "Chauhali Upazila", "Shahjadpur Upazila", "Tarash Upazila", "Ullahpara Upazila", "Raiganj Upazila"]
+        },
+        "Rangpur Division": {
+            "Nilphamari": ["Sadar Upazila", "Dimla Upazila", "Jaldhaka Upazila", "Domar Upazila", "Kishoreganj Upazila", "Saidpur Upazila"],
+            "Thakurgaon": ["Sadar Upazila", "Baliadangi Upazila", "Pirganj Upazila", "Haripur Upazila", "Ranisankail Upazila"],
+            "Gaibandha": ["Sadar Upazila", "Gobindaganj Upazila", "Phulchhari Upazila", "Saghata Upazila", "Sundarganj Upazila", "Palashbari Upazila", "Sadullapur Upazila"],
+            "Lalmonirhat": ["Sadar Upazila", "Aditmari Upazila", "Hatibandha Upazila", "Kaliganj Upazila", "Patgram Upazila"],
+            "Kurigram": ["Sadar Upazila", "Rowmari Upazila", "Rajibpur Upazila", "Chilmari Upazila", "Ulipur Upazila", "Rajarhat Upazila", "Phulbari Upazila", "Nageswari Upazila", "Bhurungamari Upazila"],
+            "Dinajpur": ["Sadar Upazila", "Parbatipur Upazila", "Phulbari Upazila", "Birampur Upazila", "Hakimpur Upazila", "Nawabganj Upazila", "Ghoraghat Upazila", "Bochaganj Upazila", "Biral Upazila", "Kaharole Upazila", "Birganj Upazila", "Khansama Upazila", "Chirirbandar Upazila"],
+            "Rangpur": ["Sadar Upazila", "Gangachara Upazila", "Badarganj Upazila", "Taraganj Upazila", "Kaunia Upazila", "Pirgachha Upazila", "Mithapukur Upazila", "Pirganj Upazila"],
+            "Panchagarh": ["Sadar Upazila", "Atwari Upazila", "Boda Upazila", "Debiganj Upazila", "Tetulia Upazila"]
+        }
+    };
+
+    // Initialize divisions for both present and permanent address
+    function initializeDivisions() {
+        const presentDiv = document.getElementById('present_division');
+        const permanentDiv = document.getElementById('permanent_division');
+        
+        for (let div in locationData) {
+            const option1 = document.createElement('option');
+            option1.value = div;
+            option1.textContent = div;
+            presentDiv.appendChild(option1);
+
+            const option2 = document.createElement('option');
+            option2.value = div;
+            option2.textContent = div;
+            permanentDiv.appendChild(option2);
+        }
+    }
+
+    // Present Address Functions
+    function populatePresentDistricts() {
+        const districtSelect = document.getElementById('present_district');
+        const upazilaSelect = document.getElementById('present_upazila');
+        districtSelect.innerHTML = '<option value="">-- Select District --</option>';
+        upazilaSelect.innerHTML = '<option value="">-- Select Upazila/Thana --</option>';
+        districtSelect.disabled = true;
+        upazilaSelect.disabled = true;
+
+        const selectedDiv = document.getElementById('present_division').value;
+        if (selectedDiv) {
+            districtSelect.disabled = false;
+            for (let dist in locationData[selectedDiv]) {
+                const option = document.createElement('option');
+                option.value = dist;
+                option.textContent = dist;
+                districtSelect.appendChild(option);
+            }
+        }
+    }
+
+    function populatePresentUpazilas() {
+        const upazilaSelect = document.getElementById('present_upazila');
+        upazilaSelect.innerHTML = '<option value="">-- Select Upazila/Thana --</option>';
+        upazilaSelect.disabled = true;
+
+        const selectedDiv = document.getElementById('present_division').value;
+        const selectedDist = document.getElementById('present_district').value;
+        if (selectedDist) {
+            upazilaSelect.disabled = false;
+            locationData[selectedDiv][selectedDist].forEach(upazila => {
+                const option = document.createElement('option');
+                option.value = upazila;
+                option.textContent = upazila;
+                upazilaSelect.appendChild(option);
+            });
+        }
+    }
+
+    // Permanent Address Functions
+    function populatePermanentDistricts() {
+        const districtSelect = document.getElementById('permanent_district');
+        const upazilaSelect = document.getElementById('permanent_upazila');
+        districtSelect.innerHTML = '<option value="">-- Select District --</option>';
+        upazilaSelect.innerHTML = '<option value="">-- Select Upazila/Thana --</option>';
+        districtSelect.disabled = true;
+        upazilaSelect.disabled = true;
+
+        const selectedDiv = document.getElementById('permanent_division').value;
+        if (selectedDiv) {
+            districtSelect.disabled = false;
+            for (let dist in locationData[selectedDiv]) {
+                const option = document.createElement('option');
+                option.value = dist;
+                option.textContent = dist;
+                districtSelect.appendChild(option);
+            }
+        }
+    }
+
+    function populatePermanentUpazilas() {
+        const upazilaSelect = document.getElementById('permanent_upazila');
+        upazilaSelect.innerHTML = '<option value="">-- Select Upazila/Thana --</option>';
+        upazilaSelect.disabled = true;
+
+        const selectedDiv = document.getElementById('permanent_division').value;
+        const selectedDist = document.getElementById('permanent_district').value;
+        if (selectedDist) {
+            upazilaSelect.disabled = false;
+            locationData[selectedDiv][selectedDist].forEach(upazila => {
+                const option = document.createElement('option');
+                option.value = upazila;
+                option.textContent = upazila;
+                upazilaSelect.appendChild(option);
+            });
+        }
+    }
+
+    function copyPresentToPermanent() {
+        $('#permanent_division').val($('#present_division').val());
+        populatePermanentDistricts();
+        $('#permanent_district').val($('#present_district').val());
+        populatePermanentUpazilas();
+        $('#permanent_upazila').val($('#present_upazila').val());
+        $('#permanent_address_text').val($('#present_address_text').val());
+    }
+
+    // Initialize divisions when the modal is shown
+    $('#personalInfoModal').on('show.bs.modal', function() {
+        initializeDivisions();
+
+            // Populate all fields with current data
+            $('#modal_assessment_date').val(
+                "{{ \Carbon\Carbon::parse($workerEntry->examination_date)->format('d-M-Y') ?? ' ' }}");
+            $('#modal_employee_name').val("{{ $workerEntry->employee_name_english ?? '' }}");
+            $('#modal_id_card_no').val("{{ $workerEntry->id_card_no ?? '' }}");
+            $('#modal_nid').val("{{ $workerEntry->nid ?? '' }}");
+            $('#modal_floor').val("{{ $workerEntry->floor ?? '' }}");
+            $('#modal_line').val("{{ $workerEntry->line ?? '' }}");
+            $('#modal_designation').val("{{ $workerEntry->designation_name ?? '' }}");
+            $('#modal_mobile').val("{{ $workerEntry->mobile ?? '' }}");
+            $('#modal_father_name').val("{{ $workerEntry->father_name ?? '' }}");
+            $('#modal_husband_name').val("{{ $workerEntry->husband_name ?? '' }}");
+            $('#modal_grade').val("{{ $workerEntry->recomanded_grade ?? '' }}");
+            $('#modal_salary').val("{{ $workerEntry->recomanded_salary ?? '' }}");
+            $('#modal_joining_date').val("{{ $workerEntry->joining_date ?? '' }}");
+            
+            // Parse and populate address fields (JSON format)
+            function parseAddressJson(raw) {
+                if (!raw) {
+                    return { division: '', district: '', upazila: '', address: '' };
+                }
+                if (typeof raw === 'object') {
+                    return {
+                        division: raw.division || '',
+                        district: raw.district || '',
+                        upazila: raw.upazila || raw.thana || '',
+                        address: raw.address || raw.post_office || ''
+                    };
+                }
+                try {
+                    var parsed = JSON.parse(raw);
+                    return {
+                        division: parsed.division || '',
+                        district: parsed.district || '',
+                        upazila: parsed.upazila || parsed.thana || '',
+                        address: parsed.address || parsed.post_office || ''
+                    };
+                } catch (e) {
+                    return { division: '', district: '', upazila: '', address: '' };
+                }
+            }
+
+            var presentAddressRaw = @json($workerEntry->present_address ?? '');
+            var permanentAddressRaw = @json($workerEntry->permanent_address ?? '');
+            var presentAddressData = parseAddressJson(presentAddressRaw);
+            var permanentAddressData = parseAddressJson(permanentAddressRaw);
+
+            // Display current present address
+            if (presentAddressData.division || presentAddressData.district || presentAddressData.upazila || presentAddressData.address) {
+                var presentAddressDisplay =
+                    'Division: ' + (presentAddressData.division || '') + ', ' +
+                    'District: ' + (presentAddressData.district || '') + ', ' +
+                    'Upazila/Thana: ' + (presentAddressData.upazila || '') + ', ' +
+                    'Post Office / Village / Road: ' + (presentAddressData.address || '');
+                $('#present_address_display_text').text(presentAddressDisplay);
+                $('#present_address_display').show();
+            } else {
+                $('#present_address_display').hide();
+            }
+
+            // Display current permanent address
+            if (permanentAddressData.division || permanentAddressData.district || permanentAddressData.upazila || permanentAddressData.address) {
+                var permanentAddressDisplay =
+                    'Division: ' + (permanentAddressData.division || '') + ', ' +
+                    'District: ' + (permanentAddressData.district || '') + ', ' +
+                    'Upazila/Thana: ' + (permanentAddressData.upazila || '') + ', ' +
+                    'Post Office / Village / Road: ' + (permanentAddressData.address || '');
+                $('#permanent_address_display_text').text(permanentAddressDisplay);
+                $('#permanent_address_display').show();
+            } else {
+                $('#permanent_address_display').hide();
+            }
+
+            $('#present_division').val(presentAddressData.division);
+            populatePresentDistricts();
+            $('#present_district').val(presentAddressData.district);
+            populatePresentUpazilas();
+            $('#present_upazila').val(presentAddressData.upazila);
+            $('#present_address_text').val(presentAddressData.address);
+
+            $('#permanent_division').val(permanentAddressData.division);
+            populatePermanentDistricts();
+            $('#permanent_district').val(permanentAddressData.district);
+            populatePermanentUpazilas();
+            $('#permanent_upazila').val(permanentAddressData.upazila);
+            $('#permanent_address_text').val(permanentAddressData.address);
+
+            $('#same_as_present_address').prop('checked', false);
+        });
+
+        $('#same_as_present_address').on('change', function() {
+            if (this.checked) {
+                copyPresentToPermanent();
+            }
+        });
+
+        $('#present_division, #present_district, #present_upazila, #present_address_text').on('change keyup', function() {
+            if ($('#same_as_present_address').is(':checked')) {
+                copyPresentToPermanent();
+            }
         });
 
         $('#personalInfoForm').on('submit', function(e) {
             e.preventDefault();
+
+            // Build JSON address fields
+            var presentAddress = JSON.stringify({
+                division: $('#present_division').val(),
+                district: $('#present_district').val(),
+                upazila: $('#present_upazila').val(),
+                address: $('#present_address_text').val()
+            });
+
+            var permanentAddress = JSON.stringify({
+                division: $('#permanent_division').val(),
+                district: $('#permanent_district').val(),
+                upazila: $('#permanent_upazila').val(),
+                address: $('#permanent_address_text').val()
+            });
 
             $.ajax({
                 url: "{{ route('workerEntries.update', ['workerEntry' => $workerEntry->id]) }}",
@@ -373,17 +873,25 @@
                 data: {
                     _token: "{{ csrf_token() }}",
                     _method: 'PUT',
+                    employee_name_english: $('#modal_employee_name').val(),
+                    id_card_no: $('#modal_id_card_no').val(),
+                    nid: $('#modal_nid').val(),
+                    floor: $('#modal_floor').val(),
+                    line: $('#modal_line').val(),
+                    designation_name: $('#modal_designation').val(),
+                    mobile: $('#modal_mobile').val(),
                     father_name: $('#modal_father_name').val(),
                     husband_name: $('#modal_husband_name').val(),
-                    present_address: $('#modal_present_address').val(),
-                    permanent_address: $('#modal_permanent_address').val()
+                    present_address: presentAddress,
+                    permanent_address: permanentAddress,
+                    recomanded_grade: $('#modal_grade').val(),
+                    recomanded_salary: $('#modal_salary').val(),
+                    joining_date: $('#modal_joining_date').val()
                 },
                 success: function(response) {
                     if (response && response.data) {
-                        $('#print_father_name').text(response.data.father_name || ' ');
-                        $('#print_husband_name').text(response.data.husband_name || ' ');
-                        $('#print_present_address').text(response.data.present_address || ' ');
-                        $('#print_permanent_address').text(response.data.permanent_address || ' ');
+                        // Update all displayed fields with the response data
+                        location.reload();
                     }
                     $('#personalInfoModal').modal('hide');
                     if (window.Swal) {
